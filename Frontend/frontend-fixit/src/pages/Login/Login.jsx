@@ -72,9 +72,8 @@ const Login = () => {
         <aside className="login-branding login-reveal login-reveal-hero" aria-label="Fixit portal branding">
           <div className="brand-row">
             <div className="brand-badge" aria-label="Fixit logo">
-              <MapPin size={18} strokeWidth={2.1} />
+              <img src={logo} alt="Fixit" className="brand-logo" />
             </div>
-            <span className="brand-label">Fixit</span>
           </div>
 
           <div className="login-copy-block">

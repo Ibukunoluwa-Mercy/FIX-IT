@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Mail, MapPin, ShieldCheck } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, Mail, ShieldCheck } from 'lucide-react';
 import neighborhoodIllustration from '../../assets/neighborhood_illustration.png';
 import logo from '../../assets/fixit-logo-black.png';
 import './ForgotPassword.css';
 
 const ForgotPassword = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('name@community.org');
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (event) => {
@@ -19,12 +19,12 @@ const ForgotPassword = () => {
       return;
     }
 
-    setLoading(true);
     setError('');
+    setLoading(true);
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 700));
-      setSubmitted(true);
+      navigate('/reset-password');
     } finally {
       setLoading(false);
     }
@@ -80,72 +80,55 @@ const ForgotPassword = () => {
 
         <section className="forgot-card-wrap">
           <div className="forgot-card">
-            <div className="card-lock-badge">
-              <MapPin size={26} />
+            <div className="card-lock-badge" aria-hidden="true">
+              <Mail size={26} />
             </div>
 
             <div className="forgot-card-header">
               <h2>Forgot Password?</h2>
-              <p>
-                No problem! Enter your email address and we&apos;ll send you a link to reset your password.
-              </p>
+              <p>No problem! Enter your email address and we&apos;ll send you a link to reset your password.</p>
             </div>
 
-            {!submitted ? (
-              <form onSubmit={handleSubmit} className="forgot-form" noValidate>
-                <div className="field-group">
-                  <label htmlFor="email">Email Address</label>
-                  <div className="input-shell">
-                    <Mail size={16} className="field-icon" />
-                    <input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(event) => {
-                        setEmail(event.target.value);
-                        setError('');
-                      }}
-                      placeholder="name@community.org"
-                      autoComplete="email"
-                    />
-                  </div>
+            <form onSubmit={handleSubmit} className="forgot-form" noValidate>
+              <div className="field-group">
+                <label htmlFor="email">Email Address</label>
+                <div className={`input-shell ${error ? 'has-error' : ''}`}>
+                  <Mail size={16} className="field-icon" />
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(event) => {
+                      setEmail(event.target.value);
+                      setError('');
+                    }}
+                    placeholder="name@community.org"
+                    autoComplete="email"
+                  />
                 </div>
-
-                {error && <div className="field-error">{error}</div>}
-
-                <button type="submit" className="reset-button" disabled={loading}>
-                  {loading ? 'Sending...' : 'Send Reset Link'}
-                  <ArrowRight size={18} />
-                </button>
-
-                <div className="divider-row">
-                  <span className="divider-line" />
-                  <span className="divider-text">OR</span>
-                  <span className="divider-line" />
-                </div>
-
-                <Link to="/login" className="back-login-button">
-                  <ArrowLeft size={16} />
-                  Back to Login
-                </Link>
-              </form>
-            ) : (
-              <div className="success-state">
-                <div className="success-icon-wrap">
-                  <Mail size={30} />
-                </div>
-                <h3>Check your inbox</h3>
-                <p>
-                  We&apos;ve sent a password reset link to <strong>{email}</strong>.
-                </p>
-                <button type="button" className="resend-button" onClick={() => setSubmitted(false)}>
-                  Resend link
-                </button>
               </div>
-            )}
+
+              {error && <div className="field-error">{error}</div>}
+
+              <button type="submit" className="reset-button" disabled={loading}>
+                {loading ? 'Sending...' : 'Send Reset Link'}
+                <ArrowRight size={18} />
+              </button>
+
+              <div className="divider-row">
+                <span className="divider-line" />
+                <span className="divider-text">OR</span>
+                <span className="divider-line" />
+              </div>
+
+              <Link to="/login" className="back-login-button">
+                <ArrowLeft size={16} />
+                Back to Login
+              </Link>
+            </form>
 
             <div className="support-footer">
-              Still having trouble? <Link to="/support">Contact Support</Link>
+              Still having trouble? <a href="mailto:support@fixit.org">Contact Support</a>
             </div>
           </div>
         </section>
