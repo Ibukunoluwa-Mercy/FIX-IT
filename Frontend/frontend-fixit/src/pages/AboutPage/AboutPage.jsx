@@ -15,7 +15,7 @@ const AboutPage = () => {
       {/* 1. Hero Section */}
       <section className="about-hero-section">
         <Container>
-          <Row className="align-items-center gy-5">
+          <Row className="align-items-center gy-5 animate-slide-in">
             <Col lg={7}>
               <div className="about-hero-badge mb-2">ABOUT FIXIT</div>
               <h1 className="about-hero-title mb-3">
@@ -73,7 +73,7 @@ const AboutPage = () => {
 
       {/* 2. The Problem Section */}
       <section className="about-section">
-        <Container>
+        <Container className="animate-slide-in delay-100">
           <div className="about-section-header">
             <div className="section-num-badge badge-red">!</div>
             <h2 className="section-heading-title">1. The Problem</h2>

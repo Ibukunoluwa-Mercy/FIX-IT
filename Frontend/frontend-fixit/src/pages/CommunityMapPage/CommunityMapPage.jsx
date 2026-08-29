@@ -53,7 +53,7 @@ const CommunityMapPage = () => {
     <div className="community-map-page bg-light-gray">
       <Container className="py-5">
         {/* Header */}
-        <div className="map-header mb-4">
+        <div className="map-header mb-4 animate-slide-in">
           <h1 className="page-title">Community Map</h1>
           <p className="page-subtitle">
             Explore reported issues across the community. Click on a marker to view details and track progress.

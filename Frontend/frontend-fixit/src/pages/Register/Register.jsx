@@ -65,7 +65,7 @@ const Register = () => {
 
       <div className="register-split">
         {/* ─── LEFT HERO ─── */}
-        <div className="register-hero">
+        <div className="register-hero animate-slide-in">
           <div className="register-hero-content">
             <h1 className="register-hero-headline">
               Your community,{' '}
@@ -114,7 +114,7 @@ const Register = () => {
         </div>
 
         {/* ─── RIGHT FORM ─── */}
-        <div className="register-form-side">
+        <div className="register-form-side animate-slide-in delay-100">
           <div className="register-card">
             {/* Progress Indicator */}
             <div className="register-progress-bar">

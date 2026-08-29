@@ -1,0 +1,150 @@
+const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const User = require('../models/User');
+const ResidentProfile = require('../models/ResidentProfile');
+const OfficialProfile = require('../models/OfficialProfile');
+const AdminProfile = require('../models/AdminProfile');
+const { sendVerificationEmail } = require('../services/emailService');
+
+const ROLE_MAP = {
+	resident: 'Community Member',
+	official: 'Issue Resolver',
+};
+
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const normalizeText = (value) => (typeof value === 'string' ? value.trim() : '');
+
+const createToken = (user) => jwt.sign(
+	{ id: user._id.toString(), role: user.role },
+	process.env.JWT_SECRET || 'fixit-development-secret',
+	{ expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+);
+
+const createVerificationToken = () => {
+	const rawToken = crypto.randomBytes(32).toString('hex');
+	return {
+		rawToken,
+		hash: crypto.createHash('sha256').update(rawToken).digest('hex'),
+		expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+	};
+};
+
+const register = async (req, res) => {
+	const fullName = normalizeText(req.body.fullName);
+	const email = normalizeText(req.body.email).toLowerCase();
+	const location = normalizeText(req.body.location);
+	const password = typeof req.body.password === 'string' ? req.body.password : '';
+	const roleKey = normalizeText(req.body.role).toLowerCase();
+	const agreeToTerms = req.body.agreeToTerms === true;
+
+	if (!fullName || !email || !location || !password || !roleKey) {
+		return res.status(400).json({ message: 'Full name, email, location, password, and role are required' });
+	}
+	if (!agreeToTerms) return res.status(400).json({ message: 'You must agree to the Terms of Service and Privacy Policy' });
+	if (!ROLE_MAP[roleKey]) return res.status(400).json({ message: 'Invalid role. Public registration is for residents or officials only' });
+	if (!emailPattern.test(email)) return res.status(400).json({ message: 'Please provide a valid email address' });
+	if (password.length < 8 || password.length > 128) return res.status(400).json({ message: 'Password must be between 8 and 128 characters' });
+
+	try {
+		const existingUser = await User.findOne({ email }).select('_id').lean();
+		if (existingUser) return res.status(409).json({ message: 'An account with this email already exists' });
+
+		const verification = createVerificationToken();
+		const user = await User.create({
+			name: fullName,
+			email,
+			location,
+			password,
+			role: ROLE_MAP[roleKey],
+			emailVerificationTokenHash: verification.hash,
+			emailVerificationExpires: verification.expires,
+		});
+
+		try {
+			if (roleKey === 'resident') await ResidentProfile.create({ user: user._id, neighborhood: location });
+			if (roleKey === 'official') await OfficialProfile.create({ user: user._id, jurisdiction: location });
+		} catch (profileError) {
+			await User.deleteOne({ _id: user._id });
+			throw profileError;
+		}
+
+		const verificationBaseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+		let emailStatus = { sent: false, skipped: true };
+		try {
+			emailStatus = await sendVerificationEmail({
+				email,
+				fullName,
+				verificationUrl: `${verificationBaseUrl}/verify-email?token=${verification.rawToken}`,
+			});
+		} catch (emailError) {
+			console.error('Verification email failed:', emailError.message);
+			emailStatus = { sent: false, skipped: false };
+		}
+
+		return res.status(201).json({
+			message: 'Account created successfully',
+			token: createToken(user),
+			user: user.toSafeProfile(),
+			emailVerification: emailStatus,
+		});
+	} catch (error) {
+		if (error.code === 11000) return res.status(409).json({ message: 'An account with this email already exists' });
+		console.error('Registration failed:', error.message);
+		return res.status(500).json({ message: 'Unable to create account' });
+	}
+};
+
+const verifyEmail = async (req, res) => {
+	const rawToken = normalizeText(req.query.token);
+	if (!rawToken) return res.status(400).json({ message: 'Verification token is required' });
+	const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+
+	try {
+		const user = await User.findOne({
+			emailVerificationTokenHash: tokenHash,
+			emailVerificationExpires: { $gt: new Date() },
+	}).select('+emailVerificationTokenHash +emailVerificationExpires');
+		if (!user) return res.status(400).json({ message: 'Verification token is invalid or expired' });
+		user.emailVerified = true;
+		user.emailVerificationTokenHash = undefined;
+		user.emailVerificationExpires = undefined;
+		await user.save();
+		return res.json({ message: 'Email verified successfully' });
+	} catch (error) {
+		return res.status(500).json({ message: 'Unable to verify email' });
+	}
+};
+
+const createAdmin = async (req, res) => {
+	const fullName = normalizeText(req.body.fullName);
+	const email = normalizeText(req.body.email).toLowerCase();
+	const password = typeof req.body.password === 'string' ? req.body.password : '';
+	if (!fullName || !email || !password || !emailPattern.test(email) || password.length < 8) return res.status(400).json({ message: 'Valid full name, email, and password are required' });
+
+	try {
+		const user = await User.create({ name: fullName, email, password, role: 'Administrator', emailVerified: true });
+		await AdminProfile.create({ user: user._id });
+		return res.status(201).json({ message: 'Administrator created', user: user.toSafeProfile() });
+	} catch (error) {
+		if (error.code === 11000) return res.status(409).json({ message: 'An account with this email already exists' });
+		return res.status(500).json({ message: 'Unable to create administrator' });
+	}
+};
+
+const login = async (req, res) => {
+	const email = normalizeText(req.body.email).toLowerCase();
+	const password = typeof req.body.password === 'string' ? req.body.password : '';
+	if (!email || !password) return res.status(400).json({ message: 'Email and password are required' });
+	try {
+		const user = await User.findOne({ email }).select('+password');
+		if (!user || !(await bcrypt.compare(password, user.password))) return res.status(401).json({ message: 'Invalid email or password' });
+		if (!user.isActive) return res.status(403).json({ message: 'This account is inactive' });
+		return res.json({ token: createToken(user), user: user.toSafeProfile() });
+	} catch (error) {
+		return res.status(500).json({ message: 'Unable to sign in' });
+	}
+};
+
+module.exports = { register, verifyEmail, createAdmin, login };

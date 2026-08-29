@@ -267,7 +267,7 @@ const ExploreIssuesPage = () => {
 
   return (
     <div className="explore-page-wrapper py-4">
-      <Container>
+      <Container className="animate-slide-in">
         {/* 1. Header & Navigation Controls */}
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
           <div>
@@ -287,7 +287,7 @@ const ExploreIssuesPage = () => {
         </div>
 
         {/* Search Bar & Sort */}
-        <Card className="border-0 shadow-sm rounded-4 mb-3">
+        <Card className="border-0 shadow-sm rounded-4 mb-3 animate-slide-in delay-100">
           <Card.Body className="p-3">
             <Row className="g-2 align-items-center">
               <Col md={8} lg={9}>
