@@ -4,6 +4,7 @@ import {
   User, Mail, MapPin, Lock, Eye, EyeOff,
   ShieldCheck, Users, Building2, ArrowRight, Loader2
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 import logo from '../../assets/fixit-logo-black.png';
 import neighborhoodIllustration from '../../assets/neighborhood_illustration.png';
 import './Register.css';
@@ -47,11 +48,28 @@ const Register = () => {
       return;
     }
     setLoading(true);
-    // Simulate API call
+
+    // Simulate API registration call
     setTimeout(() => {
       setLoading(false);
+
+      const firstName = form.fullName.trim().split(' ')[0] || 'Neighbor';
+
+      toast.success(
+        <div className="custom-toast-content">
+          <div className="toast-title">🎉 Welcome onboard, {firstName}!</div>
+          <div className="toast-subtitle">
+            Your {role === 'official' ? 'Local Official' : 'Resident'} account has been created successfully. Let's make our community better together!
+          </div>
+        </div>,
+        {
+          className: 'fixit-custom-toast',
+          icon: false,
+        }
+      );
+
       navigate('/');
-    }, 2000);
+    }, 1500);
   };
 
   return (
@@ -75,7 +93,7 @@ const Register = () => {
               Connect with neighbors, report local issues, and collaborate with
               officials to create a safer, cleaner environment for everyone.
             </p>
-
+           
             {/* Feature Badges */}
             <div className="register-badges">
               <div className="register-badge">
@@ -111,19 +129,11 @@ const Register = () => {
               className="register-illustration"
             />
           </div>
-        </div>
+        </div>  
 
         {/* ─── RIGHT FORM ─── */}
         <div className="register-form-side animate-slide-in delay-100">
           <div className="register-card">
-            {/* Progress Indicator */}
-            <div className="register-progress-bar">
-              <div className="progress-track">
-                <div className="progress-filled" />
-                <div className="progress-empty" />
-              </div>
-            </div>
-
             <h2 className="register-card-title">Create your account</h2>
             <p className="register-card-sub">I am joining as a:</p>
 
@@ -157,7 +167,6 @@ const Register = () => {
               </div>
               <ShieldCheck size={26} className="admin-banner-icon" />
             </div>
-
             {/* Form */}
             <form onSubmit={handleSubmit} noValidate className="register-form">
               {/* Full Name */}
@@ -196,8 +205,7 @@ const Register = () => {
                   />
                 </div>
                 {errors.email && <span className="reg-error">{errors.email}</span>}
-              </div>
-
+              </div> 
               {/* Neighborhood / Zip */}
               <div className="reg-field">
                 <label className="reg-label" htmlFor="neighborhood">
@@ -233,7 +241,7 @@ const Register = () => {
                     onChange={handleChange}
                     autoComplete="new-password"
                   />
-                  <button
+    <button
                     type="button"
                     className="reg-eye-btn"
                     onClick={() => setShowPassword((v) => !v)}

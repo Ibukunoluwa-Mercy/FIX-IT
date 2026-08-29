@@ -22,7 +22,7 @@
 }
 
 .about-hero-badge {
-  color: #e63946;
+  color: #f59e0b;
   font-size: 0.85rem;
   font-weight: 800;
   letter-spacing: 1.5px;
@@ -44,7 +44,7 @@
 }
 
 .btn-crimson {
-  background-color: #e63946;
+  background-color: #d97706;
   color: #ffffff;
   font-weight: 600;
   border: none;
@@ -57,7 +57,7 @@
   text-decoration: none;
 }
 .btn-crimson:hover {
-  background-color: #d62839;
+  background-color: #ea580c;
   color: #ffffff;
   transform: translateY(-2px);
 }

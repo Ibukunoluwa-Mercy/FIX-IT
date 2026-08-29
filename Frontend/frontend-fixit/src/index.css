@@ -98,3 +98,53 @@ body {
 .leaflet-default-icon-path {
   background-image: url("https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png");
 }
+
+/* ===================================================
+   CUSTOM TOASTIFY STYLING
+=================================================== */
+.Toastify__toast-container {
+  z-index: 999999 !important;
+}
+
+.Toastify__toast.fixit-custom-toast {
+  background: #ffffff !important;
+  color: #0d1b2a !important;
+  border-radius: 16px !important;
+  box-shadow: 0 16px 36px rgba(13, 27, 42, 0.14), 0 4px 12px rgba(234, 88, 12, 0.08) !important;
+  border: 1px solid #fee4d7 !important;
+  padding: 16px 18px !important;
+  font-family: 'Google Sans', sans-serif !important;
+}
+
+.Toastify__toast.fixit-custom-toast .Toastify__progress-bar--success {
+  background: linear-gradient(90deg, #ea580c 0%, #f59e0b 100%) !important;
+  height: 4px !important;
+}
+
+.Toastify__close-button {
+  color: #9ca3af !important;
+  opacity: 0.8 !important;
+}
+
+.Toastify__close-button:hover {
+  color: #ea580c !important;
+  opacity: 1 !important;
+}
+
+.custom-toast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.custom-toast-content .toast-title {
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: #0d1b2a;
+}
+
+.custom-toast-content .toast-subtitle {
+  font-size: 0.84rem;
+  color: #4b5563;
+  line-height: 1.45;
+}

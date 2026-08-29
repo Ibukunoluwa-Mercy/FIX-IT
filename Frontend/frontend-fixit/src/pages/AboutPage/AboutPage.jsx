@@ -435,7 +435,7 @@ const AboutPage = () => {
             <Row className="align-items-center gy-4">
               <Col lg={8}>
                 <div className="d-flex align-items-center gap-3">
-                  <div className="p-3 bg-white bg-opacity-10 rounded-circle text-danger">
+                  <div className="p-3 bg-white bg-opacity-10 rounded-circle"style={{color:"#d97706"}}>
                     <Users size={36} />
                   </div>
                   <div>

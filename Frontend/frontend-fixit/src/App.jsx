@@ -7,6 +7,9 @@ import ExploreIssuesPage from './pages/ExploreIssuesPage/ExploreIssuesPage'
 import AboutPage from './pages/AboutPage/AboutPage'
 import Register from './pages/Register/Register'
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 // Auth-only routes that should render without the Navbar/Footer shell
 const AUTH_ROUTES = ['/register', '/login'];
 
@@ -42,6 +45,18 @@ function App() {
   return (
     <Router>
       <AppShell />
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </Router>
   );
 }

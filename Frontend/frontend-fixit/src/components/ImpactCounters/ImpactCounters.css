@@ -13,8 +13,8 @@
   height: 100%;
 }
 .stat-icon-wrapper {
-  background-color: var(--icon-bg-green);
-  color: var(--icon-color-green);
+  background-color: #94a3b8;
+  color: #0f172a;
   width: 60px;
   height: 60px;
   border-radius: 50%;
