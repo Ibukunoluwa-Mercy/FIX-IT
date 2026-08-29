@@ -6,12 +6,14 @@ import CommunityMapPage from './pages/CommunityMapPage/CommunityMapPage'
 import ExploreIssuesPage from './pages/ExploreIssuesPage/ExploreIssuesPage'
 import AboutPage from './pages/AboutPage/AboutPage'
 import Register from './pages/Register/Register'
+import Login from './pages/Login/Login'
+import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Auth-only routes that should render without the Navbar/Footer shell
-const AUTH_ROUTES = ['/register', '/login'];
+const AUTH_ROUTES = ['/register', '/login', '/forgot-password'];
 
 function AppShell() {
   const location = useLocation();
@@ -21,6 +23,8 @@ function AppShell() {
     return (
       <Routes>
         <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
     );
   }

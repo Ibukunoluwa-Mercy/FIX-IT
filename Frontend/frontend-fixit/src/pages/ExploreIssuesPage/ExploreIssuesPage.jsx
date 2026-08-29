@@ -4,6 +4,7 @@ import { Container, Row, Col, Card, Spinner } from 'react-bootstrap';
 import { List, Map as MapIcon, X, AlertTriangle } from 'lucide-react';
 import axios from 'axios';
 import './ExploreIssuesPage.css';
+import './ExploreIssuesPage.extra.css';
 
 import { MOCK_ISSUES, TRENDING_ISSUES } from './data';
 import { IssueSearchBar } from './components/IssueSearchBar';
