@@ -11,16 +11,16 @@ import axios from 'axios';
 import './ExploreIssuesPage.css';
 
 // Import Exact Asset Images for Cards & Widgets
-import potholeImg from '../assets/massive pothole on main St.png';
-import dumpingParkImg from '../assets/illegal dumping in park.png';
-import streetlightImg from '../assets/streetlight outage.png';
-import flooding3rdImg from '../assets/flooding in third avenue.png';
-import playgroundImg from '../assets/homepage one.jpeg';
+import potholeImg from '../../assets/massive pothole on main St.png';
+import dumpingParkImg from '../../assets/illegal dumping in park.png';
+import streetlightImg from '../../assets/streetlight outage.png';
+import flooding3rdImg from '../../assets/flooding in third avenue.png';
+import playgroundImg from '../../assets/homepage one.jpeg';
 
-import trendFloodingImg from '../assets/05_flooding_at_central_road.png';
-import trendStreetlightImg from '../assets/06_broken_streetlight_park_entrance.png';
-import trendDumpingImg from '../assets/07_illegal_dumping_downtown_alley.png';
-import trendManholeImg from '../assets/08_open_manhole_near_school.png';
+import trendFloodingImg from '../../assets/05_flooding_at_central_road.png';
+import trendStreetlightImg from '../../assets/06_broken_streetlight_park_entrance.png';
+import trendDumpingImg from '../../assets/07_illegal_dumping_downtown_alley.png';
+import trendManholeImg from '../../assets/08_open_manhole_near_school.png';
 
 // Initial Mock Data for Explore Issues using exact asset files
 const MOCK_ISSUES = [

@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { Container } from 'react-bootstrap';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
-import InteractiveMap from '../components/map/InteractiveMap';
-import MapAnalytics from '../components/map/MapAnalytics';
-import MapFilters from '../components/map/MapFilters';
+import InteractiveMap from '../../components/map/InteractiveMap';
+import MapAnalytics from '../../components/map/MapAnalytics';
+import MapFilters from '../../components/map/MapFilters';
 import './CommunityMapPage.css';
 
 const categories = ['All Issues', 'Infrastructure', 'Utilities', 'Public Safety', 'Environment', 'Other'];
