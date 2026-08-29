@@ -4,7 +4,7 @@ import { Search, SlidersHorizontal, X } from 'lucide-react';
 import InteractiveMap from '../components/map/InteractiveMap';
 import MapAnalytics from '../components/map/MapAnalytics';
 import MapFilters from '../components/map/MapFilters';
-import '../index.css';
+import './CommunityMapPage.css';
 
 const categories = ['All Issues', 'Infrastructure', 'Utilities', 'Public Safety', 'Environment', 'Other'];
 

@@ -1,0 +1,24 @@
+/* Map Analytics Styles */
+.analytics-card {
+  background: #fff;
+  border-radius: 16px !important;
+}
+
+.stat-box {
+  background: #fff;
+  border-color: #f1f5f9 !important;
+}
+.icon-wrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.icon-purple { background: #ede9fe; color: #7c3aed; }
+.icon-green-light { background: #dcfce7; color: #16a34a; }
+.icon-orange { background: #ffedd5; color: #f97316; }
+.icon-green { background: #d1fae5; color: #059669; }
+.icon-red { background: #fee2e2; color: #ef4444; }

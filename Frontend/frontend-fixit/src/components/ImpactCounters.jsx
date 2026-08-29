@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { CheckCircle, Users, Map } from 'lucide-react';
+import './ImpactCounters.css';
 
 const ImpactCounters = ({ data }) => {
   return (

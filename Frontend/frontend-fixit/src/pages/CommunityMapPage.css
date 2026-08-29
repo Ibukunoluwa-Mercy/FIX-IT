@@ -1,0 +1,260 @@
+/* ========================
+   Community Map Page Styles
+======================== */
+.community-map-page {
+  background-color: #f8fafc;
+  min-height: 100vh;
+  padding-top: 40px !important;
+  padding-bottom: 80px !important;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+/* Search Bar */
+.search-input-wrapper {
+  position: relative;
+}
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+.map-search-input {
+  padding-left: 42px !important;
+  padding-right: 36px !important;
+  border-radius: 10px !important;
+  border: 1px solid #e2e8f0 !important;
+  background-color: #fff !important;
+  color: #374151 !important;
+  font-size: 0.9rem !important;
+  height: 44px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+}
+.map-search-input:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.1) !important;
+}
+.map-search-input.is-invalid-search {
+  border-color: #ef4444 !important;
+}
+.search-clear-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+}
+.search-clear-btn:hover svg { color: #374151 !important; }
+.search-submit-btn {
+  height: 44px;
+  width: 44px;
+  border-radius: 10px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+}
+.btn-settings {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px !important;
+  border: 1px solid #e2e8f0 !important;
+  background: #fff !important;
+  color: #6b7280 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.btn-settings.active {
+  background: #0f172a !important;
+  color: #fff !important;
+  border-color: #0f172a !important;
+}
+
+/* Category Pills */
+.pill-btn {
+  padding: 6px 18px;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #4b5563;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.pill-btn:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+.pill-btn.active {
+  background-color: #0f172a;
+  color: #fff;
+  border-color: #0f172a;
+  font-weight: 600;
+}
+
+/* Analytics Card */
+.analytics-card {
+  background: #fff;
+  border-radius: 16px !important;
+}
+
+/* Stat Icon Boxes */
+.stat-box {
+  background: #fff;
+  border-color: #f1f5f9 !important;
+}
+.icon-wrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.icon-purple { background: #ede9fe; color: #7c3aed; }
+.icon-green-light { background: #dcfce7; color: #16a34a; }
+.icon-orange { background: #ffedd5; color: #f97316; }
+.icon-green { background: #d1fae5; color: #059669; }
+.icon-red { background: #fee2e2; color: #ef4444; }
+
+/* Map Wrapper */
+.map-wrapper {
+  border-radius: 16px !important;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+/* Custom Leaflet Marker */
+.custom-leaflet-marker {
+  background: none !important;
+  border: none !important;
+}
+.marker-pin {
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.marker-number {
+  transform: rotate(45deg);
+  color: white;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+}
+.marker-fa {
+  transform: rotate(45deg);
+  color: white;
+  font-size: 11px;
+}
+.marker-dot {
+  transform: rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+}
+
+/* Map Legend */
+.map-legend {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+  border: 1px solid #e5e7eb;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Leaflet Popup Customization */
+.custom-popup .leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+.custom-popup .leaflet-popup-content {
+  margin: 0;
+  width: 280px !important;
+}
+.popup-content {
+  padding: 16px;
+}
+.custom-popup .leaflet-popup-tip {
+  background: white;
+}
+
+/* Filters Card */
+.filters-card {
+  background: #fff;
+  border-radius: 16px !important;
+}
+.filter-checkbox .form-check-input:checked {
+  background-color: #0f172a;
+  border-color: #0f172a;
+}
+.filter-checkbox .form-check-label {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 0.85rem;
+  color: #374151;
+  cursor: pointer;
+}
+
+/* View Toggle Buttons */
+.view-toggle-btn {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.view-toggle-btn.active {
+  background-color: #0f172a;
+  color: #fff;
+  border-color: #0f172a;
+}

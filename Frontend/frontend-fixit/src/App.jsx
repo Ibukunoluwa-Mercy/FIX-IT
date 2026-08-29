@@ -3,6 +3,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
 import CommunityMapPage from './pages/CommunityMapPage'
+import ExploreIssuesPage from './pages/ExploreIssuesPage'
 // Placeholder for other pages to avoid routing errors
 const Placeholder = ({ title }) => <div style={{ height: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}><h1>{title}</h1></div>
 
@@ -15,8 +16,8 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/map" element={<CommunityMapPage />} />
+            <Route path="/explore" element={<ExploreIssuesPage />} />
             <Route path="/register" element={<Placeholder title="Create Account Page" />} />
-            <Route path="/explore" element={<Placeholder title="Explore Issues Page" />} />
             <Route path="/about" element={<Placeholder title="About Page" />} />
           </Routes>
         </main>

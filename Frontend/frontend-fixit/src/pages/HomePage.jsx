@@ -11,7 +11,8 @@ import CTABanner from '../components/CTABanner';
 import ReportCard from '../components/ReportCard';
 
 // Images
-import img1 from '../assets/homepage one.jpeg';
+import heroImg from '../assets/homepage one.jpeg';
+import './HomePage.css';
 import img2 from '../assets/homepage two.jpeg';
 import img3 from '../assets/homepage three.jpeg';
 

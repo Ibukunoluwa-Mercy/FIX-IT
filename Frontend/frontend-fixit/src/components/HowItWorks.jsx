@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { FileText, ShieldCheck, AlertCircle, Eye, CheckSquare, ArrowRight } from 'lucide-react';
+import './HowItWorks.css';
 
 const steps = [
   {

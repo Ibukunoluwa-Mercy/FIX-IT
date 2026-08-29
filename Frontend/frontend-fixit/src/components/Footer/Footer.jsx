@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { Send } from 'lucide-react';
-import logo from '../assets/fixit.png';
+import logo from '../../assets/fixit.png';
 import './Footer.css';
 
 const Footer = () => {

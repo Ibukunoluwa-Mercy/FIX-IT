@@ -1,0 +1,77 @@
+/* CTA Banner Styles */
+.cta-banner-section {
+  padding: 60px 20px;
+  background-color: #ffffff;
+}
+.cta-banner {
+  background-color: #0b1320;
+  border-radius: 16px;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+.cta-illustration {
+  position: relative;
+  flex: 0 0 45%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-top: auto;
+}
+.cta-img {
+  max-width: 100%;
+  height: auto;
+  max-height: 280px;
+  object-fit: contain;
+  margin-bottom: -5px;
+}
+.cta-content {
+  flex: 1;
+}
+.cta-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.cta-subtitle {
+  color: #94a3b8;
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+}
+.btn-report-now {
+  background-color: #ef4444;
+  color: #ffffff;
+  font-weight: 600;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s;
+}
+.btn-report-now:hover {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+.btn-icon-wrapper {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.inner-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #ffffff;
+  border-radius: 50%;
+}

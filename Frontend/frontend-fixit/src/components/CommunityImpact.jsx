@@ -1,5 +1,6 @@
 import React from 'react';
 import { Container, Row, Col, ProgressBar } from 'react-bootstrap';
+import './CommunityImpact.css';
 
 const CommunityImpact = () => {
   return (

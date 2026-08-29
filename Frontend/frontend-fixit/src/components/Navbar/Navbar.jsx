@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Container, Navbar as BootstrapNavbar, Nav } from 'react-bootstrap';
-import logo from '../assets/fixit-logo-white.png';
+import logo from '../../assets/fixit-logo-white.png';
 import './Navbar.css';
 
 const Navbar = () => {

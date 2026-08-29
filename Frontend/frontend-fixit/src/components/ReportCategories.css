@@ -1,0 +1,54 @@
+/* Report Categories Styles */
+.report-categories-section {
+  background-color: #ffffff;
+  color: #111827;
+  padding: 80px 20px;
+}
+.report-categories-section .section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+.report-categories-section .section-subtitle {
+  color: #6b7280;
+  font-size: 1rem;
+}
+.category-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+  transition: transform 0.2s, box-shadow 0.2s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.category-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+}
+.category-icon-box {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.cat-red { background: #fee2e2; color: #ef4444; }
+.cat-green { background: #dcfce7; color: #22c55e; }
+.cat-blue { background: #dbeafe; color: #3b82f6; }
+.cat-blue-light { background: #e0f2fe; color: #0ea5e9; }
+.cat-orange { background: #ffedd5; color: #f97316; }
+
+.category-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #111827;
+}

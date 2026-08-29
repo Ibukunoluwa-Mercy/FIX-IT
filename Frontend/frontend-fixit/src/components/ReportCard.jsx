@@ -1,5 +1,6 @@
 import React from 'react';
 import { MapPin, Check, Clock, AlertTriangle } from 'lucide-react';
+import './ReportCard.css';
 
 const StatusBadge = ({ status }) => {
   switch (status) {

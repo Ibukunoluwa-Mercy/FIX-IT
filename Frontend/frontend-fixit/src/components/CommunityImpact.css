@@ -1,0 +1,52 @@
+/* Community Impact Component Styles */
+.community-impact-section {
+  background-color: #f8fafc;
+  color: #111827;
+  padding: 80px 20px;
+}
+.impact-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  border: 1px solid #e5e7eb;
+}
+.resolution-rate {
+  font-size: 5rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1;
+}
+.resolution-label {
+  font-weight: 700;
+  color: #16a34a;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+}
+.custom-progress {
+  height: 10px;
+  border-radius: 5px;
+  background-color: #f1f5f9;
+}
+.custom-progress .progress-bar {
+  background-color: #16a34a;
+}
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+.stat-name {
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+.stat-number {
+  font-weight: 800;
+  color: #0f172a;
+  font-size: 1.1rem;
+}
+.stat-divider {
+  margin: 0;
+  border-color: #f1f5f9;
+}

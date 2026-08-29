@@ -2,6 +2,7 @@ import React from 'react';
 import { Row, Col, Card, Dropdown } from 'react-bootstrap';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { FileText, ClipboardCheck, Wrench, CheckCircle, Users, ArrowRight } from 'lucide-react';
+import './MapAnalytics.css';
 
 const severityData = [
   { name: 'High', value: 38, percent: '29%', color: '#ef4444' },
