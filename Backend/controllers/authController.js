@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const fs = require('fs/promises');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
@@ -15,6 +16,8 @@ const ROLE_MAP = {
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const normalizeText = (value) => (typeof value === 'string' ? value.trim() : '');
+
+const parseBoolean = (value) => value === true || value === 'true';
 
 const createToken = (user) => jwt.sign(
 	{ id: user._id.toString(), role: user.role },
@@ -44,6 +47,7 @@ const register = async (req, res) => {
 	}
 	if (!agreeToTerms) return res.status(400).json({ message: 'You must agree to the Terms of Service and Privacy Policy' });
 	if (!ROLE_MAP[roleKey]) return res.status(400).json({ message: 'Invalid role. Public registration is for residents or officials only' });
+	if (roleKey === 'official') return res.status(400).json({ message: 'Local Officials must register through the official registration form' });
 	if (!emailPattern.test(email)) return res.status(400).json({ message: 'Please provide a valid email address' });
 	if (password.length < 8 || password.length > 128) return res.status(400).json({ message: 'Password must be between 8 and 128 characters' });
 
@@ -93,6 +97,102 @@ const register = async (req, res) => {
 		if (error.code === 11000) return res.status(409).json({ message: 'An account with this email already exists' });
 		console.error('Registration failed:', error.message);
 		return res.status(500).json({ message: 'Unable to create account' });
+	}
+};
+
+const registerOfficial = async (req, res) => {
+	const fullName = normalizeText(req.body.fullName);
+	const email = normalizeText(req.body.email).toLowerCase();
+	const phone = normalizeText(req.body.phone);
+	const password = typeof req.body.password === 'string' ? req.body.password : '';
+	const department = normalizeText(req.body.department);
+	const position = normalizeText(req.body.position);
+	const lga = normalizeText(req.body.lga);
+	const staffId = normalizeText(req.body.staffId);
+	const isConfirmed = parseBoolean(req.body.isConfirmed);
+	const removeUploadedFile = async () => {
+		if (req.file?.path) await fs.unlink(req.file.path).catch(() => {});
+	};
+
+	if (!fullName || !email || !phone || !password || !department || !position || !lga) {
+		await removeUploadedFile();
+		return res.status(400).json({ message: 'Full name, email, phone, department, position, and LGA are required' });
+	}
+	if (!req.file) return res.status(400).json({ message: 'Official ID document is required' });
+	if (!isConfirmed) {
+		await removeUploadedFile();
+		return res.status(400).json({ message: 'You must confirm that the information provided is true and accurate' });
+	}
+	if (!emailPattern.test(email)) { await removeUploadedFile(); return res.status(400).json({ message: 'Please provide a valid email address' }); }
+	if (password.length < 8 || password.length > 128) { await removeUploadedFile(); return res.status(400).json({ message: 'Password must be between 8 and 128 characters' }); }
+
+	try {
+		const duplicate = await User.findOne({ $or: [{ email }, { phone }] }).select('email phone').lean();
+		if (duplicate) {
+			await removeUploadedFile();
+			return res.status(409).json({ message: duplicate.email === email ? 'An account with this email already exists' : 'An account with this phone number already exists' });
+		}
+
+		const verification = createVerificationToken();
+		const user = await User.create({
+			name: fullName,
+			email,
+			phone,
+			location: lga,
+			password,
+			role: 'Issue Resolver',
+			emailVerificationTokenHash: verification.hash,
+			emailVerificationExpires: verification.expires,
+		});
+		let profile;
+		try {
+			profile = await OfficialProfile.create({
+				user: user._id,
+				department,
+				position,
+				lga,
+				staffId,
+				idDocumentUrl: `/uploads/official-ids/${req.file.filename}`,
+				isConfirmed: true,
+			});
+		} catch (profileError) {
+			await User.deleteOne({ _id: user._id });
+			await removeUploadedFile();
+			throw profileError;
+		}
+
+		try {
+			await sendVerificationEmail({
+				email,
+				fullName,
+				verificationUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${verification.rawToken}`,
+			});
+		} catch (emailError) {
+			console.error('Official verification email failed:', emailError.message);
+		}
+
+		return res.status(201).json({
+			message: 'Local Official account created successfully',
+			token: createToken(user),
+			profile: {
+				...user.toSafeProfile(),
+				phone: user.phone,
+				role: 'Issue Resolver',
+				officialDetails: {
+					department: profile.department,
+					position: profile.position,
+					lga: profile.lga,
+					staffId: profile.staffId,
+					idDocumentUrl: profile.idDocumentUrl,
+					isConfirmed: profile.isConfirmed,
+				},
+			},
+		});
+	} catch (error) {
+		await removeUploadedFile();
+		if (error.code === 11000) return res.status(409).json({ message: 'An account with this email or phone number already exists' });
+		console.error('Official registration failed:', error.message);
+		return res.status(500).json({ message: 'Unable to create Local Official account' });
 	}
 };
 
@@ -147,4 +247,4 @@ const login = async (req, res) => {
 	}
 };
 
-module.exports = { register, verifyEmail, createAdmin, login };
+module.exports = { register, registerOfficial, verifyEmail, createAdmin, login };
