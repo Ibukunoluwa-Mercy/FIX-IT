@@ -55,6 +55,22 @@ body {
 .custom-navbar .nav-link:hover, .custom-navbar .nav-link.active {
   color: var(--primary-amber) !important;
 }
+.custom-navbar .navbar-brand-text {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+.btn-amber {
+  background-color: var(--primary-amber);
+  color: #000;
+  border: none;
+  transition: background 0.2s;
+}
+.btn-amber:hover {
+  background-color: var(--primary-amber-hover);
+  color: #000;
+}
 
 /* Hero Section */
 .hero-section {
@@ -677,6 +693,7 @@ body {
 }
 .map-search-input {
   padding-left: 42px !important;
+  padding-right: 36px !important;    /* room for the clear ✕ */
   border-radius: 10px !important;
   border: 1px solid #e2e8f0 !important;
   background-color: #fff !important;
@@ -689,6 +706,34 @@ body {
   border-color: #3b82f6 !important;
   box-shadow: 0 0 0 3px rgba(59,130,246,0.1) !important;
 }
+.map-search-input.is-invalid-search {
+  border-color: #ef4444 !important;
+}
+.search-clear-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+}
+.search-clear-btn:hover svg { color: #374151 !important; }
+.search-submit-btn {
+  height: 44px;
+  width: 44px;
+  border-radius: 10px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+}
 .btn-settings {
   width: 44px;
   height: 44px;
@@ -700,6 +745,12 @@ body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: all 0.2s;
+}
+.btn-settings.active {
+  background: #0f172a !important;
+  color: #fff !important;
+  border-color: #0f172a !important;
 }
 
 /* Category Pills */

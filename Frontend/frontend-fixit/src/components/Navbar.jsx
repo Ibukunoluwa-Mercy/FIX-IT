@@ -1,37 +1,52 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Container, Navbar as BootstrapNavbar, Nav } from 'react-bootstrap';
 import logo from '../assets/fixit-logo-white.png';
 
 const Navbar = () => {
+  const { pathname } = useLocation();
+
+  const links = [
+    { to: '/',        label: 'Home'            },
+    { to: '/explore', label: 'Explore Issues'  },
+    { to: '/map',     label: 'Community Map'   },
+    { to: '/about',   label: 'About'           },
+  ];
+
   return (
     <BootstrapNavbar expand="lg" className="custom-navbar">
       <Container>
-        <BootstrapNavbar.Brand as={Link} to="/">
-<div style={{display:"flex",alignItems:"center"}}>          <img
-            src={logo}
-            height="40"
-            className="d-inline-block align-top"
-            alt="FixIt Logo"
-          /> <h2  style={{ color: 'white' }}>Fi<span style={{color:"#F59E0B"}}>xIt</span></h2></div>
+        {/* Brand / Logo */}
+        <BootstrapNavbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2">
+          <img src={logo} height="40" alt="FixIt Logo" className="d-inline-block align-top" />
+          <span className="navbar-brand-text">
+            Fi<span style={{ color: '#F59E0B' }}>xIt</span>
+          </span>
         </BootstrapNavbar.Brand>
-        <BootstrapNavbar.Toggle aria-controls="basic-navbar-nav" />
-        <BootstrapNavbar.Collapse id="basic-navbar-nav" className="justify-content-center">
+
+        <BootstrapNavbar.Toggle aria-controls="main-nav" />
+
+        {/* Centre Links */}
+        <BootstrapNavbar.Collapse id="main-nav" className="justify-content-center">
           <Nav>
-            <Nav.Link as={Link} to="/" className="active">Home</Nav.Link>
-            <Nav.Link as={Link} to="/explore">Explore Issues</Nav.Link>
-            <Nav.Link as={Link} to="/map">Community Map</Nav.Link>
-            <Nav.Link as={Link} to="/about">About</Nav.Link>
+            {links.map(({ to, label }) => (
+              <Nav.Link
+                key={to}
+                as={Link}
+                to={to}
+                className={pathname === to ? 'active' : ''}
+              >
+                {label}
+              </Nav.Link>
+            ))}
           </Nav>
         </BootstrapNavbar.Collapse>
-        <div className="d-none d-lg-block">
-            {/* Empty block to balance flex layout if needed, or user profile icon later */}
-             <img
-                src={logo}
-                height="40"
-                style={{ visibility: 'hidden' }}
-                alt="spacer"
-              />
+
+        {/* Right side — Report button */}
+        <div className="d-none d-lg-flex align-items-center">
+          <Link to="/register" className="btn btn-amber btn-sm fw-semibold px-4 py-2 rounded-3">
+            Report a Problem
+          </Link>
         </div>
       </Container>
     </BootstrapNavbar>

@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment Variables - NEVER commit these!
+.env
+.env.local
+.env.*.local
+# .env.example is safe to commit (no real secrets)
