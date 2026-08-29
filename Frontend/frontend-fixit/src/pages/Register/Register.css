@@ -1,0 +1,580 @@
+/* ============================================================
+   Register / Create Account Page
+   Brand: Midnight Navy #0d1b2a | Action Orange #ea580c | Off-White #faf8f5
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap');
+
+/* ─── Root Page Shell ─── */
+.register-page {
+  min-height: 100vh;
+  background-color: #faf8f5;
+  font-family: 'Google Sans', sans-serif;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 24px;
+}
+
+/* ─── Logo Bar ─── */
+.register-logo-bar {
+  position: absolute;
+  top: 24px;
+  left: 36px;
+  z-index: 100;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.register-logo {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 4px rgba(0,0,0,0.08));
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.register-logo:hover {
+  opacity: 0.85;
+  transform: scale(1.02);
+}
+
+/* ─── Split Layout Container (Centered) ─── */
+.register-split {
+  display: flex;
+  width: 100%;
+  max-width: 1100px;
+  min-height: auto;
+  background: transparent;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+}
+
+/* ═══════════════════════════════════════════════
+   LEFT — Hero Section
+═══════════════════════════════════════════════ */
+.register-hero {
+  flex: 1.1;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px 0 0 0;
+  overflow: visible;
+  position: relative;
+}
+
+.register-hero-content {
+  max-width: 500px;
+}
+
+.register-hero-headline {
+  font-size: clamp(2.2rem, 3.2vw, 3.2rem);
+  font-weight: 800;
+  color: #0d1b2a;
+  line-height: 1.12;
+  margin-bottom: 18px;
+  letter-spacing: -0.6px;
+}
+
+.hero-accent {
+  color: #ea580c;
+  display: block;
+}
+
+.register-hero-subtitle {
+  font-size: 1.05rem;
+  color: #52616b;
+  line-height: 1.6;
+  margin-bottom: 32px;
+  max-width: 440px;
+}
+
+/* Feature Badges */
+.register-badges {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+
+.register-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  max-width: 210px;
+}
+
+.badge-icon-wrap {
+  width: 44px;
+  height: 44px;
+  background: #fdeee7;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ea580c;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.badge-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #0d1b2a;
+  margin-bottom: 4px;
+}
+
+.badge-desc {
+  font-size: 0.82rem;
+  color: #6b7280;
+  line-height: 1.45;
+}
+
+/* Illustration */
+.register-illustration-wrap {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(13, 27, 42, 0.06);
+}
+
+.register-illustration {
+  width: 100%;
+  height: auto;
+  max-height: 280px;
+  object-fit: cover;
+  display: block;
+  border-radius: 20px;
+}
+
+/* ═══════════════════════════════════════════════
+   RIGHT — Auth Card Section
+═══════════════════════════════════════════════ */
+.register-form-side {
+  flex: 0 0 460px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  min-height: auto;
+}
+
+.register-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid #f0eae1;
+  box-shadow: 0 12px 40px rgba(13, 27, 42, 0.07), 0 2px 8px rgba(13, 27, 42, 0.03);
+  padding: 36px 32px 30px 32px;
+}
+
+/* Progress Bar */
+.register-progress-bar {
+  margin-bottom: 24px;
+}
+
+.progress-track {
+  display: flex;
+  gap: 6px;
+}
+
+.progress-filled {
+  flex: 1;
+  height: 4px;
+  background: #ea580c;
+  border-radius: 99px;
+}
+
+.progress-empty {
+  flex: 2;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 99px;
+}
+
+/* Title */
+.register-card-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0d1b2a;
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
+}
+
+.register-card-sub {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 14px;
+}
+
+/* ─── Role Tabs ─── */
+.register-role-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.role-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 10px;
+  border-radius: 12px;
+  border: 1.5px solid #e5e7eb;
+  background: #fff;
+  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: 'Google Sans', sans-serif;
+}
+
+.role-tab:hover {
+  border-color: #ea580c;
+  color: #ea580c;
+  background: #fff7f3;
+}
+
+.role-tab.active {
+  border-color: #ea580c;
+  background: #fff7f3;
+  color: #ea580c;
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.10);
+}
+
+.role-tab-icon {
+  opacity: 0.9;
+}
+
+/* ─── Admin Banner ─── */
+.register-admin-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff7f2;
+  border: 1px solid #fddccc;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 22px;
+}
+
+.admin-banner-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.admin-banner-label {
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.admin-banner-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ea580c;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.admin-banner-link:hover {
+  color: #c2410c;
+  text-decoration: underline;
+}
+
+.admin-banner-icon {
+  color: #ea580c;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+/* ─── Form Fields ─── */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.reg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.reg-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.01em;
+}
+
+.reg-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+  overflow: hidden;
+}
+
+.reg-input-wrap:focus-within {
+  border-color: #ea580c;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.10);
+}
+
+.reg-input-wrap.has-error {
+  border-color: #ef4444;
+  background: #fff8f8;
+}
+
+.reg-input-wrap.has-error:focus-within {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.10);
+}
+
+.reg-input-icon {
+  color: #9ca3af;
+  margin-left: 13px;
+  flex-shrink: 0;
+}
+
+.reg-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 11px 12px;
+  font-size: 0.875rem;
+  color: #0d1b2a;
+  font-family: 'Google Sans', sans-serif;
+  outline: none;
+}
+
+.reg-input::placeholder {
+  color: #b0b7c3;
+}
+
+.reg-eye-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 13px;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+.reg-eye-btn:hover {
+  color: #ea580c;
+}
+
+.reg-error {
+  font-size: 0.75rem;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ─── Terms Checkbox ─── */
+.reg-terms {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.reg-terms-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.reg-checkbox {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  accent-color: #ea580c;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.reg-link {
+  color: #ea580c;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+
+.reg-link:hover {
+  color: #c2410c;
+  text-decoration: underline;
+}
+
+/* ─── Submit Button ─── */
+.reg-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: 'Google Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.01em;
+  box-shadow: 0 4px 16px rgba(234, 88, 12, 0.30);
+  margin-top: 4px;
+}
+
+.reg-submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #c2410c 0%, #9a3412 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(234, 88, 12, 0.40);
+}
+
+.reg-submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.reg-submit-btn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.reg-spinner {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Footer Link ─── */
+.reg-footer-link {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 0.83rem;
+  color: #6b7280;
+}
+
+/* ════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════ */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .register-split {
+    gap: 32px;
+    padding: 20px 10px;
+  }
+
+  .register-form-side {
+    flex: 0 0 420px;
+  }
+}
+
+/* Mobile — stack layout */
+@media (max-width: 860px) {
+  .register-page {
+    padding: 80px 16px 32px 16px;
+    align-items: flex-start;
+  }
+
+  .register-logo-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 14px 20px;
+    background: rgba(250, 248, 245, 0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid #ede8e0;
+  }
+
+  .register-split {
+    flex-direction: column;
+    gap: 36px;
+  }
+
+  .register-hero {
+    padding: 0;
+    width: 100%;
+  }
+
+  .register-hero-content {
+    max-width: 100%;
+  }
+
+  .register-hero-headline {
+    font-size: 2rem;
+  }
+
+  .register-badges {
+    gap: 16px;
+  }
+
+  .register-illustration-wrap {
+    max-width: 100%;
+  }
+
+  .register-illustration {
+    max-height: 220px;
+  }
+
+  .register-form-side {
+    width: 100%;
+    flex: 1 1 auto;
+  }
+
+  .register-card {
+    border-radius: 20px;
+    padding: 28px 20px;
+    box-shadow: 0 4px 24px rgba(13, 27, 42, 0.06);
+  }
+}
+
+@media (max-width: 480px) {
+  .register-hero-headline {
+    font-size: 1.65rem;
+  }
+
+  .register-card {
+    padding: 22px 16px;
+  }
+
+  .register-role-tabs {
+    gap: 8px;
+  }
+
+  .role-tab {
+    padding: 12px 8px;
+    font-size: 0.8rem;
+  }
+}

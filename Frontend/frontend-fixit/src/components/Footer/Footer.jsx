@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { Send } from 'lucide-react';
-import logo from '../../assets/fixit.png';
+import logo from '../../assets/fixit-logo-white.png';
 import './Footer.css';
 
 const Footer = () => {
@@ -10,7 +10,10 @@ const Footer = () => {
       <Container>
         <Row className="gy-4 mb-5">
           <Col lg={3} md={6}>
-            <img src={logo} alt="FixIt" height="50" className="mb-3" />
+            <img src={logo} height="40" alt="FixIt Logo" className="d-inline-block align-top" />
+                      <span className="navbar-brand-text">
+                        <span style={{color:"white", fontSize:"30px"}}>Fi</span><span style={{ color: '#F59E0B', fontSize:"30px" }}>xIt</span>
+                      </span>
             <p className="footer-text mb-4">
               Empowering communities, one fix at a time.
             </p>
