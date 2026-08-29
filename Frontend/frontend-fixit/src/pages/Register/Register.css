@@ -609,6 +609,24 @@
   font-size: .92rem;
 }
 
+@keyframes registerReveal {
+  from { opacity: 0; transform: translateX(var(--register-slide-x, 0)) translateY(var(--register-slide-y, 0)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.register-reveal {
+  opacity: 0;
+  animation: registerReveal .65s cubic-bezier(.22, 1, .36, 1) forwards;
+}
+
+.register-reveal-hero { --register-slide-x: -48px; animation-delay: .08s; }
+.register-reveal-card { --register-slide-x: 48px; animation-delay: .24s; }
+.register-reveal-strip { --register-slide-y: 28px; animation-delay: .42s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .register-reveal { opacity: 1; animation: none; transform: none; }
+}
+
 .official-page .register-split {
   max-width: 1100px;
   min-height: 0;
