@@ -759,23 +759,28 @@
   width: min(100%, 1100px);
   max-width: 1100px;
   margin: 28px auto 0;
-  padding: 12px 18px;
+  min-height: 96px;
+  padding: 18px 26px;
   border-radius: 12px;
   background: #fffaf5;
   color: #ea580c;
 }
 
-.secure-strip div { display: flex; flex-direction: column; gap: 2px; flex: 1; }
-.secure-strip strong { color: #344054; font-size: .72rem; }
-.secure-strip span { color: #667085; font-size: .62rem; }
-.secure-strip img { align-self: flex-end; width: 92px; max-height: 52px; object-fit: contain; }
+.secure-strip > svg { width: 28px; height: 28px; flex: 0 0 auto; }
+.secure-strip div { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.secure-strip strong { color: #344054; font-size: .86rem; }
+.secure-strip span { color: #667085; font-size: .72rem; line-height: 1.35; }
+.secure-strip img { align-self: center; width: 132px; max-height: 76px; object-fit: contain; }
 
 @media (max-width: 860px) {
   .official-page { padding: 76px 16px 20px; }
   .official-page-heading { margin-bottom: 24px; }
   .official-page-heading h1 { font-size: 1.3rem; }
   .official-page .register-form-side { flex: 1 1 auto; width: 100%; max-width: 460px; }
-  .secure-strip { align-items: flex-start; flex-wrap: wrap; }
+  .secure-strip { align-items: flex-start; flex-wrap: wrap; min-height: 0; padding: 18px; }
+  .secure-strip > svg { width: 24px; height: 24px; }
+  .secure-strip strong { font-size: .8rem; }
+  .secure-strip span { font-size: .68rem; }
   .secure-strip img { display: none; }
 }
 

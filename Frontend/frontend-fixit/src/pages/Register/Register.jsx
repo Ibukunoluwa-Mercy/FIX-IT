@@ -76,7 +76,15 @@ const Register = () => {
       toast.success(role === 'official'
         ? `Welcome onboard, ${form.fullName.split(' ')[0]}! Your Local Official account has been created. Check your email to verify it.`
         : 'Welcome onboard! Your Fixit account has been created. Check your email to verify it.');
-      navigate('/');
+      if (role === 'official') {
+        setForm(initialForm);
+        setStep(1);
+        setReviewed(false);
+        setErrors({});
+        setShowPassword(false);
+      } else {
+        navigate('/');
+      }
     } catch (error) {
       const message = error instanceof TypeError && error.message.toLowerCase().includes('fetch')
         ? 'Unable to reach the Fixit server. Start the backend and check its MongoDB connection.'
