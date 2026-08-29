@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import ctaImg from '../assets/community_cta_illustration.png';
+import ctaImg from '../../assets/community_cta_illustration.png';
 import './CTABanner.css';
 
 const CTABanner = () => {

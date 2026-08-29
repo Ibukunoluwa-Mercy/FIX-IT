@@ -3,18 +3,18 @@ import { Container, Row, Col } from 'react-bootstrap';
 import { ArrowRight, PlusCircle, Compass } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import ImpactCounters from '../components/ImpactCounters';
-import HowItWorks from '../components/HowItWorks';
-import ReportCategories from '../components/ReportCategories';
-import CommunityImpact from '../components/CommunityImpact';
-import CTABanner from '../components/CTABanner';
-import ReportCard from '../components/ReportCard';
+import ImpactCounters from '../components/ImpactCounters/ImpactCounters';
+import HowItWorks from '../components/HowItWorks/HowItWorks';
+import ReportCategories from '../components/ReportCategories/ReportCategories';
+import CommunityImpact from '../components/CommunityImpact/CommunityImpact';
+import CTABanner from '../components/CTABanner/CTABanner';
+import ReportCard from '../components/ReportCard/ReportCard';
 
 // Images
-import heroImg from '../assets/homepage one.jpeg';
-import './HomePage.css';
+import img1 from '../assets/homepage one.jpeg';
 import img2 from '../assets/homepage two.jpeg';
 import img3 from '../assets/homepage three.jpeg';
+import './HomePage.css';
 
 const HomePage = () => {
   const navigate = useNavigate();

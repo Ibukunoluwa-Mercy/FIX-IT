@@ -13,6 +13,8 @@ const reportSchema = new mongoose.Schema(
 		},
 		images: { type: [String], default: [] },
 		createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+		confirmedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+		priorityScore: { type: Number, default: 0 },
 		resolvedAt: { type: Date },
 		completedAt: { type: Date },
 	},
