@@ -53,7 +53,7 @@ const Login = () => {
 
       const firstName = data.user?.name?.split(' ')[0] || 'there';
       toast.success(`Welcome back, ${firstName}!`);
-      navigate('/explore');
+      navigate('/dashboard');
     } catch (err) {
       const message = err.response?.data?.message || err.message || 'Unable to sign in right now.';
       setError(message);
