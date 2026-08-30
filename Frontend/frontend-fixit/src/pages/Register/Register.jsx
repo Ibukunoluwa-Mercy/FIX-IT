@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, ChevronDown, Eye, EyeOff, FileCheck, Lock, Mail, MapPin, Phone, ShieldCheck, Upload, User, Users, Building2 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 import logo from '../../assets/fixit-logo-black.png';
 import neighborhoodIllustration from '../../assets/neighborhood_illustration.png';
 import securityIllustration from '../../assets/security building illustration.png';
@@ -84,9 +85,8 @@ const Register = () => {
                 body.append('officialIdFile', form.officialId);
                 return body;
             })() : JSON.stringify({ fullName: form.fullName, email: form.email, location: form.neighborhood, password: form.password, role, agreeToTerms: agreed });
-            const response = await fetch(`${API_URL}/api/auth/${role === 'official' ? 'register-official' : 'register'}`, { method: 'POST', ...(role === 'resident' ? { headers: { 'Content-Type': 'application/json' } } : {}), body: requestBody });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message || 'Unable to create account');
+            const response = await axios.post(`${API_URL}/api/auth/${role === 'official' ? 'register-official' : 'register'}`, requestBody);
+            const data = response.data;
             localStorage.setItem('fixitToken', data.token);
             toast.success(role === 'official'
                 ? `Welcome onboard, ${form.fullName.split(' ')[0]}! Your Local Official account has been created. Check your email to verify it.`
@@ -101,9 +101,9 @@ const Register = () => {
                 navigate('/');
             }
         } catch (error) {
-            const message = error instanceof TypeError && error.message.toLowerCase().includes('fetch')
+            const message = error.response?.data?.message || (error instanceof TypeError && error.message.toLowerCase().includes('fetch')
                 ? 'Unable to reach the Fixit server. Start the backend and check its MongoDB connection.'
-                : error.message;
+                : error.message);
             toast.error(message);
         } finally { setLoading(false); }
     };

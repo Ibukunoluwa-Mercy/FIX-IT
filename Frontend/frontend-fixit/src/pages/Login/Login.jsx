@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowRight, Eye, EyeOff, Lock, Mail, MapPin, Users } from 'lucide-react';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 import logo from '../../assets/fixit-logo-black.png';
 import neighborhoodIllustration from '../../assets/neighborhood_illustration.png';
 import './Login.css';
@@ -36,19 +37,15 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const response = await axios.post(`${API_URL}/api/auth/login`, {
           email: form.email.trim().toLowerCase(),
           password: form.password,
-        }),
-      });
+        });
 
-      const data = await response.json();
+      const data = response.data;
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Invalid email or password.');
+      if (!data) {
+        throw new Error('Unable to sign in right now.');
       }
 
       localStorage.setItem('fixitToken', data.token);
@@ -58,7 +55,7 @@ const Login = () => {
       toast.success(`Welcome back, ${firstName}!`);
       navigate('/explore');
     } catch (err) {
-      const message = err.message || 'Unable to sign in right now.';
+      const message = err.response?.data?.message || err.message || 'Unable to sign in right now.';
       setError(message);
       toast.error(message);
     } finally {

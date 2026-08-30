@@ -7,6 +7,7 @@ import ExploreIssuesPage from './pages/ExploreIssuesPage/ExploreIssuesPage'
 import AboutPage from './pages/AboutPage/AboutPage'
 import Register from './pages/Register/Register'
 import Login from './pages/Login/Login'
+import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
 import ResetPassword from './pages/ResetPassword/ResetPassword'
 
 import { ToastContainer } from 'react-toastify';
@@ -24,7 +25,7 @@ function AppShell() {
       <Routes>
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/forgot-password" element={<ResetPassword />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     );

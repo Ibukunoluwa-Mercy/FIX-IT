@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Check, Eye, EyeOff, Lock, ShieldCheck } from 'lucide-react';
+import axios from 'axios';
 import './ResetPassword.css';
 
 const ResetPassword = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [form, setForm] = useState({ newPassword: '', confirmPassword: '' });
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -48,8 +50,20 @@ const ResetPassword = () => {
     setLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 850));
+      const resetToken = searchParams.get('token');
+      if (!resetToken) {
+        setErrors({ form: 'This password reset link is invalid or incomplete.' });
+        return;
+      }
+
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
+      const response = await axios.put(`${apiUrl}/api/auth/reset-password/${encodeURIComponent(resetToken)}`, {
+        password: form.newPassword,
+      });
+      localStorage.setItem('fixitToken', response.data.token);
       setSuccess(true);
+    } catch (error) {
+      setErrors({ form: error.response?.data?.message || 'Unable to reset your password. Please request a new link.' });
     } finally {
       setLoading(false);
     }
@@ -119,6 +133,8 @@ const ResetPassword = () => {
                 </div>
                 {errors.confirmPassword && <span className="field-error">{errors.confirmPassword}</span>}
               </div>
+
+              {errors.form && <div className="field-error">{errors.form}</div>}
 
               <button type="submit" className="reset-button" disabled={loading}>
                 {loading ? 'Resetting...' : 'Reset Password'}

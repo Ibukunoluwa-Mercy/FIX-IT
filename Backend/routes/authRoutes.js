@@ -1,5 +1,5 @@
 const express = require('express');
-const { register, registerOfficial, verifyEmail, createAdmin, login } = require('../controllers/authController');
+const { register, registerOfficial, verifyEmail, forgotPassword, resetPassword, createAdmin, login } = require('../controllers/authController');
 const { requireAuth, requireRole } = require('../middleware/authMiddleware');
 const { officialIdUpload } = require('../middleware/officialUpload');
 
@@ -14,6 +14,8 @@ router.post('/register-official', (req, res, next) => {
 	});
 }, registerOfficial);
 router.post('/login', login);
+router.post('/forgot-password', forgotPassword);
+router.put('/reset-password/:resetToken', resetPassword);
 router.get('/verify-email', verifyEmail);
 router.post('/admin', requireAuth, requireRole('admin'), createAdmin);
 

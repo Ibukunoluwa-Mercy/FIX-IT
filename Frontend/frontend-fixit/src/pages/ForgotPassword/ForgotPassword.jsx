@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Mail, ShieldCheck } from 'lucide-react';
+import axios from 'axios';
 import neighborhoodIllustration from '../../assets/neighborhood_illustration.png';
 import logo from '../../assets/fixit-logo-black.png';
 import './ForgotPassword.css';
@@ -10,6 +11,7 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState('name@community.org');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const apiUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -23,8 +25,10 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 700));
-      navigate('/reset-password');
+      await axios.post(`${apiUrl}/api/auth/forgot-password`, { email: email.trim().toLowerCase() });
+      navigate('/login');
+    } catch (error) {
+      setError(error.response?.data?.message || 'Unable to send the reset link. Please try again.');
     } finally {
       setLoading(false);
     }

@@ -6,7 +6,7 @@ const User = require('../models/User');
 const ResidentProfile = require('../models/ResidentProfile');
 const OfficialProfile = require('../models/OfficialProfile');
 const AdminProfile = require('../models/AdminProfile');
-const { sendVerificationEmail } = require('../services/emailService');
+const { sendVerificationEmail, sendWelcomeEmail, sendLoginEmail, sendPasswordResetEmail } = require('../services/emailService');
 
 const ROLE_MAP = {
 	resident: 'resident',
@@ -32,6 +32,15 @@ const createVerificationToken = () => {
 		rawToken,
 		hash: crypto.createHash('sha256').update(rawToken).digest('hex'),
 		expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+	};
+};
+
+const createPasswordResetToken = () => {
+	const rawToken = crypto.randomBytes(32).toString('hex');
+	return {
+		rawToken,
+		hash: crypto.createHash('sha256').update(rawToken).digest('hex'),
+		expires: new Date(Date.now() + 15 * 60 * 1000),
 	};
 };
 
@@ -87,12 +96,20 @@ const register = async (req, res) => {
 			console.error('Verification email failed:', emailError.message);
 			emailStatus = { sent: false, skipped: false };
 		}
+		let welcomeEmail = { sent: false, skipped: true };
+		try {
+			welcomeEmail = await sendWelcomeEmail({ email, fullName });
+		} catch (emailError) {
+			console.error('Welcome email failed:', emailError.message);
+			welcomeEmail = { sent: false, skipped: false };
+		}
 
 		return res.status(201).json({
 			message: 'Account created successfully',
 			token: createToken(user),
 			user: user.toSafeProfile(),
 			emailVerification: emailStatus,
+			welcomeEmail,
 		});
 	} catch (error) {
 		if (error.code === 11000) return res.status(409).json({ message: 'An account with this email already exists' });
@@ -171,6 +188,11 @@ const registerOfficial = async (req, res) => {
 		} catch (emailError) {
 			console.error('Official verification email failed:', emailError.message);
 		}
+		try {
+			await sendWelcomeEmail({ email, fullName });
+		} catch (emailError) {
+			console.error('Official welcome email failed:', emailError.message);
+		}
 
 		return res.status(201).json({
 			message: 'Local Official account created successfully',
@@ -218,6 +240,70 @@ const verifyEmail = async (req, res) => {
 	}
 };
 
+const forgotPassword = async (req, res) => {
+	const email = normalizeText(req.body.email).toLowerCase();
+	const genericMessage = 'If an account with that email exists, a password reset link has been sent.';
+	if (!email || !emailPattern.test(email)) return res.status(200).json({ message: genericMessage });
+
+	try {
+		const user = await User.findOne({ email }).select('+resetPasswordToken +resetPasswordExpire');
+		if (!user) return res.status(200).json({ message: genericMessage });
+
+		const resetToken = createPasswordResetToken();
+		user.resetPasswordToken = resetToken.hash;
+		user.resetPasswordExpire = resetToken.expires;
+		await user.save({ validateModifiedOnly: true });
+
+		try {
+			await sendPasswordResetEmail({
+				email: user.email,
+				fullName: user.name || user.email,
+				resetUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken.rawToken}`,
+			});
+		} catch (emailError) {
+			user.resetPasswordToken = undefined;
+			user.resetPasswordExpire = undefined;
+			await user.save({ validateModifiedOnly: true });
+			console.error('Password reset email failed:', emailError.message);
+		}
+
+		return res.status(200).json({ message: genericMessage });
+	} catch (error) {
+		console.error('Forgot password failed:', error.message);
+		return res.status(500).json({ message: 'Unable to process password reset request' });
+	}
+};
+
+const resetPassword = async (req, res) => {
+	const rawToken = normalizeText(req.params.resetToken);
+	const password = typeof req.body.password === 'string' ? req.body.password : '';
+	if (!rawToken) return res.status(400).json({ message: 'Password reset token is required' });
+	if (password.length < 8 || password.length > 128) return res.status(400).json({ message: 'Password must be between 8 and 128 characters' });
+
+	const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+	try {
+		const user = await User.findOne({
+			resetPasswordToken: tokenHash,
+			resetPasswordExpire: { $gt: Date.now() },
+		}).select('+password +resetPasswordToken +resetPasswordExpire');
+		if (!user) return res.status(400).json({ message: 'Password reset token is invalid or expired' });
+
+		user.password = password;
+		user.resetPasswordToken = undefined;
+		user.resetPasswordExpire = undefined;
+		await user.save();
+
+		return res.status(200).json({
+			message: 'Password reset successful',
+			token: createToken(user),
+			user: user.toSafeProfile(),
+		});
+	} catch (error) {
+		console.error('Password reset failed:', error.message);
+		return res.status(500).json({ message: 'Unable to reset password' });
+	}
+};
+
 const createAdmin = async (req, res) => {
 	const fullName = normalizeText(req.body.fullName);
 	const email = normalizeText(req.body.email).toLowerCase();
@@ -257,12 +343,18 @@ const login = async (req, res) => {
 		}
 
 		const token = createToken(user);
+		try {
+			await sendLoginEmail({ email: user.email, fullName: user.name || user.email });
+		} catch (emailError) {
+			console.error('Login email failed:', emailError.message);
+		}
 		return res.status(200).json({
 			message: 'Login successful',
 			token,
 			user: {
 				id: user._id,
 				fullName: user.name,
+				name: user.name,
 				email: user.email,
 				role: user.role,
 			},
@@ -273,4 +365,4 @@ const login = async (req, res) => {
 	}
 };
 
-module.exports = { register, registerOfficial, verifyEmail, createAdmin, login };
+module.exports = { register, registerOfficial, verifyEmail, forgotPassword, resetPassword, createAdmin, login };
