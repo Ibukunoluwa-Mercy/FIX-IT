@@ -52,7 +52,7 @@ const ExploreIssuesPage = () => {
     const fetchExploreData = async () => {
       setLoading(true);
       try {
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:2701';
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5100';
         const queryParams = new URLSearchParams(searchParams);
         const res = await axios.get(`${baseUrl}/api/reports/explore?${queryParams.toString()}`);
         if (res.data && Array.isArray(res.data.issues)) {

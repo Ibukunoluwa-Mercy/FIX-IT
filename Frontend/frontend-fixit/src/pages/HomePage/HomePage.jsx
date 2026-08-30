@@ -57,7 +57,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:2701';
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5100';
         const response = await axios.get(`${apiBaseUrl}/api/reports/home-data`);
         if (response.data && response.data.recentActivity && Array.isArray(response.data.recentActivity)) {
           setData(response.data);

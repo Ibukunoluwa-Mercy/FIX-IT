@@ -7,7 +7,7 @@ import neighborhoodIllustration from '../../assets/neighborhood_illustration.png
 import securityIllustration from '../../assets/security building illustration.png';
 import './Register.css';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:2701';
+const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
 const initialForm = { fullName: '', email: '', neighborhood: '', phone: '', password: '', office: '', position: '', lga: '', staffId: '', officialId: null };
 const officialOptions = {
     office: ['Health Department', 'Public Works', 'Environmental Services', 'Transport Authority'],

@@ -15,6 +15,6 @@ router.post('/register-official', (req, res, next) => {
 }, registerOfficial);
 router.post('/login', login);
 router.get('/verify-email', verifyEmail);
-router.post('/admin', requireAuth, requireRole('Administrator'), createAdmin);
+router.post('/admin', requireAuth, requireRole('admin'), createAdmin);
 
 module.exports = router;

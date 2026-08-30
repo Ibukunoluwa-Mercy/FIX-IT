@@ -6,7 +6,7 @@ import logo from '../../assets/fixit-logo-black.png';
 import neighborhoodIllustration from '../../assets/neighborhood_illustration.png';
 import './Login.css';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:2701';
+const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
 
 const Login = () => {
   const navigate = useNavigate();

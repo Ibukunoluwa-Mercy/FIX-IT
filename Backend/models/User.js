@@ -1,14 +1,23 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema(
 	{
 		name: { type: String, trim: true },
 		firstName: { type: String, trim: true },
 		lastName: { type: String, trim: true },
-		email: { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
+		email: {
+			type: String,
+			required: true,
+			unique: true,
+			lowercase: true,
+			trim: true,
+			index: true,
+			match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please provide a valid email address'],
+		},
 		phone: { type: String, trim: true, index: true, sparse: true },
-		password: { type: String, required: true, select: false },
-		role: { type: String, enum: ['Community Member', 'Issue Resolver', 'Administrator'], required: true, default: 'Community Member' },
+		password: { type: String, required: true, minlength: 8, select: false },
+		role: { type: String, enum: ['resident', 'admin', 'Community Member', 'Issue Resolver', 'Administrator'], default: 'resident', required: true },
 		location: { type: String, trim: true, default: '' },
 		isActive: { type: Boolean, default: true },
 		emailVerified: { type: Boolean, default: false },
@@ -20,10 +29,13 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre('save', async function hashPassword(next) {
 	if (!this.isModified('password')) return next();
-	const bcrypt = require('bcryptjs');
 	this.password = await bcrypt.hash(this.password, 12);
 	return next();
 });
+
+userSchema.methods.matchPassword = async function matchPassword(enteredPassword) {
+	return bcrypt.compare(enteredPassword, this.password);
+};
 
 userSchema.methods.toSafeProfile = function toSafeProfile() {
 	return {

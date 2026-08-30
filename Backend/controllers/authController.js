@@ -9,8 +9,9 @@ const AdminProfile = require('../models/AdminProfile');
 const { sendVerificationEmail } = require('../services/emailService');
 
 const ROLE_MAP = {
-	resident: 'Community Member',
-	official: 'Issue Resolver',
+	resident: 'resident',
+	official: 'admin',
+	admin: 'admin',
 };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -22,7 +23,7 @@ const parseBoolean = (value) => value === true || value === 'true';
 const createToken = (user) => jwt.sign(
 	{ id: user._id.toString(), role: user.role },
 	process.env.JWT_SECRET || 'fixit-development-secret',
-	{ expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+	{ expiresIn: process.env.JWT_EXPIRES_IN || '30d' }
 );
 
 const createVerificationToken = () => {
@@ -61,7 +62,7 @@ const register = async (req, res) => {
 			email,
 			location,
 			password,
-			role: ROLE_MAP[roleKey],
+			role: ROLE_MAP[roleKey] || 'resident',
 			emailVerificationTokenHash: verification.hash,
 			emailVerificationExpires: verification.expires,
 		});
@@ -140,7 +141,7 @@ const registerOfficial = async (req, res) => {
 			phone,
 			location: lga,
 			password,
-			role: 'Issue Resolver',
+			role: 'admin',
 			emailVerificationTokenHash: verification.hash,
 			emailVerificationExpires: verification.expires,
 		});
@@ -224,7 +225,7 @@ const createAdmin = async (req, res) => {
 	if (!fullName || !email || !password || !emailPattern.test(email) || password.length < 8) return res.status(400).json({ message: 'Valid full name, email, and password are required' });
 
 	try {
-		const user = await User.create({ name: fullName, email, password, role: 'Administrator', emailVerified: true });
+		const user = await User.create({ name: fullName, email, password, role: 'admin', emailVerified: true });
 		await AdminProfile.create({ user: user._id });
 		return res.status(201).json({ message: 'Administrator created', user: user.toSafeProfile() });
 	} catch (error) {
@@ -236,13 +237,38 @@ const createAdmin = async (req, res) => {
 const login = async (req, res) => {
 	const email = normalizeText(req.body.email).toLowerCase();
 	const password = typeof req.body.password === 'string' ? req.body.password : '';
-	if (!email || !password) return res.status(400).json({ message: 'Email and password are required' });
+	if (!email || !password) {
+		return res.status(400).json({ message: 'Email and password are required' });
+	}
+
 	try {
 		const user = await User.findOne({ email }).select('+password');
-		if (!user || !(await bcrypt.compare(password, user.password))) return res.status(401).json({ message: 'Invalid email or password' });
-		if (!user.isActive) return res.status(403).json({ message: 'This account is inactive' });
-		return res.json({ token: createToken(user), user: user.toSafeProfile() });
+		if (!user) {
+			return res.status(401).json({ message: 'Invalid credentials' });
+		}
+
+		const isPasswordCorrect = await user.matchPassword(password);
+		if (!isPasswordCorrect) {
+			return res.status(401).json({ message: 'Invalid credentials' });
+		}
+
+		if (user.isActive === false) {
+			return res.status(403).json({ message: 'This account is inactive' });
+		}
+
+		const token = createToken(user);
+		return res.status(200).json({
+			message: 'Login successful',
+			token,
+			user: {
+				id: user._id,
+				fullName: user.name,
+				email: user.email,
+				role: user.role,
+			},
+		});
 	} catch (error) {
+		console.error('Login failed:', error.message);
 		return res.status(500).json({ message: 'Unable to sign in' });
 	}
 };
