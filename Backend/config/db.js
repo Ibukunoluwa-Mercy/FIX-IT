@@ -18,7 +18,7 @@ const connectDB = async () => {
 					retryWrites: true,
 					w: 'majority',
 				});
-				console.log(`MongoDB connected using ${mongoUri}`);
+				console.log(`MongoDB successfully connected `);
 				return true;
 			} catch (error) {
 				console.error(`MongoDB connection attempt ${attempt}/${maxAttempts} failed for ${mongoUri}: ${error.message}`);

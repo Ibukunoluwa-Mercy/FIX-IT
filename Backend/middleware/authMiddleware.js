@@ -29,6 +29,8 @@ const requireAuth = (req, res, next) => {
 
 module.exports = { requireAuth };
 
+module.exports.protect = requireAuth;
+
 const requireRole = (...allowedRoles) => (req, res, next) => {
 	const normalizedAllowed = allowedRoles.map(normalizeRole);
 	const userRole = normalizeRole(req.user?.role);

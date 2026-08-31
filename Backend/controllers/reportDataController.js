@@ -66,6 +66,13 @@ const getBreakdown = (counts, total, labels) => labels.map((label) => ({
 	percentage: percentage(counts[label] || 0, total),
 }));
 const expandCategories = (values) => values.flatMap((value) => CATEGORY_GROUPS[value] || [value]);
+const getCoordinates = (coordinates) => {
+	if (Array.isArray(coordinates) && coordinates.length >= 2) return { lat: coordinates[1], lng: coordinates[0] };
+	if (coordinates && Number.isFinite(Number(coordinates.lat)) && Number.isFinite(Number(coordinates.lng))) {
+		return { lat: Number(coordinates.lat), lng: Number(coordinates.lng) };
+	}
+	return null;
+};
 
 const getCommunityOverview = async (req, res) => {
 	try {
@@ -118,15 +125,11 @@ const getMapReports = async (req, res) => {
 			.sort({ createdAt: -1 })
 			.lean();
 		return res.json(reports
-			.filter((report) => Array.isArray(report.location?.coordinates) && report.location.coordinates.length >= 2)
-			.map((report) => ({
-				_id: report._id,
-				title: report.title,
-				category: report.category,
-				severity: report.severity,
-				status: report.status,
-				location: { lat: report.location.coordinates[1], lng: report.location.coordinates[0], address: report.location.address || '' },
-				createdAt: report.createdAt,
+			.map((report) => ({ report, coordinates: getCoordinates(report.location?.coordinates) }))
+			.filter(({ coordinates }) => coordinates)
+			.map(({ report, coordinates }) => ({
+				_id: report._id, title: report.title, category: report.category, severity: report.severity, status: report.status,
+				location: { ...coordinates, address: report.location.address || '' }, createdAt: report.createdAt,
 			})));
 	} catch (error) {
 		return res.status(500).json({ message: 'Unable to load map reports', error: error.message });
