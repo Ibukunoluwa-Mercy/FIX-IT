@@ -89,6 +89,7 @@ const Register = () => {
             const data = response.data;
             localStorage.setItem('fixitToken', data.token);
             localStorage.setItem('fixitUser', JSON.stringify(data.user || {}));
+            localStorage.setItem('fixitDashboardGreeting', 'welcome');
             toast.success(role === 'official'
                 ? `Welcome onboard, ${form.fullName.split(' ')[0]}! Your Local Official account has been created. Check your email to verify it.`
                 : 'Welcome onboard! Your Fixit account has been created. Check your email to verify it.');

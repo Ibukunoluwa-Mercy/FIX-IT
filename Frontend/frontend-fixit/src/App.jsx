@@ -44,6 +44,7 @@ function AppShell() {
           <Route path="/" element={<HomePage />} />
           <Route path="/map" element={<CommunityMapPage />} />
           <Route path="/explore" element={<ExploreIssuesPage />} />
+          <Route path="/reports" element={<ExploreIssuesPage />} />
           <Route path="/about" element={<AboutPage />} />
         </Routes>
       </main>

@@ -50,6 +50,7 @@ const Login = () => {
 
       localStorage.setItem('fixitToken', data.token);
       localStorage.setItem('fixitUser', JSON.stringify(data.user || {}));
+      localStorage.setItem('fixitDashboardGreeting', 'welcome-back');
 
       const firstName = data.user?.name?.split(' ')[0] || 'there';
       toast.success(`Welcome back, ${firstName}!`);

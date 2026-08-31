@@ -1,25 +1,22 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Activity, Bell, Bookmark, ChevronDown, ChevronRight, CircleHelp, FileText, Grid2X2,
-  LockKeyhole, LogOut, MapPin, Menu, MessageSquare, MoreHorizontal, Plus, Search,
+  LogOut, MapPin, Menu, MessageSquare, MoreHorizontal, Plus, Search,
   Settings, ShieldCheck, Star, UserCircle, Users, X
 } from 'lucide-react';
-import potholeImage from '../../assets/massive pothole on main St.png';
-import streetlightImage from '../../assets/06_broken_streetlight_park_entrance.png';
-import crosswalkImage from '../../assets/homepage three.jpeg';
 import './ResidentDashboard.css';
 
-const reports = [
-  { code: '#CF-2026-01', title: 'Massive Pothole on 5th Avenue', meta: '2 days ago  •  1200 Block, 5th Ave', status: 'In Progress', image: potholeImage, color: 'orange', width: '82%' },
-  { code: '#CF-2026-02', title: 'Broken Streetlight', meta: '5 hours ago  •  Corner of Elm & Maple', status: 'New', image: streetlightImage, color: 'red', width: '28%' },
-  { code: '#CF-2025-89', title: 'Faded Crosswalk Lines', meta: '1 week ago  •  3rd Street & Main Ave', status: 'Resolved', image: crosswalkImage, color: 'green', width: '64%' },
-];
+const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
 
 const navGroups = [
   [{ label: 'Dashboard', icon: Grid2X2, active: true }, { label: 'My Reports', icon: FileText }, { label: 'Nearby Issues', icon: MapPin }, { label: 'Notifications', icon: Bell, badge: 3 }, { label: 'Messages', icon: MessageSquare }, { label: 'Saved Locations', icon: Bookmark }],
   [{ label: 'Help Center', icon: CircleHelp }, { label: 'Settings', icon: Settings }],
 ];
+
+const formatDate = (value) => value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(value)) : 'Just now';
+const statusClass = (status = 'New') => status.toLowerCase().replace(/\s+/g, '-');
 
 const ResidentDashboard = () => {
   const navigate = useNavigate();
@@ -28,21 +25,56 @@ const ResidentDashboard = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
-  const [reportSubmitted, setReportSubmitted] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
   const [filter, setFilter] = useState('All');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [dashboard, setDashboard] = useState({ userInfo: {}, stats: {}, recentReports: [], recentUpdates: [], mapIssues: [] });
+  const [form, setForm] = useState({ title: '', description: '', address: '', imageUrl: '' });
+  const [submitting, setSubmitting] = useState(false);
 
   const user = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('fixitUser') || '{}'); } catch { return {}; }
   }, []);
-  const userName = user.name || user.fullName || 'Sarah Johnson';
+  const token = localStorage.getItem('fixitToken');
+  const userInfo = dashboard.userInfo.name ? dashboard.userInfo : user;
+  const userName = userInfo.name || userInfo.fullName || 'Resident';
   const firstName = userName.split(' ')[0];
+  const greeting = localStorage.getItem('fixitDashboardGreeting') === 'welcome' ? 'Welcome' : 'Welcome back';
+
+  const loadDashboard = useCallback(async () => {
+    if (!token) { navigate('/login'); return; }
+    setLoading(true); setError('');
+    try {
+      const response = await axios.get(`${API_URL}/api/dashboard/overview`, { headers: { Authorization: `Bearer ${token}` } });
+      setDashboard(response.data);
+    } catch (requestError) {
+      if (requestError.response?.status === 401) { localStorage.removeItem('fixitToken'); navigate('/login'); return; }
+      setError(requestError.response?.data?.message || 'Unable to load your dashboard.');
+    } finally { setLoading(false); }
+  }, [navigate, token]);
+  useEffect(() => { loadDashboard(); }, [loadDashboard]);
+
+  const reports = dashboard.recentReports || [];
   const visibleReports = filter === 'All' ? reports : reports.filter((report) => report.status === filter);
+  const stats = dashboard.stats || {};
 
   const logout = () => {
     localStorage.removeItem('fixitToken');
     localStorage.removeItem('fixitUser');
     navigate('/login');
+  };
+  const goToNav = (label) => { setActiveNav(label); if (label === 'My Reports') navigate('/reports'); if (label === 'Nearby Issues') navigate('/map'); };
+  const updateForm = (event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
+  const submitReport = async (event) => {
+    event.preventDefault(); setSubmitting(true);
+    try {
+      let coordinates = { lat: 0, lng: 0 };
+      if (navigator.geolocation) coordinates = await new Promise((resolve) => navigator.geolocation.getCurrentPosition((position) => resolve({ lat: position.coords.latitude, lng: position.coords.longitude }), () => resolve(coordinates), { timeout: 2500 }));
+      await axios.post(`${API_URL}/api/reports`, { ...form, ...coordinates }, { headers: { Authorization: `Bearer ${token}` } });
+      setForm({ title: '', description: '', address: '', imageUrl: '' }); setShowReportModal(false); await loadDashboard();
+    } catch (requestError) { setError(requestError.response?.data?.message || 'Unable to submit your report.'); }
+    finally { setSubmitting(false); }
   };
 
   return (
@@ -61,7 +93,7 @@ const ResidentDashboard = () => {
           {navGroups.map((group, groupIndex) => (
             <div className={`nav-group ${groupIndex ? 'nav-group-secondary' : ''}`} key={groupIndex}>
               {group.map(({ label, icon: Icon, badge, active }) => (
-                <button key={label} className={`resident-nav-link ${(activeNav === label || active && activeNav === 'Dashboard') ? 'active' : ''}`} onClick={() => setActiveNav(label)} title={label}>
+                  <button key={label} className={`resident-nav-link ${(activeNav === label || active && activeNav === 'Dashboard') ? 'active' : ''}`} onClick={() => goToNav(label)} title={label}>
                   <Icon size={17} /><span>{label}</span>{badge && <b className="nav-badge">{badge}</b>}
                 </button>
               ))}
@@ -88,25 +120,26 @@ const ResidentDashboard = () => {
         </header>
 
         <div className="resident-content">
-          <section className="dashboard-intro"><div><h1>Welcome back, {firstName}! <span aria-hidden="true">👋</span></h1><p>Here&apos;s an overview of what&apos;s happening in your community.</p></div><div className="intro-search"><Search size={16} /><input aria-label="Search dashboard" placeholder="Search reports..." /></div></section>
+          <section className="dashboard-intro"><div><h1>{greeting}, {userName}! <span aria-hidden="true">👋</span></h1><p>Here&apos;s an overview of what&apos;s happening in your community.</p></div><div className="intro-search"><Search size={16} /><input aria-label="Search dashboard" placeholder="Search reports..." /></div></section>
+          {error && <div className="dashboard-alert" role="alert">{error}</div>}
 
           <section className="row g-3 stats-grid" aria-label="Overview statistics">
-            {[['My Reports', '4', 'Active', FileText, 'orange', 'View all'], ['Resolved', '12', 'This Month', Activity, 'green', 'View all'], ['Impact Score', '85', 'Great Work! 🎉', Star, 'amber', 'Details'], ['Community Rank', 'Top 20%', 'In your city', Users, 'blue', 'View leaderboard']].map(([label, value, note, Icon, tone, action]) => <article className="col-12 col-sm-6 col-xl-3" key={label}><div className={`stat-card stat-${tone}`}><span className="stat-icon"><Icon size={18} /></span><span className="stat-label">{label}</span><strong className="stat-value">{value}</strong><small>{note}</small><button onClick={() => setActiveNav(label)}>{action} <ChevronRight size={14} /></button></div></article>)}
+            {[['My Reports', stats.totalActiveReports ?? 0, 'Active', FileText, 'orange', '/reports'], ['Resolved', stats.resolvedThisMonth ?? 0, 'This Month', Activity, 'green', '/reports'], ['Impact Score', stats.impactScore ?? 0, 'Keep it going!', Star, 'amber', null], ['Community Rank', stats.rank || 'N/A', 'In your city', Users, 'blue', '/map']].map(([label, value, note, Icon, tone, path]) => <article className="col-12 col-sm-6 col-xl-3" key={label}><div className={`stat-card stat-${tone}`}><span className="stat-icon"><Icon size={18} /></span><span className="stat-label">{label}</span><strong className="stat-value">{loading ? <span className="skeleton skeleton-value" /> : value}</strong><small>{note}</small><button onClick={() => path ? navigate(path) : console.info(`${label} details`)}>{label === 'Impact Score' ? 'Details' : label === 'Community Rank' ? 'View leaderboard' : 'View all'} <ChevronRight size={14} /></button></div></article>)}
           </section>
 
           <section className="report-cta"><div className="cta-icon"><Plus size={26} /></div><div><h2>Report a New Problem</h2><p>Help keep our community safe and clean.</p></div><button onClick={() => setShowReportModal(true)}>Report Now <ChevronRight size={17} /></button></section>
 
           <div className="row g-3 dashboard-lower">
-            <section className="col-12 col-xl-7"><div className="dashboard-panel reports-panel"><div className="panel-heading"><h2>Recent Reports</h2><div className="report-filter"><button className={filter === 'All' ? 'selected' : ''} onClick={() => setFilter('All')}>All</button>{['In Progress', 'New', 'Resolved'].map((status) => <button className={filter === status ? 'selected' : ''} key={status} onClick={() => setFilter(status)}>{status}</button>)}</div></div>{visibleReports.map((report) => <button className="report-row" key={report.code} onClick={() => setSelectedReport(report)}><img src={report.image} alt="" /><span className="report-details"><small>{report.code}</small><strong>{report.title}</strong><span>{report.meta}</span><i className={`progress-line ${report.color}`} style={{ width: report.width }} /></span><span className={`status-pill ${report.color}`}><i />{report.status}</span><ChevronRight size={17} className="row-chevron" /></button>)}{!visibleReports.length && <p className="empty-state">No reports match this filter.</p>}<button className="panel-link" onClick={() => setActiveNav('My Reports')}>View All <ChevronRight size={14} /></button></div></section>
-            <section className="col-12 col-xl-5"><div className="dashboard-panel updates-panel"><div className="panel-heading"><h2>Recent Updates</h2><button className="more-button" aria-label="More updates"><MoreHorizontal size={19} /></button></div><div className="timeline"><div className="timeline-item"><span className="timeline-dot orange"><Activity size={13} /></span><div><small>STATUS CHANGE</small><p><b>#CF-2026-01</b> updated to <em>In Progress</em>.</p><time>2 hours ago</time></div></div><div className="timeline-item"><span className="timeline-dot grey"><MessageSquare size={13} /></span><div><small>NEW COMMENT</small><p>City Works added a comment on <b>#CF-2026-01</b></p><blockquote>&quot;Crew dispatched to assess the damage...&quot;</blockquote><time>Yesterday</time></div></div><div className="timeline-item"><span className="timeline-dot blue"><FileText size={13} /></span><div><small>REPORT SUBMITTED</small><p><b>#CF-2026-02</b> received and pending review.</p><time>2 days ago</time></div></div></div></div></section>
+            <section className="col-12 col-xl-7"><div className="dashboard-panel reports-panel"><div className="panel-heading"><h2>Recent Reports</h2><div className="report-filter"><button className={filter === 'All' ? 'selected' : ''} onClick={() => setFilter('All')}>All</button>{['In Progress', 'New', 'Resolved'].map((status) => <button className={filter === status ? 'selected' : ''} key={status} onClick={() => setFilter(status)}>{status}</button>)}</div></div>{loading ? <div className="empty-state"><span className="skeleton skeleton-line" /><span className="skeleton skeleton-line" /></div> : visibleReports.length ? visibleReports.map((report) => <button className="report-row" key={report._id || report.reportId} onClick={() => setSelectedReport(report)}><span className="report-thumb">{report.imageUrl ? <img src={report.imageUrl} alt="" /> : <FileText size={20} />}</span><span className="report-details"><small>{report.reportId || `#${String(report._id).slice(-8)}`}</small><strong>{report.title}</strong><span>{formatDate(report.createdAt)} &nbsp;•&nbsp; {report.location?.address || 'Location unavailable'}</span><i className={`progress-line ${statusClass(report.status)}`} /></span><span className={`status-pill ${statusClass(report.status)}`}><i />{report.status}</span><ChevronRight size={17} className="row-chevron" /></button>) : <div className="empty-state"><FileText size={42} /><strong>No reports yet</strong><span>You haven&apos;t submitted any community reports.</span><button onClick={() => setShowReportModal(true)}>Create Your First Report</button></div>}<button className="panel-link" onClick={() => navigate('/reports')}>View All <ChevronRight size={14} /></button></div></section>
+            <section className="col-12 col-xl-5"><div className="dashboard-panel updates-panel"><div className="panel-heading"><h2>Recent Updates</h2><button className="more-button" aria-label="More updates"><MoreHorizontal size={19} /></button></div>{loading ? <div className="empty-state compact"><span className="skeleton skeleton-line" /><span className="skeleton skeleton-line" /></div> : dashboard.recentUpdates?.length ? <div className="timeline">{dashboard.recentUpdates.map((update, index) => <div className="timeline-item" key={`${update.timestamp}-${index}`}><span className={`timeline-dot ${index % 2 ? 'grey' : 'orange'}`}><Activity size={13} /></span><div><small>{update.type?.replace('_', ' ')}</small><p>{update.text}</p><time>{formatDate(update.timestamp)}</time></div></div>)}</div> : <div className="empty-state compact"><span className="empty-icon"><Bell size={24} /></span><strong>No updates available</strong><span>Updates related to your reports will appear here.</span></div>}</div></section>
           </div>
 
-          <section className="dashboard-panel issue-map-panel"><div className="panel-heading"><h2>Issue Map</h2><button className="panel-link" onClick={() => navigate('/map')}>View Map <ChevronRight size={14} /></button></div><div className="issue-map"><div className="map-road road-a" /><div className="map-road road-b" /><div className="map-road road-c" /><div className="map-water" /><button className="map-pin pin-orange" aria-label="In progress report" onClick={() => setSelectedReport(reports[0])}><MapPin size={26} /></button><button className="map-pin pin-green" aria-label="Resolved report" onClick={() => setSelectedReport(reports[2])}><MapPin size={26} /></button><button className="map-pin pin-red" aria-label="New report" onClick={() => setSelectedReport(reports[1])}><MapPin size={26} /></button><span className="map-label"><i className="orange" /> In progress <i className="green" /> Resolved <i className="red" /> New</span></div></section>
+          <section className="dashboard-panel issue-map-panel"><div className="panel-heading"><h2>Issue Map</h2><button className="panel-link" onClick={() => navigate('/map')}>View Map <ChevronRight size={14} /></button></div><div className="issue-map"><div className="map-grid" />{dashboard.mapIssues?.slice(0, 12).map((issue, index) => <button className={`map-pin pin-${['orange', 'green', 'red'][index % 3]}`} style={{ left: `${12 + ((index * 23) % 76)}%`, top: `${22 + ((index * 31) % 54)}%` }} aria-label={issue.title} key={issue.id} onClick={() => setSelectedReport(issue)}><MapPin size={26} /></button>)}<span className="map-label"><i className="orange" /> In progress <i className="green" /> Resolved <i className="red" /> New</span></div></section>
         </div>
       </main>
 
-      {showReportModal && <div className="modal-backdrop" role="presentation" onMouseDown={() => setShowReportModal(false)}><div className="report-modal" role="dialog" aria-modal="true" aria-labelledby="report-modal-title" onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setShowReportModal(false)} aria-label="Close"><X size={18} /></button>{reportSubmitted ? <div className="modal-success"><span><ShieldCheck size={25} /></span><h2>Report received</h2><p>Thanks for helping improve your community. We&apos;ll review your report shortly.</p><button onClick={() => { setReportSubmitted(false); setShowReportModal(false); }}>Done</button></div> : <><h2 id="report-modal-title">Report a New Problem</h2><p className="modal-subtitle">Tell us what needs attention in your community.</p><label>Problem title<input placeholder="e.g. Broken streetlight" /></label><label>Location<input placeholder="Street, landmark or area" /></label><label>Description<textarea rows="3" placeholder="Add a few details..." /></label><button className="modal-submit" onClick={() => setReportSubmitted(true)}>Submit Report <ChevronRight size={16} /></button></>}</div></div>}
-      {selectedReport && <div className="modal-backdrop" role="presentation" onMouseDown={() => setSelectedReport(null)}><div className="report-modal detail-modal" role="dialog" aria-modal="true" onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setSelectedReport(null)} aria-label="Close"><X size={18} /></button><img src={selectedReport.image} alt="" /><small>{selectedReport.code}</small><h2>{selectedReport.title}</h2><p>{selectedReport.meta}</p><span className={`status-pill ${selectedReport.color}`}><i />{selectedReport.status}</span><button className="modal-submit" onClick={() => setSelectedReport(null)}>Close</button></div></div>}
+      {showReportModal && <div className="modal-backdrop" role="presentation" onMouseDown={() => setShowReportModal(false)}><form className="report-modal" onSubmit={submitReport} onMouseDown={(event) => event.stopPropagation()}><button type="button" className="modal-close" onClick={() => setShowReportModal(false)} aria-label="Close"><X size={18} /></button><h2 id="report-modal-title">Report a New Problem</h2><p className="modal-subtitle">Tell us what needs attention in your community.</p><label>Problem title<input required name="title" value={form.title} onChange={updateForm} placeholder="e.g. Broken streetlight" /></label><label>Location<input required name="address" value={form.address} onChange={updateForm} placeholder="Street, landmark or area" /></label><label>Description<textarea name="description" value={form.description} onChange={updateForm} rows="3" placeholder="Add a few details..." /></label><label>Image URL <span className="optional">(optional)</span><input name="imageUrl" value={form.imageUrl} onChange={updateForm} placeholder="https://..." /></label><button disabled={submitting} className="modal-submit" type="submit">{submitting ? 'Submitting...' : 'Submit Report'} <ChevronRight size={16} /></button></form></div>}
+      {selectedReport && <div className="modal-backdrop" role="presentation" onMouseDown={() => setSelectedReport(null)}><div className="report-modal detail-modal" onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setSelectedReport(null)} aria-label="Close"><X size={18} /></button><small>{selectedReport.reportId || selectedReport.id}</small><h2>{selectedReport.title}</h2><p>{selectedReport.location?.address || 'Location unavailable'}</p><span className={`status-pill ${statusClass(selectedReport.status)}`}><i />{selectedReport.status}</span></div></div>}
     </div>
   );
 };
