@@ -12,11 +12,12 @@ const protect = async (req, res, next) => {
 		const decoded = jwt.verify(token, getJwtSecret());
 		const userId = decoded.id || decoded._id || decoded.userId;
 		if (!userId) return res.status(401).json({ message: 'Invalid authentication token' });
-		const user = await User.findById(userId).select('+password');
+		const user = await User.findById(userId);
 		if (!user || user.isActive === false) return res.status(401).json({ message: 'User account is unavailable' });
 		req.user = user;
 		return next();
 	} catch (error) {
+		if (error.name !== 'JsonWebTokenError' && error.name !== 'TokenExpiredError') return next(error);
 		return res.status(401).json({ message: 'Invalid or expired token' });
 	}
 };

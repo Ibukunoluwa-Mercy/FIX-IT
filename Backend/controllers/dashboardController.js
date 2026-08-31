@@ -48,7 +48,7 @@ const getOverview = async (req, res) => {
 		]);
 
 		return res.json({
-			userInfo: { name: user.name, avatar: user.avatarUrl, impactScore: user.impactScore, communityRank: user.cityRank },
+			userInfo: { name: user.name, email: user.email, avatarUrl: user.avatarUrl, impactScore: user.impactScore, cityRank: user.cityRank },
 			stats: { totalActiveReports, resolvedThisMonth, impactScore: user.impactScore, rank: user.cityRank },
 			recentReports,
 			recentUpdates,
@@ -61,15 +61,16 @@ const getOverview = async (req, res) => {
 
 const submitReport = async (req, res) => {
 	const { title, description = '', address = '', lat, lng, imageUrl = '' } = req.body;
-	if (!title || !address || !Number.isFinite(Number(lat)) || !Number.isFinite(Number(lng))) {
-		return res.status(400).json({ message: 'Title, address, latitude, and longitude are required' });
+	if (!title || !address) {
+		return res.status(400).json({ message: 'Title and address are required' });
 	}
 	try {
 		const userId = getAuthenticatedUserId(req);
 		const reportId = await getNextReportId();
+		const hasCoordinates = Number.isFinite(Number(lat)) && Number.isFinite(Number(lng));
 		const report = await Report.create({
 			reportId, user: userId, createdBy: userId, title, description,
-			location: { address, coordinates: { lat: Number(lat), lng: Number(lng) } },
+			location: { address, ...(hasCoordinates ? { coordinates: { lat: Number(lat), lng: Number(lng) } } : {}) },
 			status: 'New', imageUrl, images: imageUrl ? [imageUrl] : [],
 			updates: [{ type: 'SUBMITTED', text: 'Report submitted and pending review.', author: req.user?.name || '', timestamp: new Date() }],
 		});

@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+const { protect } = require('./auth');
 
 const normalizeRole = (value) => {
 	const normalized = String(value || '').trim().toLowerCase();
@@ -14,22 +14,9 @@ const normalizeRole = (value) => {
 	return aliases[normalized] || normalized;
 };
 
-const requireAuth = (req, res, next) => {
-	const authorization = req.headers.authorization || '';
-	const token = authorization.startsWith('Bearer ') ? authorization.slice(7) : null;
-	if (!token) return res.status(401).json({ message: 'Authentication required' });
+const requireAuth = protect;
 
-	try {
-		req.user = jwt.verify(token, process.env.JWT_SECRET || 'fixit-development-secret');
-		return next();
-	} catch (error) {
-		return res.status(401).json({ message: 'Invalid or expired token' });
-	}
-};
-
-module.exports = { requireAuth };
-
-module.exports.protect = requireAuth;
+module.exports = { requireAuth, protect };
 
 const requireRole = (...allowedRoles) => (req, res, next) => {
 	const normalizedAllowed = allowedRoles.map(normalizeRole);

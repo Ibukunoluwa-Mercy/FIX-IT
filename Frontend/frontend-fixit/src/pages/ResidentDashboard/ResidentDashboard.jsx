@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import ReportWizard from '../ReportWizardPage/ReportWizard';
 import {
   Activity, Bell, Bookmark, ChevronDown, ChevronRight, CircleHelp, FileText, Grid2X2,
   LogOut, MapPin, Menu, MessageSquare, MoreHorizontal, Plus, Search,
@@ -24,14 +25,12 @@ const ResidentDashboard = () => {
   const [activeNav, setActiveNav] = useState('Dashboard');
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showReportModal, setShowReportModal] = useState(false);
+  const [showReportWizard, setShowReportWizard] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
   const [filter, setFilter] = useState('All');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [dashboard, setDashboard] = useState({ userInfo: {}, stats: {}, recentReports: [], recentUpdates: [], mapIssues: [] });
-  const [form, setForm] = useState({ title: '', description: '', address: '', imageUrl: '' });
-  const [submitting, setSubmitting] = useState(false);
 
   const user = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('fixitUser') || '{}'); } catch { return {}; }
@@ -65,17 +64,6 @@ const ResidentDashboard = () => {
     navigate('/login');
   };
   const goToNav = (label) => { setActiveNav(label); if (label === 'My Reports') navigate('/reports'); if (label === 'Nearby Issues') navigate('/map'); };
-  const updateForm = (event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
-  const submitReport = async (event) => {
-    event.preventDefault(); setSubmitting(true);
-    try {
-      let coordinates = { lat: 0, lng: 0 };
-      if (navigator.geolocation) coordinates = await new Promise((resolve) => navigator.geolocation.getCurrentPosition((position) => resolve({ lat: position.coords.latitude, lng: position.coords.longitude }), () => resolve(coordinates), { timeout: 2500 }));
-      await axios.post(`${API_URL}/api/reports`, { ...form, ...coordinates }, { headers: { Authorization: `Bearer ${token}` } });
-      setForm({ title: '', description: '', address: '', imageUrl: '' }); setShowReportModal(false); await loadDashboard();
-    } catch (requestError) { setError(requestError.response?.data?.message || 'Unable to submit your report.'); }
-    finally { setSubmitting(false); }
-  };
 
   return (
     <div className={`resident-dashboard ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
@@ -113,7 +101,7 @@ const ResidentDashboard = () => {
         <header className="resident-header">
           <div className="mobile-brand"><span className="brand-mark"><ShieldCheck size={18} /></span><strong>Fixit</strong></div>
           <div className="header-actions">
-            <button className="new-report-button" onClick={() => setShowReportModal(true)}><Plus size={16} /> New Report</button>
+            <button className="new-report-button" onClick={() => setShowReportWizard(true)}><Plus size={16} /> New Report</button>
             <div className="header-popover-wrap"><button className="icon-button header-icon" onClick={() => setShowNotifications((value) => !value)} aria-label="Notifications"><Bell size={19} /><b>3</b></button>{showNotifications && <div className="notification-popover"><strong>Notifications</strong><p>City Works added a comment to your report.</p><p>Your streetlight report is now in progress.</p></div>}</div>
             <button className="icon-button header-icon profile-icon" onClick={() => setShowProfileMenu((value) => !value)} aria-label="Open profile"><UserCircle size={21} /></button>
           </div>
@@ -127,10 +115,10 @@ const ResidentDashboard = () => {
             {[['My Reports', stats.totalActiveReports ?? 0, 'Active', FileText, 'orange', '/reports'], ['Resolved', stats.resolvedThisMonth ?? 0, 'This Month', Activity, 'green', '/reports'], ['Impact Score', stats.impactScore ?? 0, 'Keep it going!', Star, 'amber', null], ['Community Rank', stats.rank || 'N/A', 'In your city', Users, 'blue', '/map']].map(([label, value, note, Icon, tone, path]) => <article className="col-12 col-sm-6 col-xl-3" key={label}><div className={`stat-card stat-${tone}`}><span className="stat-icon"><Icon size={18} /></span><span className="stat-label">{label}</span><strong className="stat-value">{loading ? <span className="skeleton skeleton-value" /> : value}</strong><small>{note}</small><button onClick={() => path ? navigate(path) : console.info(`${label} details`)}>{label === 'Impact Score' ? 'Details' : label === 'Community Rank' ? 'View leaderboard' : 'View all'} <ChevronRight size={14} /></button></div></article>)}
           </section>
 
-          <section className="report-cta"><div className="cta-icon"><Plus size={26} /></div><div><h2>Report a New Problem</h2><p>Help keep our community safe and clean.</p></div><button onClick={() => setShowReportModal(true)}>Report Now <ChevronRight size={17} /></button></section>
+          <section className="report-cta"><div className="cta-icon"><Plus size={26} /></div><div><h2>Report a New Problem</h2><p>Help keep our community safe and clean.</p></div><button onClick={() => setShowReportWizard(true)}>Report Now <ChevronRight size={17} /></button></section>
 
           <div className="row g-3 dashboard-lower">
-            <section className="col-12 col-xl-7"><div className="dashboard-panel reports-panel"><div className="panel-heading"><h2>Recent Reports</h2><div className="report-filter"><button className={filter === 'All' ? 'selected' : ''} onClick={() => setFilter('All')}>All</button>{['In Progress', 'New', 'Resolved'].map((status) => <button className={filter === status ? 'selected' : ''} key={status} onClick={() => setFilter(status)}>{status}</button>)}</div></div>{loading ? <div className="empty-state"><span className="skeleton skeleton-line" /><span className="skeleton skeleton-line" /></div> : visibleReports.length ? visibleReports.map((report) => <button className="report-row" key={report._id || report.reportId} onClick={() => setSelectedReport(report)}><span className="report-thumb">{report.imageUrl ? <img src={report.imageUrl} alt="" /> : <FileText size={20} />}</span><span className="report-details"><small>{report.reportId || `#${String(report._id).slice(-8)}`}</small><strong>{report.title}</strong><span>{formatDate(report.createdAt)} &nbsp;•&nbsp; {report.location?.address || 'Location unavailable'}</span><i className={`progress-line ${statusClass(report.status)}`} /></span><span className={`status-pill ${statusClass(report.status)}`}><i />{report.status}</span><ChevronRight size={17} className="row-chevron" /></button>) : <div className="empty-state"><FileText size={42} /><strong>No reports yet</strong><span>You haven&apos;t submitted any community reports.</span><button onClick={() => setShowReportModal(true)}>Create Your First Report</button></div>}<button className="panel-link" onClick={() => navigate('/reports')}>View All <ChevronRight size={14} /></button></div></section>
+            <section className="col-12 col-xl-7"><div className="dashboard-panel reports-panel"><div className="panel-heading"><h2>Recent Reports</h2><div className="report-filter"><button className={filter === 'All' ? 'selected' : ''} onClick={() => setFilter('All')}>All</button>{['In Progress', 'New', 'Resolved'].map((status) => <button className={filter === status ? 'selected' : ''} key={status} onClick={() => setFilter(status)}>{status}</button>)}</div></div>{loading ? <div className="empty-state"><span className="skeleton skeleton-line" /><span className="skeleton skeleton-line" /></div> : visibleReports.length ? visibleReports.map((report) => <button className="report-row" key={report._id || report.reportId} onClick={() => setSelectedReport(report)}><span className="report-thumb">{report.imageUrl ? <img src={report.imageUrl} alt="" /> : <FileText size={20} />}</span><span className="report-details"><small>{report.reportId || `#${String(report._id).slice(-8)}`}</small><strong>{report.title}</strong><span>{formatDate(report.createdAt)} &nbsp;•&nbsp; {report.location?.address || 'Location unavailable'}</span><i className={`progress-line ${statusClass(report.status)}`} /></span><span className={`status-pill ${statusClass(report.status)}`}><i />{report.status}</span><ChevronRight size={17} className="row-chevron" /></button>) : <div className="empty-state"><FileText size={42} /><strong>No reports yet</strong><span>You haven&apos;t submitted any community reports.</span><button onClick={() => setShowReportWizard(true)}>Create Your First Report</button></div>}<button className="panel-link" onClick={() => navigate('/reports')}>View All <ChevronRight size={14} /></button></div></section>
             <section className="col-12 col-xl-5"><div className="dashboard-panel updates-panel"><div className="panel-heading"><h2>Recent Updates</h2><button className="more-button" aria-label="More updates"><MoreHorizontal size={19} /></button></div>{loading ? <div className="empty-state compact"><span className="skeleton skeleton-line" /><span className="skeleton skeleton-line" /></div> : dashboard.recentUpdates?.length ? <div className="timeline">{dashboard.recentUpdates.map((update, index) => <div className="timeline-item" key={`${update.timestamp}-${index}`}><span className={`timeline-dot ${index % 2 ? 'grey' : 'orange'}`}><Activity size={13} /></span><div><small>{update.type?.replace('_', ' ')}</small><p>{update.text}</p><time>{formatDate(update.timestamp)}</time></div></div>)}</div> : <div className="empty-state compact"><span className="empty-icon"><Bell size={24} /></span><strong>No updates available</strong><span>Updates related to your reports will appear here.</span></div>}</div></section>
           </div>
 
@@ -138,7 +126,7 @@ const ResidentDashboard = () => {
         </div>
       </main>
 
-      {showReportModal && <div className="modal-backdrop" role="presentation" onMouseDown={() => setShowReportModal(false)}><form className="report-modal" onSubmit={submitReport} onMouseDown={(event) => event.stopPropagation()}><button type="button" className="modal-close" onClick={() => setShowReportModal(false)} aria-label="Close"><X size={18} /></button><h2 id="report-modal-title">Report a New Problem</h2><p className="modal-subtitle">Tell us what needs attention in your community.</p><label>Problem title<input required name="title" value={form.title} onChange={updateForm} placeholder="e.g. Broken streetlight" /></label><label>Location<input required name="address" value={form.address} onChange={updateForm} placeholder="Street, landmark or area" /></label><label>Description<textarea name="description" value={form.description} onChange={updateForm} rows="3" placeholder="Add a few details..." /></label><label>Image URL <span className="optional">(optional)</span><input name="imageUrl" value={form.imageUrl} onChange={updateForm} placeholder="https://..." /></label><button disabled={submitting} className="modal-submit" type="submit">{submitting ? 'Submitting...' : 'Submit Report'} <ChevronRight size={16} /></button></form></div>}
+      {showReportWizard && <ReportWizard onClose={() => setShowReportWizard(false)} onSubmitted={() => { setShowReportWizard(false); loadDashboard(); }} />}
       {selectedReport && <div className="modal-backdrop" role="presentation" onMouseDown={() => setSelectedReport(null)}><div className="report-modal detail-modal" onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setSelectedReport(null)} aria-label="Close"><X size={18} /></button><small>{selectedReport.reportId || selectedReport.id}</small><h2>{selectedReport.title}</h2><p>{selectedReport.location?.address || 'Location unavailable'}</p><span className={`status-pill ${statusClass(selectedReport.status)}`}><i />{selectedReport.status}</span></div></div>}
     </div>
   );
