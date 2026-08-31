@@ -88,6 +88,7 @@ const Register = () => {
             const response = await axios.post(`${API_URL}/api/auth/${role === 'official' ? 'register-official' : 'register'}`, requestBody);
             const data = response.data;
             localStorage.setItem('fixitToken', data.token);
+            localStorage.setItem('fixitUser', JSON.stringify(data.user || {}));
             toast.success(role === 'official'
                 ? `Welcome onboard, ${form.fullName.split(' ')[0]}! Your Local Official account has been created. Check your email to verify it.`
                 : 'Welcome onboard! Your Fixit account has been created. Check your email to verify it.');
@@ -97,9 +98,8 @@ const Register = () => {
                 setReviewed(false);
                 setErrors({});
                 setShowPassword(false);
-            } else {
-                navigate('/');
             }
+            navigate('/dashboard');
         } catch (error) {
             const message = error.response?.data?.message || (error instanceof TypeError && error.message.toLowerCase().includes('fetch')
                 ? 'Unable to reach the Fixit server. Start the backend and check its MongoDB connection.'
