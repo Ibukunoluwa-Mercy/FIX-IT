@@ -181,7 +181,8 @@ const submitWizardReport = async (req, res) => {
 		await User.findByIdAndUpdate(userId, { $inc: { impactScore: 10 } }, { new: true });
 		return res.status(201).json(report);
 	} catch (error) {
-		return res.status(500).json({ message: 'Unable to submit report', error: error.message });
+		console.error('Report submission error in submitWizardReport:', error);
+		return res.status(500).json({ message: error.message || 'Unable to submit report', error: error.message });
 	}
 };
 

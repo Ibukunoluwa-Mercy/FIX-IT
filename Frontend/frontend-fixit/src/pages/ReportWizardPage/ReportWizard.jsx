@@ -28,6 +28,8 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
 
   const update = (event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
 
+  const [uploadedUrls, setUploadedUrls] = useState([]);
+
   const choosePhotos = (event) => {
     const incomingFiles = Array.from(event.target.files || []);
     const validFiles = incomingFiles.filter((file) => file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024);
@@ -41,11 +43,13 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
       }));
 
     setPhotos(nextPhotos);
+    setUploadedUrls([]);
     event.target.value = '';
   };
 
   const uploadPhotos = async () => {
     if (!photos.length) return [];
+    if (uploadedUrls.length === photos.length && uploadedUrls.length > 0) return uploadedUrls;
 
     const token = getAuthToken();
     if (!token) throw new Error('Please sign in before uploading photos.');
@@ -62,7 +66,9 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
       },
     });
 
-    return response.data?.urls || [];
+    const urls = response.data?.urls || [];
+    setUploadedUrls(urls);
+    return urls;
   };
 
   const geocodeAddress = async (address) => {

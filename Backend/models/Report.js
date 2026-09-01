@@ -33,7 +33,7 @@ const reportSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
-reportSchema.pre('save', function normalizeReportData(next) {
+reportSchema.pre('save', function normalizeReportData() {
 	const normalizedCategory = (this.category || '').trim();
 	if (!this.title && normalizedCategory) this.title = normalizedCategory;
 	if (!this.category && this.title) this.category = this.title;
@@ -47,7 +47,6 @@ reportSchema.pre('save', function normalizeReportData(next) {
 		this.location.lat = this.location.coordinates.lat;
 		this.location.lng = this.location.coordinates.lng;
 	}
-	next();
 });
 
 module.exports = mongoose.model('Report', reportSchema);
