@@ -21,7 +21,7 @@ const connectDB = async () => {
 				console.log(`MongoDB successfully connected `);
 				return true;
 			} catch (error) {
-				console.error(`MongoDB connection attempt ${attempt}/${maxAttempts} failed for ${mongoUri}: ${error.message}`);
+				console.error(`MongoDB connection attempt ${attempt}/${maxAttempts} failed: ${error.message}`);
 				if (attempt < maxAttempts) await new Promise((resolve) => setTimeout(resolve, Math.min(attempt * 2000, 10000)));
 			}
 		}
