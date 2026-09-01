@@ -84,11 +84,11 @@ const Register = () => {
                 body.append('isConfirmed', String(reviewed));
                 body.append('officialIdFile', form.officialId);
                 return body;
-            })() : JSON.stringify({ fullName: form.fullName, email: form.email, location: form.neighborhood, password: form.password, role, agreeToTerms: agreed });
+            })() : { fullName: form.fullName, email: form.email, location: form.neighborhood, password: form.password, role, agreeToTerms: agreed };
             const response = await axios.post(`${API_URL}/api/auth/${role === 'official' ? 'register-official' : 'register'}`, requestBody);
             const data = response.data;
             localStorage.setItem('fixitToken', data.token);
-            localStorage.setItem('fixitUser', JSON.stringify(data.user || {}));
+            localStorage.setItem('fixitUser', JSON.stringify(data.user || data.profile || {}));
             localStorage.setItem('fixitDashboardGreeting', 'welcome');
             toast.success(role === 'official'
                 ? `Welcome onboard, ${form.fullName.split(' ')[0]}! Your Local Official account has been created. Check your email to verify it.`

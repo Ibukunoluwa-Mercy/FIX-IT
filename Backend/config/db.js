@@ -1,4 +1,11 @@
 const mongoose = require('mongoose');
+const dns = require('dns');
+
+try {
+	dns.setServers(['8.8.8.8', '8.8.4.4']);
+} catch (e) {
+	// fallback to default dns if not supported
+}
 
 const getMongoUris = () => {
 	const configuredUris = [process.env.MONGODB_URI, process.env.MONGO_URI].filter(Boolean);

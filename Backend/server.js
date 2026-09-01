@@ -59,6 +59,8 @@ app.use((error, req, res, next) => {
 	if (res.headersSent) return next(error);
 	if (error.message === 'Origin is not allowed by CORS') return res.status(403).json({ message: error.message });
 	if (error.type === 'entity.too.large') return res.status(413).json({ message: 'Request payload is too large' });
+	if (error && error.code === 'LIMIT_FILE_SIZE') return res.status(413).json({ message: 'File is too large' });
+	if (error && error.code === 'LIMIT_UNEXPECTED_FILE') return res.status(400).json({ message: 'Unsupported file type' });
 	console.error('Unhandled API error:', error);
 	return res.status(500).json({ message: 'Internal server error' });
 });
