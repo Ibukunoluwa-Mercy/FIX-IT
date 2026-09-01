@@ -7,6 +7,7 @@ import {
   LogOut, MapPin, Menu, MessageSquare, MoreHorizontal, Plus, Search,
   Settings, ShieldCheck, Star, UserCircle, Users, X
 } from 'lucide-react';
+import logoWhite from '../../assets/fixit-logo-white.png';
 import './ResidentDashboard.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
@@ -70,7 +71,10 @@ const ResidentDashboard = () => {
       <aside className="resident-sidebar">
         <div className="resident-brand-row">
           <Link to="/dashboard" className="resident-brand" aria-label="Fixit dashboard">
-            <span className="brand-mark"><ShieldCheck size={20} /></span><span className="brand-word">Fixit</span>
+            <img src={logoWhite} alt="FixIt" className="brand-logo-img" />
+            <span className="brand-word">
+              Fi<span style={{ color: '#f59e0b' }}>xIt</span>
+            </span>
           </Link>
           <button className="icon-button sidebar-toggle" onClick={() => setIsSidebarCollapsed((value) => !value)} aria-label="Toggle sidebar" title="Toggle sidebar">
             {isSidebarCollapsed ? <Menu size={19} /> : <X size={18} />}
@@ -99,7 +103,12 @@ const ResidentDashboard = () => {
 
       <main className="resident-main">
         <header className="resident-header">
-          <div className="mobile-brand"><span className="brand-mark"><ShieldCheck size={18} /></span><strong>Fixit</strong></div>
+          <div className="mobile-brand">
+            <img src={logoWhite} alt="FixIt" className="brand-logo-img" style={{ height: '28px' }} />
+            <span className="brand-word" style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a' }}>
+              Fi<span style={{ color: '#f59e0b' }}>xIt</span>
+            </span>
+          </div>
           <div className="header-actions">
             <button className="new-report-button" onClick={() => setShowReportWizard(true)}><Plus size={16} /> New Report</button>
             <div className="header-popover-wrap">
@@ -129,7 +138,7 @@ const ResidentDashboard = () => {
           {error && <div className="dashboard-alert" role="alert">{error}</div>}
 
           <section className="row g-3 stats-grid" aria-label="Overview statistics">
-            {[['My Reports', stats.totalActiveReports ?? 0, 'Active', FileText, 'orange', '/reports'], ['Resolved', stats.resolvedThisMonth ?? 0, 'This Month', Activity, 'green', '/reports'], ['Impact Score', stats.impactScore ?? 0, 'Keep it going!', Star, 'amber', null], ['Community Rank', stats.rank || 'N/A', 'In your city', Users, 'blue', '/map']].map(([label, value, note, Icon, tone, path]) => <article className="col-12 col-sm-6 col-xl-3" key={label}><div className={`stat-card stat-${tone}`}><span className="stat-icon"><Icon size={18} /></span><span className="stat-label">{label}</span><strong className="stat-value">{loading ? <span className="skeleton skeleton-value" /> : value}</strong><small>{note}</small><button onClick={() => path ? navigate(path) : console.info(`${label} details`)}>{label === 'Impact Score' ? 'Details' : label === 'Community Rank' ? 'View leaderboard' : 'View all'} <ChevronRight size={14} /></button></div></article>)}
+            {[['My Reports', stats.totalActiveReports ?? 0, 'Active', FileText, 'orange', '/reports'], ['Resolved', stats.resolvedThisMonth ?? 0, 'This Month', Activity, 'green', '/reports'], ['Impact Score', stats.impactScore ?? 0, 'Keep it going!', Star, 'amber', null], ['Community Rank', stats.rank || 'Top 0%', 'In your city', Users, 'blue', '/map']].map(([label, value, note, Icon, tone, path]) => <article className="col-12 col-sm-6 col-xl-3" key={label}><div className={`stat-card stat-${tone}`}><span className="stat-icon"><Icon size={18} /></span><span className="stat-label">{label}</span><strong className="stat-value">{loading ? <span className="skeleton skeleton-value" /> : value}</strong><small>{note}</small><button onClick={() => path ? navigate(path) : console.info(`${label} details`)}>{label === 'Impact Score' ? 'Details' : label === 'Community Rank' ? 'View leaderboard' : 'View all'} <ChevronRight size={14} /></button></div></article>)}
           </section>
 
           <section className="report-cta"><div className="cta-icon"><Plus size={26} /></div><div><h2>Report a New Problem</h2><p>Help keep our community safe and clean.</p></div><button onClick={() => setShowReportWizard(true)}>Report Now <ChevronRight size={17} /></button></section>

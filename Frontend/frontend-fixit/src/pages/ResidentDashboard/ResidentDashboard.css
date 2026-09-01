@@ -24,3 +24,7 @@
 .empty-updates-text{display:flex;flex-direction:column;gap:3px}
 .empty-updates-text strong{font-size:14px;font-weight:700;color:#1e293b}
 .empty-updates-text span{font-size:12px;color:#64748b}
+
+/* Brand Logo Image */
+.brand-logo-img{height:36px;width:auto;object-fit:contain;display:block}
+.sidebar-collapsed .brand-logo-img{height:32px;margin:0 auto}

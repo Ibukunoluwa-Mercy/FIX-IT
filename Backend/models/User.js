@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema(
 		name: { type: String, required: true, trim: true },
 		avatarUrl: { type: String, trim: true, default: '' },
 		impactScore: { type: Number, default: 0 },
-		cityRank: { type: String, default: 'N/A' },
+		cityRank: { type: String, default: 'Top 0%' },
 		firstName: { type: String, trim: true },
 		lastName: { type: String, trim: true },
 		email: {

@@ -120,8 +120,8 @@ const getOverview = async (req, res) => {
 		]);
 
 		return res.json({
-			userInfo: { name: user.name, email: user.email, avatarUrl: user.avatarUrl, impactScore: user.impactScore, cityRank: user.cityRank },
-			stats: { totalActiveReports, resolvedThisMonth, impactScore: user.impactScore, rank: user.cityRank },
+			userInfo: { name: user.name, email: user.email, avatarUrl: user.avatarUrl, impactScore: user.impactScore ?? 0, cityRank: user.cityRank || 'Top 0%' },
+			stats: { totalActiveReports, resolvedThisMonth, impactScore: user.impactScore ?? 0, rank: user.cityRank || 'Top 0%' },
 			recentReports,
 			recentUpdates,
 			mapIssues: mapReports.map((report) => ({ id: report.reportId || report._id, title: report.title, location: formatLocation(report.location), status: report.status })),
