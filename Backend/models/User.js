@@ -5,8 +5,8 @@ const userSchema = new mongoose.Schema(
 	{
 		name: { type: String, required: true, trim: true },
 		avatarUrl: { type: String, trim: true, default: '' },
-		impactScore: { type: Number, default: 85 },
-		cityRank: { type: String, default: 'Top 20%' },
+		impactScore: { type: Number, default: 0 },
+		cityRank: { type: String, default: 'N/A' },
 		firstName: { type: String, trim: true },
 		lastName: { type: String, trim: true },
 		email: {
@@ -32,10 +32,9 @@ const userSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
-userSchema.pre('save', async function hashPassword(next) {
-	if (!this.isModified('password')) return next();
+userSchema.pre('save', async function hashPassword() {
+	if (!this.isModified('password')) return;
 	this.password = await bcrypt.hash(this.password, 12);
-	return next();
 });
 
 userSchema.methods.matchPassword = async function matchPassword(enteredPassword) {

@@ -12,7 +12,7 @@ import './ResidentDashboard.css';
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
 
 const navGroups = [
-  [{ label: 'Dashboard', icon: Grid2X2, active: true }, { label: 'My Reports', icon: FileText }, { label: 'Nearby Issues', icon: MapPin }, { label: 'Notifications', icon: Bell, badge: 3 }, { label: 'Messages', icon: MessageSquare }, { label: 'Saved Locations', icon: Bookmark }],
+  [{ label: 'Dashboard', icon: Grid2X2, active: true }, { label: 'My Reports', icon: FileText }, { label: 'Nearby Issues', icon: MapPin }, { label: 'Notifications', icon: Bell, badge: 0 }, { label: 'Messages', icon: MessageSquare }, { label: 'Saved Locations', icon: Bookmark }],
   [{ label: 'Help Center', icon: CircleHelp }, { label: 'Settings', icon: Settings }],
 ];
 
@@ -82,7 +82,7 @@ const ResidentDashboard = () => {
             <div className={`nav-group ${groupIndex ? 'nav-group-secondary' : ''}`} key={groupIndex}>
               {group.map(({ label, icon: Icon, badge, active }) => (
                   <button key={label} className={`resident-nav-link ${(activeNav === label || active && activeNav === 'Dashboard') ? 'active' : ''}`} onClick={() => goToNav(label)} title={label}>
-                  <Icon size={17} /><span>{label}</span>{badge && <b className="nav-badge">{badge}</b>}
+                  <Icon size={17} /><span>{label}</span>{Boolean(badge && badge > 0) && <b className="nav-badge">{badge}</b>}
                 </button>
               ))}
             </div>
@@ -102,7 +102,24 @@ const ResidentDashboard = () => {
           <div className="mobile-brand"><span className="brand-mark"><ShieldCheck size={18} /></span><strong>Fixit</strong></div>
           <div className="header-actions">
             <button className="new-report-button" onClick={() => setShowReportWizard(true)}><Plus size={16} /> New Report</button>
-            <div className="header-popover-wrap"><button className="icon-button header-icon" onClick={() => setShowNotifications((value) => !value)} aria-label="Notifications"><Bell size={19} /><b>3</b></button>{showNotifications && <div className="notification-popover"><strong>Notifications</strong><p>City Works added a comment to your report.</p><p>Your streetlight report is now in progress.</p></div>}</div>
+            <div className="header-popover-wrap">
+              <button className="icon-button header-icon" onClick={() => setShowNotifications((value) => !value)} aria-label="Notifications">
+                <Bell size={19} />
+                {dashboard.recentUpdates?.length > 0 && <b>{dashboard.recentUpdates.length}</b>}
+              </button>
+              {showNotifications && (
+                <div className="notification-popover">
+                  <strong>Notifications</strong>
+                  {dashboard.recentUpdates?.length ? (
+                    dashboard.recentUpdates.slice(0, 3).map((u, i) => (
+                      <p key={i}>{u.text}</p>
+                    ))
+                  ) : (
+                    <p>No new notifications.</p>
+                  )}
+                </div>
+              )}
+            </div>
             <button className="icon-button header-icon profile-icon" onClick={() => setShowProfileMenu((value) => !value)} aria-label="Open profile"><UserCircle size={21} /></button>
           </div>
         </header>
@@ -117,9 +134,128 @@ const ResidentDashboard = () => {
 
           <section className="report-cta"><div className="cta-icon"><Plus size={26} /></div><div><h2>Report a New Problem</h2><p>Help keep our community safe and clean.</p></div><button onClick={() => setShowReportWizard(true)}>Report Now <ChevronRight size={17} /></button></section>
 
-          <div className="row g-3 dashboard-lower">
-            <section className="col-12 col-xl-7"><div className="dashboard-panel reports-panel"><div className="panel-heading"><h2>Recent Reports</h2><div className="report-filter"><button className={filter === 'All' ? 'selected' : ''} onClick={() => setFilter('All')}>All</button>{['In Progress', 'New', 'Resolved'].map((status) => <button className={filter === status ? 'selected' : ''} key={status} onClick={() => setFilter(status)}>{status}</button>)}</div></div>{loading ? <div className="empty-state"><span className="skeleton skeleton-line" /><span className="skeleton skeleton-line" /></div> : visibleReports.length ? visibleReports.map((report) => <button className="report-row" key={report._id || report.reportId} onClick={() => setSelectedReport(report)}><span className="report-thumb">{report.imageUrl ? <img src={report.imageUrl} alt="" /> : <FileText size={20} />}</span><span className="report-details"><small>{report.reportId || `#${String(report._id).slice(-8)}`}</small><strong>{report.title}</strong><span>{formatDate(report.createdAt)} &nbsp;•&nbsp; {report.location?.address || 'Location unavailable'}</span><i className={`progress-line ${statusClass(report.status)}`} /></span><span className={`status-pill ${statusClass(report.status)}`}><i />{report.status}</span><ChevronRight size={17} className="row-chevron" /></button>) : <div className="empty-state"><FileText size={42} /><strong>No reports yet</strong><span>You haven&apos;t submitted any community reports.</span><button onClick={() => setShowReportWizard(true)}>Create Your First Report</button></div>}<button className="panel-link" onClick={() => navigate('/reports')}>View All <ChevronRight size={14} /></button></div></section>
-            <section className="col-12 col-xl-5"><div className="dashboard-panel updates-panel"><div className="panel-heading"><h2>Recent Updates</h2><button className="more-button" aria-label="More updates"><MoreHorizontal size={19} /></button></div>{loading ? <div className="empty-state compact"><span className="skeleton skeleton-line" /><span className="skeleton skeleton-line" /></div> : dashboard.recentUpdates?.length ? <div className="timeline">{dashboard.recentUpdates.map((update, index) => <div className="timeline-item" key={`${update.timestamp}-${index}`}><span className={`timeline-dot ${index % 2 ? 'grey' : 'orange'}`}><Activity size={13} /></span><div><small>{update.type?.replace('_', ' ')}</small><p>{update.text}</p><time>{formatDate(update.timestamp)}</time></div></div>)}</div> : <div className="empty-state compact"><span className="empty-icon"><Bell size={24} /></span><strong>No updates available</strong><span>Updates related to your reports will appear here.</span></div>}</div></section>
+          <div className="dashboard-panels-stacked">
+            <section className="dashboard-panel reports-panel">
+              <div className="panel-heading">
+                <h2>Recent Reports</h2>
+                <button className="panel-header-link" onClick={() => navigate('/reports')}>
+                  View All <ChevronRight size={15} />
+                </button>
+              </div>
+              {loading ? (
+                <div className="empty-state">
+                  <span className="skeleton skeleton-line" />
+                  <span className="skeleton skeleton-line" />
+                </div>
+              ) : visibleReports.length ? (
+                <div className="reports-list">
+                  {visibleReports.map((report) => (
+                    <button className="report-row" key={report._id || report.reportId} onClick={() => setSelectedReport(report)}>
+                      <span className="report-thumb">{report.imageUrl ? <img src={report.imageUrl} alt="" /> : <FileText size={20} />}</span>
+                      <span className="report-details">
+                        <small>{report.reportId || `#${String(report._id).slice(-8)}`}</small>
+                        <strong>{report.title}</strong>
+                        <span>{formatDate(report.createdAt)} &nbsp;•&nbsp; {report.location?.address || 'Location unavailable'}</span>
+                        <i className={`progress-line ${statusClass(report.status)}`} />
+                      </span>
+                      <span className={`status-pill ${statusClass(report.status)}`}><i />{report.status}</span>
+                      <ChevronRight size={17} className="row-chevron" />
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="empty-state empty-state-reports">
+                  <div className="empty-illustration-reports">
+                    <svg width="180" height="110" viewBox="0 0 180 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Subtle background glow/cloud & hill */}
+                      <ellipse cx="90" cy="70" rx="64" ry="34" fill="#FFF4EA" opacity="0.6"/>
+                      <path d="M20 92C32 82 50 84 62 87" stroke="#FFE3CC" strokeWidth="2" strokeLinecap="round" strokeDasharray="3 3"/>
+                      
+                      {/* Left plant */}
+                      <path d="M42 90V76" stroke="#52B788" strokeWidth="2.5" strokeLinecap="round"/>
+                      <circle cx="36" cy="73" r="4.5" fill="#74C69D"/>
+                      <circle cx="48" cy="70" r="4.5" fill="#74C69D"/>
+                      <circle cx="42" cy="64" r="5" fill="#52B788"/>
+
+                      {/* Right plant */}
+                      <path d="M142 90V78" stroke="#52B788" strokeWidth="2.5" strokeLinecap="round"/>
+                      <circle cx="137" cy="75" r="4" fill="#74C69D"/>
+                      <circle cx="147" cy="73" r="4" fill="#74C69D"/>
+                      <circle cx="142" cy="67" r="4.5" fill="#52B788"/>
+
+                      {/* Clipboard */}
+                      <rect x="64" y="24" width="52" height="66" rx="8" fill="#FFFFFF" stroke="#8E857B" strokeWidth="2.5"/>
+                      {/* Clipboard clip top */}
+                      <rect x="79" y="19" width="22" height="9" rx="3.5" fill="#4B5563"/>
+                      <circle cx="90" cy="17" r="3" fill="#D1D5DB"/>
+
+                      {/* Document text lines */}
+                      <rect x="76" y="36" width="28" height="2.5" rx="1.25" fill="#9CA3AF"/>
+                      <rect x="72" y="44" width="36" height="2.5" rx="1.25" fill="#CBD5E1"/>
+                      <rect x="72" y="52" width="24" height="2.5" rx="1.25" fill="#CBD5E1"/>
+                      <rect x="72" y="60" width="30" height="2.5" rx="1.25" fill="#CBD5E1"/>
+                      <rect x="72" y="68" width="18" height="2.5" rx="1.25" fill="#CBD5E1"/>
+
+                      {/* Magnifying Glass */}
+                      <circle cx="102" cy="64" r="12" fill="#FFFFFF" stroke="#374151" strokeWidth="3"/>
+                      <line x1="111" y1="73" x2="122" y2="84" stroke="#374151" strokeWidth="3.5" strokeLinecap="round"/>
+                    </svg>
+                  </div>
+                  <h3 className="empty-title">No reports yet</h3>
+                  <p className="empty-subtitle">You haven&apos;t submitted any community reports.</p>
+                  <button className="empty-cta-btn" onClick={() => setShowReportWizard(true)}>
+                    Create Your First Report
+                  </button>
+                </div>
+              )}
+            </section>
+
+            <section className="dashboard-panel updates-panel">
+              <div className="panel-heading">
+                <h2>Recent Updates</h2>
+              </div>
+              {loading ? (
+                <div className="empty-state compact">
+                  <span className="skeleton skeleton-line" />
+                  <span className="skeleton skeleton-line" />
+                </div>
+              ) : dashboard.recentUpdates?.length ? (
+                <div className="timeline">
+                  {dashboard.recentUpdates.map((update, index) => (
+                    <div className="timeline-item" key={`${update.timestamp}-${index}`}>
+                      <span className={`timeline-dot ${index % 2 ? 'grey' : 'orange'}`}>
+                        <Activity size={13} />
+                      </span>
+                      <div>
+                        <small>{update.type?.replace('_', ' ')}</small>
+                        <p>{update.text}</p>
+                        <time>{formatDate(update.timestamp)}</time>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="empty-state-updates">
+                  <div className="empty-bell-circle">
+                    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Bell Body */}
+                      <path d="M22 11C17.5817 11 14 14.5817 14 19V24.5C14 25.5 13 26.5 11.5 27.5C10.8 27.97 11.15 29 12 29H32C32.85 29 33.2 27.97 32.5 27.5C31 26.5 30 25.5 30 24.5V19C30 14.5817 26.4183 11 22 11Z" fill="#FDBA74"/>
+                      <circle cx="22" cy="8.5" r="2.5" fill="#FB923C"/>
+                      <ellipse cx="22" cy="31" rx="3.5" ry="2" fill="#F97316"/>
+                      {/* Ring dashes */}
+                      <line x1="8" y1="17" x2="10" y2="18.5" stroke="#FB923C" strokeWidth="2" strokeLinecap="round"/>
+                      <line x1="36" y1="17" x2="34" y2="18.5" stroke="#FB923C" strokeWidth="2" strokeLinecap="round"/>
+                      <line x1="9" y1="23" x2="6.5" y2="23.5" stroke="#FB923C" strokeWidth="2" strokeLinecap="round"/>
+                      <line x1="35" y1="23" x2="37.5" y2="23.5" stroke="#FB923C" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  </div>
+                  <div className="empty-updates-text">
+                    <strong>No updates available</strong>
+                    <span>Updates related to your reports will appear here.</span>
+                  </div>
+                </div>
+              )}
+            </section>
           </div>
 
           <section className="dashboard-panel issue-map-panel"><div className="panel-heading"><h2>Issue Map</h2><button className="panel-link" onClick={() => navigate('/map')}>View Map <ChevronRight size={14} /></button></div><div className="issue-map"><div className="map-grid" />{dashboard.mapIssues?.slice(0, 12).map((issue, index) => <button className={`map-pin pin-${['orange', 'green', 'red'][index % 3]}`} style={{ left: `${12 + ((index * 23) % 76)}%`, top: `${22 + ((index * 31) % 54)}%` }} aria-label={issue.title} key={issue.id} onClick={() => setSelectedReport(issue)}><MapPin size={26} /></button>)}<span className="map-label"><i className="orange" /> In progress <i className="green" /> Resolved <i className="red" /> New</span></div></section>

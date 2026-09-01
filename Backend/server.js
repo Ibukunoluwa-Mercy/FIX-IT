@@ -1,18 +1,20 @@
 const path = require('path');
-
-const express = require('express');
-const app = express();
-const mongoose = require('mongoose');
-const cors = require('cors');
-require('dotenv').config({ path: path.join(__dirname, '.env') });
 const fs = require('fs');
 const dns = require('dns');
+
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 const connectDB = require('./config/db');
 const reportRoutes = require('./routes/reportRoutes');
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 
+const app = express();
 const port = process.env.PORT || 5100;
 const uploadDirectory = path.join(__dirname, 'uploads');
 const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')

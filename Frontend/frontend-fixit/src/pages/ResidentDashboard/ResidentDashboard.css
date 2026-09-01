@@ -2,3 +2,25 @@
 @media (max-width:900px){.resident-sidebar{flex-basis:76px}.resident-sidebar .brand-word,.resident-sidebar .resident-nav-link span,.resident-sidebar .profile-copy,.resident-sidebar .resident-profile>svg{display:none}.resident-sidebar .resident-nav-link{justify-content:center;padding:11px 0}.resident-sidebar .nav-badge{position:absolute;right:7px;top:5px}.resident-sidebar .resident-profile{justify-content:center}.resident-brand-row{padding-left:10px;padding-right:2px}.resident-brand{margin:auto}.sidebar-toggle{display:none}.resident-header{padding:0 18px}.mobile-brand{display:flex;align-items:center;gap:8px;margin-right:auto}.mobile-brand .brand-mark{width:27px;height:27px}.resident-content{padding:22px 18px}.dashboard-intro{align-items:start;gap:15px}.intro-search{display:none}}
 @media (max-width:600px){.resident-sidebar{position:fixed;inset:0 auto 0 0;width:76px}.resident-main{margin-left:76px}.resident-header{height:58px}.new-report-button{font-size:0;padding:9px}.new-report-button svg{margin:0}.header-actions{gap:8px}.dashboard-intro h1{font-size:20px}.dashboard-intro p{line-height:1.5}.report-cta{align-items:flex-start;flex-wrap:wrap}.report-cta button{margin-left:52px}.report-filter{max-width:180px;overflow:auto}.report-row{gap:8px}.report-row img{width:49px;height:49px}.status-pill{font-size:8px;padding:4px 5px}.row-chevron{display:none}.map-label{font-size:8px;padding:5px 8px}.resident-content{padding:20px 12px}.dashboard-panel{padding:14px 10px}}
 .report-thumb{width:58px;height:58px;flex:0 0 58px;border-radius:8px;background:#fff1eb;color:#f97316;display:grid;place-items:center;overflow:hidden}.report-thumb img{width:100%;height:100%;object-fit:cover}.dashboard-alert{margin:0 0 16px;padding:11px 14px;border:1px solid #fed7aa;border-radius:8px;background:#fff7ed;color:#9a3412;font-size:13px}.skeleton{display:block;background:linear-gradient(90deg,#edf0f3 25%,#f8fafc 50%,#edf0f3 75%);background-size:200% 100%;animation:skeleton-loading 1.3s infinite;border-radius:5px}.skeleton-value{width:48px;height:34px}.skeleton-line{width:100%;height:62px;margin:10px 0}.empty-state.compact{min-height:210px}.optional{color:var(--muted);font-size:11px;font-weight:400}.map-grid{position:absolute;inset:0;background-color:#e8f2e4;background-image:linear-gradient(25deg,transparent 46%,#c5dbbd 47%,#c5dbbd 50%,transparent 51%),linear-gradient(105deg,transparent 46%,#d5e2d0 47%,#d5e2d0 50%,transparent 51%);background-size:130px 100px;opacity:.85}.map-pin{z-index:1}@keyframes skeleton-loading{to{background-position:-200% 0}}
+
+/* --- Redesigned Recent Reports & Recent Updates Layout --- */
+.dashboard-panels-stacked{display:flex;flex-direction:column;gap:18px;margin-bottom:18px}
+.panel-heading h2{font-size:14px;font-weight:700;color:#1e293b;margin:0}
+.panel-header-link{background:none;border:none;color:#ea580c;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:3px;cursor:pointer;padding:0;transition:color 0.2s}
+.panel-header-link:hover{color:#c2410c}
+
+/* Recent Reports Empty State */
+.empty-state-reports{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px 28px;text-align:center}
+.empty-illustration-reports{margin-bottom:14px;display:flex;justify-content:center}
+.empty-illustration-reports svg{max-width:100%;height:auto}
+.empty-title{font-size:16px;font-weight:700;color:#1e293b;margin:0 0 6px}
+.empty-subtitle{font-size:12px;color:#64748b;margin:0 0 16px;max-width:320px}
+.empty-cta-btn{border:1.5px solid #f97316;background:#fff;color:#ea580c;border-radius:8px;font-weight:700;font-size:13px;padding:9px 24px;cursor:pointer;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);box-shadow:0 1px 2px rgba(0,0,0,0.05)}
+.empty-cta-btn:hover{background:#fff7ed;border-color:#ea580c;color:#c2410c;transform:translateY(-1px);box-shadow:0 3px 6px rgba(249, 115, 22, 0.15)}
+
+/* Recent Updates Empty State */
+.empty-state-updates{display:flex;align-items:center;gap:18px;padding:18px 14px}
+.empty-bell-circle{width:56px;height:56px;border-radius:50%;background:#fff7ed;display:grid;place-items:center;flex-shrink:0}
+.empty-updates-text{display:flex;flex-direction:column;gap:3px}
+.empty-updates-text strong{font-size:14px;font-weight:700;color:#1e293b}
+.empty-updates-text span{font-size:12px;color:#64748b}
