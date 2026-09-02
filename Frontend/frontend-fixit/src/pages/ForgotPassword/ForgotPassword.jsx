@@ -5,10 +5,18 @@ import neighborhoodIllustration from '../../assets/neighborhood_illustration.png
 import logo from '../../assets/fixit-logo-white.png';
 import './ForgotPassword.css';
 
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const ForgotPassword = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [form, setForm] = useState({ newPassword: '', confirmPassword: '' });
+  const resetToken = searchParams.get('token');
+
+  const [form, setForm] = useState({
+    email: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -17,11 +25,20 @@ const ForgotPassword = () => {
 
   const validate = () => {
     const e = {};
+    if (!resetToken) {
+      if (!form.email.trim()) {
+        e.email = 'Email address is required.';
+      } else if (!emailPattern.test(form.email.trim())) {
+        e.email = 'Please enter a valid email address.';
+      }
+    }
+
     if (!form.newPassword) {
       e.newPassword = 'Password is required.';
     } else if (form.newPassword.length < 8) {
       e.newPassword = 'Password must be at least 8 characters.';
     }
+
     if (!form.confirmPassword) {
       e.confirmPassword = 'Please confirm your password.';
     } else if (form.confirmPassword !== form.newPassword) {
@@ -34,7 +51,10 @@ const ForgotPassword = () => {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => {
-      const next = { ...prev, [name]: '' };
+      const next = { ...prev, [name]: '', form: '' };
+      if (name === 'email' && !resetToken && value.trim().length > 0 && !emailPattern.test(value.trim())) {
+        next.email = 'Please enter a valid email address.';
+      }
       if (name === 'newPassword' && value.length > 0 && value.length < 8) {
         next.newPassword = 'Password must be at least 8 characters.';
       }
@@ -48,24 +68,40 @@ const ForgotPassword = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const nextErrors = validate();
-    if (Object.keys(nextErrors).length > 0) { setErrors(nextErrors); return; }
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
+    }
 
     setLoading(true);
+    setErrors({});
+
     try {
-      const resetToken = searchParams.get('token') || 'dummy-token';
       const apiUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
       
-      if (searchParams.get('token')) {
-        const response = await axios.put(
+      let response;
+      if (resetToken) {
+        response = await axios.put(
           `${apiUrl}/api/auth/reset-password/${encodeURIComponent(resetToken)}`,
           { password: form.newPassword }
         );
+      } else {
+        response = await axios.put(
+          `${apiUrl}/api/auth/reset-password`,
+          {
+            email: form.email.trim().toLowerCase(),
+            password: form.newPassword,
+          }
+        );
+      }
+
+      if (response.data?.token) {
         localStorage.setItem('fixitToken', response.data.token);
       }
       setSuccess(true);
     } catch (err) {
       setErrors({
-        form: err.response?.data?.message || 'Unable to reset your password. Please request a new link.',
+        form: err.response?.data?.message || 'Unable to reset your password. Please check your information and try again.',
       });
     } finally {
       setLoading(false);
@@ -90,7 +126,9 @@ const ForgotPassword = () => {
               <span className="headline-highlight">we&apos;ve got you.</span>
             </h1>
             <p className="forgot-subtext">
-              Enter your email address and we&apos;ll send you a link to reset your password.
+              {resetToken
+                ? 'Create a strong, secure new password to regain access to your account.'
+                : 'Enter your email address and choose a new password to quickly regain access.'}
             </p>
           </div>
 
@@ -134,10 +172,39 @@ const ForgotPassword = () => {
 
                 <div className="forgot-card-header">
                   <h2>Reset Password</h2>
-                  <p>Enter your new password below to regain access to your account.</p>
+                  <p>
+                    {resetToken
+                      ? 'Enter your new password below to regain access to your account.'
+                      : 'Enter your registered email and new password below.'}
+                  </p>
                 </div>
 
                 <form className="forgot-form" onSubmit={handleSubmit} noValidate>
+
+                  {/* Email Address (shown when direct reset without token link) */}
+                  {!resetToken && (
+                    <div className="field-group">
+                      <label htmlFor="email">Email Address</label>
+                      <div className={`input-shell ${errors.email ? 'has-error' : ''}`}>
+                        <i className="fa-solid fa-envelope field-icon"></i>
+                        <input
+                          id="email"
+                          name="email"
+                          type="email"
+                          value={form.email}
+                          onChange={handleChange}
+                          placeholder="name@community.org"
+                          autoComplete="email"
+                        />
+                      </div>
+                      {errors.email && (
+                        <span className="field-error">
+                          <i className="fa-solid fa-circle-exclamation error-icon"></i>
+                          {errors.email}
+                        </span>
+                      )}
+                    </div>
+                  )}
                   
                   {/* New Password */}
                   <div className="field-group">
@@ -150,7 +217,7 @@ const ForgotPassword = () => {
                         type={showNew ? 'text' : 'password'}
                         value={form.newPassword}
                         onChange={handleChange}
-                        placeholder="Enter new password"
+                        placeholder="Enter new password (min. 8 characters)"
                         autoComplete="new-password"
                       />
                       <button

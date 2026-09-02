@@ -25,7 +25,9 @@ router.post('/register', register);
 router.post('/register-official', uploadOfficialId, registerOfficial);
 router.post('/login', login);
 router.post('/forgot-password', forgotPassword);
+router.put('/reset-password', resetPassword);
 router.put('/reset-password/:resetToken', resetPassword);
+router.post('/reset-password', resetPassword);
 router.get('/verify-email', verifyEmail);
 router.post('/admin', requireAuth, requireRole('admin'), createAdmin);
 
