@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { ArrowLeft, ArrowRight, Check, ImagePlus, MapPin, Plus, Upload, X } from 'lucide-react';
 import './ReportWizard.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
@@ -199,8 +198,8 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
     return (
       <div className="wizard-backdrop">
         <div className="wizard-intro" role="dialog" aria-modal="true">
-          <button className="wizard-close" onClick={onClose} aria-label="Close"><X /></button>
-          <span className="wizard-intro-icon"><ImagePlus /></span>
+          <button className="wizard-close" onClick={onClose} aria-label="Close"><i className="fa-solid fa-xmark"></i></button>
+          <span className="wizard-intro-icon"><i className="fa-solid fa-image" style={{ fontSize: 24 }}></i></span>
           <h2>Report a New Problem</h2>
           <p>Help keep our community safe and clean by letting us know what&apos;s happening.</p>
           {[['Quick & Easy', 'Report issues in just a few steps.'], ['Track Progress', 'We&apos;ll keep you updated on the status.'], ['Stronger Community', 'Your report helps make a difference.']].map(([title, text], index) => (
@@ -212,7 +211,7 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
               </div>
             </div>
           ))}
-          <button className="wizard-primary" onClick={() => setStage(1)}>Report Now <ArrowRight size={17} /></button>
+          <button className="wizard-primary" onClick={() => setStage(1)}>Report Now <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i></button>
           <button className="wizard-cancel" onClick={onClose}>Cancel</button>
         </div>
       </div>
@@ -223,8 +222,8 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
     <div className="wizard-backdrop">
       <div className="wizard-shell" role="dialog" aria-modal="true">
         <header className="wizard-header">
-          <button onClick={onClose}><ArrowLeft size={15} /> Back to Dashboard</button>
-          <button className="wizard-close" onClick={onClose} aria-label="Close"><X /></button>
+          <button onClick={onClose}><i className="fa-solid fa-arrow-left" style={{ marginRight: 6 }}></i> Back to Dashboard</button>
+          <button className="wizard-close" onClick={onClose} aria-label="Close"><i className="fa-solid fa-xmark"></i></button>
         </header>
 
         <div className="wizard-title">
@@ -240,7 +239,7 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
                 className={step === index + 1 ? 'current' : step > index + 1 ? 'complete' : ''}
                 onClick={() => step > index + 1 && setStep(index + 1)}
               >
-                <span>{step > index + 1 ? <Check size={14} /> : index + 1}</span>
+                <span>{step > index + 1 ? <i className="fa-solid fa-check" style={{ fontSize: 13 }}></i> : index + 1}</span>
                 {label}
               </button>
             ))}
@@ -300,11 +299,11 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
                   />
                 </label>
                 <div className="wizard-map">
-                  <MapPin size={38} />
+                  <i className="fa-solid fa-location-dot" style={{ fontSize: 36, color: '#ea580c' }}></i>
                   <span>Map preview</span>
                 </div>
                 <div className="address-preview">
-                  <MapPin size={15} />
+                  <i className="fa-solid fa-location-dot" style={{ fontSize: 14, color: '#64748b' }}></i>
                   {form.address || 'Your selected address will appear here'}
                 </div>
               </>
@@ -314,7 +313,7 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
               <>
                 <label>Add photos to show the issue</label>
                 <div className="drop-zone">
-                  <Upload size={28} />
+                  <i className="fa-solid fa-cloud-arrow-up" style={{ fontSize: 28, color: '#94a3b8' }}></i>
                   <strong>Drag and drop photos here</strong>
                   <small>JPG, PNG, WEBP. Max 5MB each.</small>
                   <label className="choose-files">
@@ -328,13 +327,13 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
                     <div key={`${photo.preview}-${index}`}>
                       <img src={photo.preview} alt="Report preview" />
                       <button type="button" onClick={() => setPhotos((current) => current.filter((_, photoIndex) => photoIndex !== index))}>
-                        <X size={13} />
+                        <i className="fa-solid fa-xmark" style={{ fontSize: 12 }}></i>
                       </button>
                     </div>
                   ))}
 
                   <label className="add-photo">
-                    <Plus />
+                    <i className="fa-solid fa-plus" style={{ fontSize: 18 }}></i>
                     <small>Add more</small>
                     <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={choosePhotos} />
                   </label>
@@ -375,17 +374,17 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
             <footer className="wizard-actions">
               {step > 1 && (
                 <button className="wizard-secondary" onClick={() => setStep((current) => current - 1)}>
-                  <ArrowLeft size={15} /> Back
+                  <i className="fa-solid fa-arrow-left" style={{ marginRight: 6 }}></i> Back
                 </button>
               )}
 
               {step < 4 ? (
                 <button className="wizard-primary" onClick={next}>
-                  Next: {steps[step]} <ArrowRight size={15} />
+                  Next: {steps[step]} <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i>
                 </button>
               ) : (
                 <button className="wizard-primary" disabled={submitting} onClick={submit}>
-                  {submitting ? 'Submitting...' : 'Submit Report'} <ArrowRight size={15} />
+                  {submitting ? 'Submitting...' : 'Submit Report'} <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i>
                 </button>
               )}
             </footer>

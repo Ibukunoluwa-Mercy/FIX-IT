@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card } from 'react-bootstrap';
-import { ArrowRight } from 'lucide-react';
 
 export const TrendingIssuesWidget = ({ issues }) => {
   return (
@@ -9,7 +8,7 @@ export const TrendingIssuesWidget = ({ issues }) => {
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h6 className="fw-bold mb-0">Trending Issues</h6>
           <a href="#" className="small text-primary text-decoration-none fw-semibold">
-            View All <ArrowRight size={13} />
+            View All <i className="fa-solid fa-arrow-right ms-1" style={{ fontSize: 12 }}></i>
           </a>
         </div>
         <div className="d-flex flex-column gap-3">
