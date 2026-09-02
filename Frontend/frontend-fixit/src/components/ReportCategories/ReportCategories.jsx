@@ -1,26 +1,16 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import './ReportCategories.css';
-import { 
-  AlertTriangle, 
-  Trash2, 
-  Waves, 
-  Lightbulb, 
-  Droplet, 
-  Building2, 
-  ShieldAlert, 
-  Leaf 
-} from 'lucide-react';
 
 const categories = [
-  { name: 'Roads & Potholes', icon: <AlertTriangle size={24} />, colorClass: 'cat-red' },
-  { name: 'Waste & Dumping', icon: <Trash2 size={24} />, colorClass: 'cat-green' },
-  { name: 'Flooding & Drainage', icon: <Waves size={24} />, colorClass: 'cat-blue' },
-  { name: 'Streetlights', icon: <Lightbulb size={24} />, colorClass: 'cat-orange' },
-  { name: 'Water Problems', icon: <Droplet size={24} />, colorClass: 'cat-blue-light' },
-  { name: 'Public Facilities', icon: <Building2 size={24} />, colorClass: 'cat-blue' },
-  { name: 'Safety Hazards', icon: <ShieldAlert size={24} />, colorClass: 'cat-red' },
-  { name: 'Environment', icon: <Leaf size={24} />, colorClass: 'cat-green' },
+  { name: 'Roads & Potholes', icon: <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: 22 }}></i>, colorClass: 'cat-red' },
+  { name: 'Waste & Dumping', icon: <i className="fa-solid fa-trash-can" style={{ fontSize: 22 }}></i>, colorClass: 'cat-green' },
+  { name: 'Flooding & Drainage', icon: <i className="fa-solid fa-water" style={{ fontSize: 22 }}></i>, colorClass: 'cat-blue' },
+  { name: 'Streetlights', icon: <i className="fa-solid fa-lightbulb" style={{ fontSize: 22 }}></i>, colorClass: 'cat-orange' },
+  { name: 'Water Problems', icon: <i className="fa-solid fa-droplet" style={{ fontSize: 22 }}></i>, colorClass: 'cat-blue-light' },
+  { name: 'Public Facilities', icon: <i className="fa-solid fa-building" style={{ fontSize: 22 }}></i>, colorClass: 'cat-blue' },
+  { name: 'Safety Hazards', icon: <i className="fa-solid fa-shield-halved" style={{ fontSize: 22 }}></i>, colorClass: 'cat-red' },
+  { name: 'Environment', icon: <i className="fa-solid fa-leaf" style={{ fontSize: 22 }}></i>, colorClass: 'cat-green' },
 ];
 
 const ReportCategories = () => {
