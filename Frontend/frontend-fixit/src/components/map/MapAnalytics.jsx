@@ -1,7 +1,6 @@
 import React from 'react';
 import { Row, Col, Card, Dropdown } from 'react-bootstrap';
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { FileText, ClipboardCheck, Wrench, CheckCircle, Users, ArrowRight } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import './MapAnalytics.css';
 
 const severityData = [
@@ -54,7 +53,7 @@ const MapAnalytics = () => {
             <div className="stat-box p-3 border rounded-3 h-100">
               <div className="d-flex align-items-center gap-3">
                 <div className="icon-wrapper icon-purple">
-                  <FileText size={24} />
+                  <i className="fa-solid fa-file-lines" style={{ fontSize: 22 }}></i>
                 </div>
                 <div>
                   <h3 className="mb-0 fw-bold">128</h3>
@@ -68,7 +67,7 @@ const MapAnalytics = () => {
             <div className="stat-box p-3 border rounded-3 h-100">
               <div className="d-flex align-items-center gap-3">
                 <div className="icon-wrapper icon-green-light">
-                  <ClipboardCheck size={24} />
+                  <i className="fa-solid fa-clipboard-check" style={{ fontSize: 22 }}></i>
                 </div>
                 <div>
                   <h3 className="mb-0 fw-bold">42</h3>
@@ -82,7 +81,7 @@ const MapAnalytics = () => {
             <div className="stat-box p-3 border rounded-3 h-100">
               <div className="d-flex align-items-center gap-3">
                 <div className="icon-wrapper icon-orange">
-                  <Wrench size={24} />
+                  <i className="fa-solid fa-wrench" style={{ fontSize: 22 }}></i>
                 </div>
                 <div>
                   <h3 className="mb-0 fw-bold">24</h3>
@@ -96,7 +95,7 @@ const MapAnalytics = () => {
             <div className="stat-box p-3 border rounded-3 h-100">
               <div className="d-flex align-items-center gap-3">
                 <div className="icon-wrapper icon-green">
-                  <CheckCircle size={24} />
+                  <i className="fa-solid fa-circle-check" style={{ fontSize: 22 }}></i>
                 </div>
                 <div>
                   <h3 className="mb-0 fw-bold">62</h3>
@@ -110,7 +109,7 @@ const MapAnalytics = () => {
             <div className="stat-box p-3 border rounded-3 h-100">
               <div className="d-flex align-items-center gap-3">
                 <div className="icon-wrapper icon-red">
-                  <Users size={24} />
+                  <i className="fa-solid fa-users" style={{ fontSize: 22 }}></i>
                 </div>
                 <div>
                   <h3 className="mb-0 fw-bold">10.4K</h3>
@@ -186,7 +185,7 @@ const MapAnalytics = () => {
               ))}
             </div>
             <div className="text-center mt-4 pt-2">
-              <a href="#" className="text-primary text-decoration-none small fw-semibold">View all categories <ArrowRight size={14} /></a>
+              <a href="#" className="text-primary text-decoration-none small fw-semibold">View all categories <i className="fa-solid fa-arrow-right ms-1"></i></a>
             </div>
           </Col>
 
@@ -201,7 +200,7 @@ const MapAnalytics = () => {
               ))}
             </div>
             <div className="text-center mt-4 pt-1">
-              <a href="#" className="text-primary text-decoration-none small fw-semibold">View all areas <ArrowRight size={14} /></a>
+              <a href="#" className="text-primary text-decoration-none small fw-semibold">View all areas <i className="fa-solid fa-arrow-right ms-1"></i></a>
             </div>
           </Col>
         </Row>

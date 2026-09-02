@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, Row, Col, Form, Badge } from 'react-bootstrap';
-import { Search, X } from 'lucide-react';
 
 export const IssueSearchBar = ({
   searchInput,
@@ -19,7 +18,7 @@ export const IssueSearchBar = ({
         <Row className="g-2 align-items-center">
           <Col md={8} lg={9}>
             <div className="position-relative">
-              <Search size={18} className="search-icon-explore" />
+              <i className="fa-solid fa-magnifying-glass search-icon-explore"></i>
               <input
                 type="text"
                 className="form-control search-input-explore"
@@ -40,7 +39,7 @@ export const IssueSearchBar = ({
                     updateParams({ q: '' });
                   }}
                 >
-                  <X size={16} />
+                  <i className="fa-solid fa-xmark"></i>
                 </button>
               )}
 

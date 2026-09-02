@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Card, Row, Col, Form, Button, Dropdown } from 'react-bootstrap';
-import { Calendar } from 'lucide-react';
 import './MapFilters.css';
 
 const categories = ['Roads & Potholes', 'Waste & Dumping', 'Streetlights', 'Water Problems', 'Flooding & Drainage', 'Public Facilities', 'Safety Hazards', 'Environment', 'Other'];

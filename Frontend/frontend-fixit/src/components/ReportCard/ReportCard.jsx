@@ -1,5 +1,4 @@
 import React from 'react';
-import { MapPin, User, Clock } from 'lucide-react';
 import './ReportCard.css';
 
 const StatusBadge = ({ status }) => {
@@ -29,17 +28,17 @@ const ReportCard = ({ item, report, index = 0 }) => {
       </div>
       <div className="p-4">
         <div className="report-card-location">
-          <MapPin size={14} className="text-secondary" />
+          <i className="fa-solid fa-location-dot text-secondary" style={{ fontSize: 13 }}></i>
           <span>{data.location || 'Community Location'}</span>
         </div>
         <h5 className="report-card-title">{data.title || 'Untitled Issue'}</h5>
         <p className="report-card-desc">{data.description || 'No description provided.'}</p>
         <div className="report-card-footer">
           <span className="d-flex align-items-center gap-1">
-            <User size={14} /> {data.user || `${data.confirmations || 0} confirmations`}
+            <i className="fa-solid fa-user" style={{ fontSize: 13 }}></i> {data.user || `${data.confirmations || 0} confirmations`}
           </span>
           <span className="d-flex align-items-center gap-1">
-            <Clock size={14} /> {data.time || data.timeAgo || 'Recently'}
+            <i className="fa-solid fa-clock" style={{ fontSize: 13 }}></i> {data.time || data.timeAgo || 'Recently'}
           </span>
         </div>
       </div>

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, Row, Col, Badge } from 'react-bootstrap';
-import { MapPin, ThumbsUp, MessageSquare, ArrowRight, Camera } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const IssueFeedCard = ({ issue, isConfirmed, onConfirm }) => {
@@ -15,7 +14,7 @@ export const IssueFeedCard = ({ issue, isConfirmed, onConfirm }) => {
             {issue.severity}
           </Badge>
           <div className="photo-count-badge">
-            <Camera size={13} className="me-1" /> {issue.photoCount}
+            <i className="fa-solid fa-camera me-1" style={{ fontSize: 11 }}></i> {issue.photoCount}
           </div>
         </Col>
 
@@ -30,7 +29,7 @@ export const IssueFeedCard = ({ issue, isConfirmed, onConfirm }) => {
 
             <div className="d-flex flex-wrap align-items-center gap-3 text-muted small mb-2">
               <span className="d-flex align-items-center gap-1">
-                <MapPin size={14} className="text-secondary" /> {issue.location}
+                <i className="fa-solid fa-location-dot text-secondary" style={{ fontSize: 13 }}></i> {issue.location}
               </span>
               <span>•</span>
               <span>{issue.category}</span>
@@ -49,15 +48,15 @@ export const IssueFeedCard = ({ issue, isConfirmed, onConfirm }) => {
                 className={`btn-confirm-action ${isConfirmed ? 'active' : ''}`}
                 onClick={() => onConfirm(issue.id)}
               >
-                <ThumbsUp size={14} className="me-1" />
+                <i className="fa-solid fa-thumbs-up me-1" style={{ fontSize: 13 }}></i>
                 {totalConfirmations} Confirmed
               </button>
               <span className="text-muted small d-flex align-items-center gap-1">
-                <MessageSquare size={14} /> {issue.commentsCount}
+                <i className="fa-solid fa-message" style={{ fontSize: 13 }}></i> {issue.commentsCount}
               </span>
             </div>
             <Link to={`/explore`} className="btn-view-details text-decoration-none">
-              View Details <ArrowRight size={14} className="ms-1" />
+              View Details <i className="fa-solid fa-arrow-right ms-1" style={{ fontSize: 13 }}></i>
             </Link>
           </div>
         </Col>

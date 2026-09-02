@@ -1,6 +1,5 @@
 import React from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
-import { Send } from 'lucide-react';
 import logo from '../../assets/fixit-logo-white.png';
 import './Footer.css';
 
@@ -63,7 +62,7 @@ const Footer = () => {
             <Form className="newsletter-form">
               <div className="d-flex">
                 <Form.Control type="email" placeholder="Your email address" className="newsletter-input" />
-                <Button className="newsletter-btn"><Send size={16} /></Button>
+                <Button className="newsletter-btn"><i className="fa-solid fa-paper-plane" style={{ fontSize: 15 }}></i></Button>
               </div>
             </Form>
           </Col>

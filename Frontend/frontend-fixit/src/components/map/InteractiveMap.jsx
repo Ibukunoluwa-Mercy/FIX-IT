@@ -3,7 +3,6 @@ import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from 'rea
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './InteractiveMap.css';
-import { Maximize2 } from 'lucide-react';
 
 // Custom icon factory
 const createCustomIcon = (color, number = '', iconClass = '') => {
@@ -73,7 +72,7 @@ const FullscreenButton = () => {
         onClick={handleFullscreen}
         title="Fullscreen"
       >
-        <Maximize2 size={18} color="#374151" />
+        <i className="fa-solid fa-expand" style={{ fontSize: 16, color: '#374151' }}></i>
       </button>
     </div>
   );

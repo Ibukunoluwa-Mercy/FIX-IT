@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { Container } from 'react-bootstrap';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
 import InteractiveMap from '../../components/map/InteractiveMap';
 import MapAnalytics from '../../components/map/MapAnalytics';
 import MapFilters from '../../components/map/MapFilters';
@@ -62,7 +61,7 @@ const CommunityMapPage = () => {
           {/* Search Row */}
           <form onSubmit={handleSearch} className="search-bar-container mt-4 d-flex gap-2 align-items-center">
             <div className="search-input-wrapper flex-grow-1 position-relative">
-              <Search className="search-icon" size={18} color="#9ca3af" />
+              <i className="fa-solid fa-magnifying-glass search-icon" style={{ color: '#9ca3af' }}></i>
               <input
                 ref={inputRef}
                 type="text"
@@ -75,7 +74,7 @@ const CommunityMapPage = () => {
               />
               {searchQuery && (
                 <button type="button" className="search-clear-btn" onClick={clearSearch}>
-                  <X size={16} color="#9ca3af" />
+                  <i className="fa-solid fa-xmark" style={{ color: '#9ca3af' }}></i>
                 </button>
               )}
             </div>
@@ -88,7 +87,7 @@ const CommunityMapPage = () => {
               {isSearching ? (
                 <span className="spinner-border spinner-border-sm" role="status" />
               ) : (
-                <Search size={16} />
+                <i className="fa-solid fa-magnifying-glass"></i>
               )}
             </button>
 
@@ -98,7 +97,7 @@ const CommunityMapPage = () => {
               onClick={() => setShowFilters(v => !v)}
               title="Toggle Filters"
             >
-              <SlidersHorizontal size={18} />
+              <i className="fa-solid fa-sliders"></i>
             </button>
           </form>
 

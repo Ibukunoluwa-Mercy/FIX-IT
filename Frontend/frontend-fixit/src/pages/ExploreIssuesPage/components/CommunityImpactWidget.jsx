@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, Row, Col } from 'react-bootstrap';
-import { ArrowRight, CheckCircle, Wrench, Flame } from 'lucide-react';
 
 export const CommunityImpactWidget = () => {
   return (
@@ -9,27 +8,27 @@ export const CommunityImpactWidget = () => {
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h6 className="fw-bold mb-0">Community Impact</h6>
           <a href="#" className="small text-primary text-decoration-none fw-semibold">
-            View Insights <ArrowRight size={13} />
+            View Insights <i className="fa-solid fa-arrow-right ms-1" style={{ fontSize: 12 }}></i>
           </a>
         </div>
         <Row className="g-2 text-center mb-3">
           <Col xs={6} className="p-2 border rounded-3 bg-light-subtle">
-            <div className="text-success mb-1"><CheckCircle size={20} /></div>
+            <div className="text-success mb-1"><i className="fa-solid fa-circle-check" style={{ fontSize: 18 }}></i></div>
             <h5 className="fw-bold mb-0">82%</h5>
             <div className="text-muted" style={{ fontSize: '0.75rem' }}>Resolution Rate</div>
           </Col>
           <Col xs={6} className="p-2 border rounded-3 bg-light-subtle">
-            <div className="text-primary mb-1"><Wrench size={20} /></div>
+            <div className="text-primary mb-1"><i className="fa-solid fa-wrench" style={{ fontSize: 18 }}></i></div>
             <h5 className="fw-bold mb-0">4.2 days</h5>
             <div className="text-muted" style={{ fontSize: '0.75rem' }}>Avg. Resolution Time</div>
           </Col>
           <Col xs={6} className="p-2 border rounded-3 bg-light-subtle">
-            <div className="text-warning mb-1"><Flame size={20} /></div>
+            <div className="text-warning mb-1"><i className="fa-solid fa-fire" style={{ fontSize: 18 }}></i></div>
             <h5 className="fw-bold mb-0">246</h5>
             <div className="text-muted" style={{ fontSize: '0.75rem' }}>Reported this month</div>
           </Col>
           <Col xs={6} className="p-2 border rounded-3 bg-light-subtle">
-            <div className="text-success mb-1"><CheckCircle size={20} /></div>
+            <div className="text-success mb-1"><i className="fa-solid fa-circle-check" style={{ fontSize: 18 }}></i></div>
             <h5 className="fw-bold mb-0">201</h5>
             <div className="text-muted" style={{ fontSize: '0.75rem' }}>Resolved this month</div>
           </Col>

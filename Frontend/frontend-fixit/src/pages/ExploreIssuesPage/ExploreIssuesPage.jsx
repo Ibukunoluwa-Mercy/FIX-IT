@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Spinner } from 'react-bootstrap';
-import { List, Map as MapIcon, X, AlertTriangle } from 'lucide-react';
 import axios from 'axios';
 import './ExploreIssuesPage.css';
 import './ExploreIssuesPage.extra.css';
@@ -138,10 +137,10 @@ const ExploreIssuesPage = () => {
           </div>
           <div className="d-flex gap-2 align-self-start align-self-md-center">
             <button className="view-mode-btn active">
-              <List size={16} className="me-1" /> List View
+              <i className="fa-solid fa-list me-1"></i> List View
             </button>
             <button className="view-mode-btn" onClick={() => navigate('/map')}>
-              <MapIcon size={16} className="me-1" /> Map View
+              <i className="fa-solid fa-map me-1"></i> Map View
             </button>
           </div>
         </div>
@@ -164,19 +163,19 @@ const ExploreIssuesPage = () => {
             {statusFilter.map((s) => (
               <span key={s} className="filter-tag tag-status">
                 Status: {s}
-                <X size={14} className="ms-1 cursor-pointer" onClick={() => toggleFilterItem('status', s, statusFilter)} />
+                <i className="fa-solid fa-xmark ms-1 cursor-pointer" onClick={() => toggleFilterItem('status', s, statusFilter)}></i>
               </span>
             ))}
             {categoryFilter.map((c) => (
               <span key={c} className="filter-tag tag-category">
                 Category: {c}
-                <X size={14} className="ms-1 cursor-pointer" onClick={() => toggleFilterItem('category', c, categoryFilter)} />
+                <i className="fa-solid fa-xmark ms-1 cursor-pointer" onClick={() => toggleFilterItem('category', c, categoryFilter)}></i>
               </span>
             ))}
             {severityFilter.map((sev) => (
               <span key={sev} className="filter-tag tag-severity">
                 {sev} Severity
-                <X size={14} className="ms-1 cursor-pointer" onClick={() => toggleFilterItem('severity', sev, severityFilter)} />
+                <i className="fa-solid fa-xmark ms-1 cursor-pointer" onClick={() => toggleFilterItem('severity', sev, severityFilter)}></i>
               </span>
             ))}
             <button className="btn btn-link text-primary text-decoration-none p-0 small fw-semibold ms-2" onClick={clearAllFilters}>
@@ -196,7 +195,7 @@ const ExploreIssuesPage = () => {
             ) : filteredIssues.length === 0 ? (
               <Card className="border-0 shadow-sm rounded-4 text-center py-5">
                 <Card.Body>
-                  <AlertTriangle size={48} className="text-warning mb-3" />
+                  <i className="fa-solid fa-triangle-exclamation text-warning mb-3" style={{ fontSize: 44 }}></i>
                   <h5 className="fw-bold">No Issues Found</h5>
                   <p className="text-muted small">No issues match the selected filters or search terms.</p>
                   <button className="btn btn-dark rounded-3 btn-sm px-4 mt-2" onClick={clearAllFilters}>

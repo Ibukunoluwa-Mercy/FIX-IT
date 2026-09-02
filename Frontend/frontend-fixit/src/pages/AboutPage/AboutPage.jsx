@@ -1,11 +1,6 @@
 import React from 'react';
-import { Container, Row, Col, Card } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, ExternalLink, Eye, Users, CheckCircle, AlertTriangle, 
-  FileText, ShieldCheck, Wrench, Shield, Check, Flame, MessageSquare,
-  Search, Droplet, Waves, Lightbulb, Building2, Leaf, MoreHorizontal, Camera
-} from 'lucide-react';
 import problemPhoneImg from '../../assets/problem_phone_illustration.png';
 import './AboutPage.css';
 
@@ -26,10 +21,10 @@ const AboutPage = () => {
               </p>
               <div className="d-flex flex-wrap gap-3">
                 <Link to="/register" className="btn-crimson">
-                  Report a Problem <ExternalLink size={16} />
+                  Report a Problem <i className="fa-solid fa-arrow-up-right-from-square ms-2"></i>
                 </Link>
                 <Link to="/explore" className="btn-navy-outlined">
-                  Explore Issues <Eye size={16} />
+                  Explore Issues <i className="fa-solid fa-eye ms-2"></i>
                 </Link>
               </div>
             </Col>
@@ -42,25 +37,25 @@ const AboutPage = () => {
                 <div className="d-flex justify-content-between align-items-center">
                   <div className="workflow-node">
                     <div className="workflow-icon-box workflow-icon-problem">
-                      <AlertTriangle size={24} />
+                      <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: 22 }}></i>
                     </div>
                     <span className="workflow-label">Problem</span>
                   </div>
                   
-                  <div className="workflow-arrow"><ArrowRight size={20} /></div>
+                  <div className="workflow-arrow"><i className="fa-solid fa-arrow-right"></i></div>
 
                   <div className="workflow-node">
                     <div className="workflow-icon-box workflow-icon-action">
-                      <Users size={24} />
+                      <i className="fa-solid fa-users" style={{ fontSize: 22 }}></i>
                     </div>
                     <span className="workflow-label">Action</span>
                   </div>
 
-                  <div className="workflow-arrow"><ArrowRight size={20} /></div>
+                  <div className="workflow-arrow"><i className="fa-solid fa-arrow-right"></i></div>
 
                   <div className="workflow-node">
                     <div className="workflow-icon-box workflow-icon-resolved">
-                      <CheckCircle size={24} />
+                      <i className="fa-solid fa-circle-check" style={{ fontSize: 22 }}></i>
                     </div>
                     <span className="workflow-label">Resolution</span>
                   </div>
@@ -128,31 +123,31 @@ const AboutPage = () => {
               <div className="solution-flow-card h-100 d-flex flex-column justify-content-center">
                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
                   <div className="lifecycle-node">
-                    <div className="lifecycle-icon bg-step-report"><FileText size={22} /></div>
+                    <div className="lifecycle-icon bg-step-report"><i className="fa-solid fa-file-lines" style={{ fontSize: 20 }}></i></div>
                     <span className="fw-bold small">Report</span>
                   </div>
-                  <ArrowRight size={18} className="text-muted" />
+                  <i className="fa-solid fa-arrow-right text-muted"></i>
 
                   <div className="lifecycle-node">
-                    <div className="lifecycle-icon bg-step-verify"><Search size={22} /></div>
+                    <div className="lifecycle-icon bg-step-verify"><i className="fa-solid fa-magnifying-glass" style={{ fontSize: 20 }}></i></div>
                     <span className="fw-bold small">Verify</span>
                   </div>
-                  <ArrowRight size={18} className="text-muted" />
+                  <i className="fa-solid fa-arrow-right text-muted"></i>
 
                   <div className="lifecycle-node">
-                    <div className="lifecycle-icon bg-step-prioritize"><AlertTriangle size={22} /></div>
+                    <div className="lifecycle-icon bg-step-prioritize"><i className="fa-solid fa-triangle-exclamation" style={{ fontSize: 20 }}></i></div>
                     <span className="fw-bold small">Prioritize</span>
                   </div>
-                  <ArrowRight size={18} className="text-muted" />
+                  <i className="fa-solid fa-arrow-right text-muted"></i>
 
                   <div className="lifecycle-node">
-                    <div className="lifecycle-icon bg-step-track"><Wrench size={22} /></div>
+                    <div className="lifecycle-icon bg-step-track"><i className="fa-solid fa-wrench" style={{ fontSize: 20 }}></i></div>
                     <span className="fw-bold small">Track</span>
                   </div>
-                  <ArrowRight size={18} className="text-muted" />
+                  <i className="fa-solid fa-arrow-right text-muted"></i>
 
                   <div className="lifecycle-node">
-                    <div className="lifecycle-icon bg-step-resolve"><CheckCircle size={22} /></div>
+                    <div className="lifecycle-icon bg-step-resolve"><i className="fa-solid fa-circle-check" style={{ fontSize: 20 }}></i></div>
                     <span className="fw-bold small">Resolve</span>
                   </div>
                 </div>
@@ -164,7 +159,7 @@ const AboutPage = () => {
 
             <Col lg={4}>
               <div className="solution-quote-card">
-                <ShieldCheck size={48} className="text-primary flex-shrink-0" />
+                <i className="fa-solid fa-shield-halved text-primary flex-shrink-0" style={{ fontSize: 44 }}></i>
                 <div>
                   <h6 className="fw-bold mb-1 text-dark">No more lost reports.</h6>
                   <p className="text-muted small mb-0">No more silence. Just real action and real change.</p>
@@ -185,12 +180,12 @@ const AboutPage = () => {
 
           <Row className="g-4">
             {[
-              { num: '1', title: 'Submit a Report', desc: 'Report a problem with photos, location, and details in seconds.', icon: <FileText size={26} />, class: 'icon-step-1' },
-              { num: '2', title: 'Community Verifies', desc: 'Nearby community members confirm and upvote the issue.', icon: <Users size={26} />, class: 'icon-step-2' },
-              { num: '3', title: 'Prioritized', desc: 'Our smart system scores and prioritizes based on severity and impact.', icon: <Flame size={26} />, class: 'icon-step-3' },
-              { num: '4', title: 'Assigned', desc: 'The issue is assigned to the right team for action.', icon: <Shield size={26} />, class: 'icon-step-4' },
-              { num: '5', title: 'In Progress', desc: 'Work updates and progress are shared in real time.', icon: <Wrench size={26} />, class: 'icon-step-5' },
-              { num: '6', title: 'Resolved', desc: 'Community confirms resolution and the issue is closed.', icon: <CheckCircle size={26} />, class: 'icon-step-6' },
+              { num: '1', title: 'Submit a Report', desc: 'Report a problem with photos, location, and details in seconds.', icon: <i className="fa-solid fa-file-lines" style={{ fontSize: 24 }}></i>, class: 'icon-step-1' },
+              { num: '2', title: 'Community Verifies', desc: 'Nearby community members confirm and upvote the issue.', icon: <i className="fa-solid fa-users" style={{ fontSize: 24 }}></i>, class: 'icon-step-2' },
+              { num: '3', title: 'Prioritized', desc: 'Our smart system scores and prioritizes based on severity and impact.', icon: <i className="fa-solid fa-fire" style={{ fontSize: 24 }}></i>, class: 'icon-step-3' },
+              { num: '4', title: 'Assigned', desc: 'The issue is assigned to the right team for action.', icon: <i className="fa-solid fa-shield" style={{ fontSize: 24 }}></i>, class: 'icon-step-4' },
+              { num: '5', title: 'In Progress', desc: 'Work updates and progress are shared in real time.', icon: <i className="fa-solid fa-wrench" style={{ fontSize: 24 }}></i>, class: 'icon-step-5' },
+              { num: '6', title: 'Resolved', desc: 'Community confirms resolution and the issue is closed.', icon: <i className="fa-solid fa-circle-check" style={{ fontSize: 24 }}></i>, class: 'icon-step-6' },
             ].map((step, idx) => (
               <Col key={idx} lg={2} md={4} sm={6}>
                 <div className="step-timeline-card">
@@ -221,17 +216,17 @@ const AboutPage = () => {
               <div className="role-card">
                 <div className="role-header">
                   <div className="role-avatar role-community">
-                    <Users size={24} />
+                    <i className="fa-solid fa-users" style={{ fontSize: 22 }}></i>
                   </div>
                   <div>
                     <h4 className="role-title text-danger">Community Members</h4>
                   </div>
                 </div>
                 <ul className="role-features-list">
-                  <li><Check size={16} className="text-danger flex-shrink-0" /> Submit reports with location & media</li>
-                  <li><Check size={16} className="text-danger flex-shrink-0" /> Confirm and upvote nearby issues</li>
-                  <li><Check size={16} className="text-danger flex-shrink-0" /> Comment and engage</li>
-                  <li><Check size={16} className="text-danger flex-shrink-0" /> Track your reported issues</li>
+                  <li><i className="fa-solid fa-check text-danger flex-shrink-0 me-2"></i> Submit reports with location & media</li>
+                  <li><i className="fa-solid fa-check text-danger flex-shrink-0 me-2"></i> Confirm and upvote nearby issues</li>
+                  <li><i className="fa-solid fa-check text-danger flex-shrink-0 me-2"></i> Comment and engage</li>
+                  <li><i className="fa-solid fa-check text-danger flex-shrink-0 me-2"></i> Track your reported issues</li>
                 </ul>
               </div>
             </Col>
@@ -241,17 +236,17 @@ const AboutPage = () => {
               <div className="role-card">
                 <div className="role-header">
                   <div className="role-avatar role-resolver">
-                    <Wrench size={24} />
+                    <i className="fa-solid fa-wrench" style={{ fontSize: 22 }}></i>
                   </div>
                   <div>
                     <h4 className="role-title text-primary">Issue Resolvers</h4>
                   </div>
                 </div>
                 <ul className="role-features-list">
-                  <li><Check size={16} className="text-primary flex-shrink-0" /> Accept and view assigned issues</li>
-                  <li><Check size={16} className="text-primary flex-shrink-0" /> Update progress in real-time</li>
-                  <li><Check size={16} className="text-primary flex-shrink-0" /> Upload before/after evidence</li>
-                  <li><Check size={16} className="text-primary flex-shrink-0" /> Close issues when resolved</li>
+                  <li><i className="fa-solid fa-check text-primary flex-shrink-0 me-2"></i> Accept and view assigned issues</li>
+                  <li><i className="fa-solid fa-check text-primary flex-shrink-0 me-2"></i> Update progress in real-time</li>
+                  <li><i className="fa-solid fa-check text-primary flex-shrink-0 me-2"></i> Upload before/after evidence</li>
+                  <li><i className="fa-solid fa-check text-primary flex-shrink-0 me-2"></i> Close issues when resolved</li>
                 </ul>
               </div>
             </Col>
@@ -261,17 +256,17 @@ const AboutPage = () => {
               <div className="role-card">
                 <div className="role-header">
                   <div className="role-avatar role-admin">
-                    <ShieldCheck size={24} />
+                    <i className="fa-solid fa-shield-halved" style={{ fontSize: 22 }}></i>
                   </div>
                   <div>
                     <h4 className="role-title text-success">Administrators</h4>
                   </div>
                 </div>
                 <ul className="role-features-list">
-                  <li><Check size={16} className="text-success flex-shrink-0" /> Verify and approve reports</li>
-                  <li><Check size={16} className="text-success flex-shrink-0" /> Assign tasks and manage users</li>
-                  <li><Check size={16} className="text-success flex-shrink-0" /> Monitor categories and content</li>
-                  <li><Check size={16} className="text-success flex-shrink-0" /> Analyze metrics and impact</li>
+                  <li><i className="fa-solid fa-check text-success flex-shrink-0 me-2"></i> Verify and approve reports</li>
+                  <li><i className="fa-solid fa-check text-success flex-shrink-0 me-2"></i> Assign tasks and manage users</li>
+                  <li><i className="fa-solid fa-check text-success flex-shrink-0 me-2"></i> Monitor categories and content</li>
+                  <li><i className="fa-solid fa-check text-success flex-shrink-0 me-2"></i> Analyze metrics and impact</li>
                 </ul>
               </div>
             </Col>
@@ -295,9 +290,9 @@ const AboutPage = () => {
               { name: 'Streetlights', icon: 'fa-lightbulb' },
               { name: 'Water', icon: 'fa-tint' },
               { name: 'Public Facilities', icon: 'fa-building' },
-              { name: 'Safety', icon: 'fa-exclamation-triangle' },
+              { name: 'Safety', icon: 'fa-triangle-exclamation' },
               { name: 'Environment', icon: 'fa-leaf' },
-              { name: 'Other Issues', icon: 'fa-ellipsis-h' },
+              { name: 'Other Issues', icon: 'fa-ellipsis' },
             ].map((cat, idx) => (
               <Col key={idx}>
                 <div className="report-grid-card">
@@ -326,7 +321,7 @@ const AboutPage = () => {
           <Row className="g-4 mb-5">
             <Col md={3}>
               <div className="transparency-box">
-                <div className="transparency-icon"><Eye size={22} /></div>
+                <div className="transparency-icon"><i className="fa-solid fa-eye" style={{ fontSize: 20 }}></i></div>
                 <div>
                   <h6 className="fw-bold mb-1 text-dark">Track Every Issue</h6>
                   <p className="text-muted small mb-0">From submission to resolution. Stay informed with real-time status updates.</p>
@@ -336,7 +331,7 @@ const AboutPage = () => {
 
             <Col md={3}>
               <div className="transparency-box">
-                <div className="transparency-icon"><Users size={22} /></div>
+                <div className="transparency-icon"><i className="fa-solid fa-users" style={{ fontSize: 20 }}></i></div>
                 <div>
                   <h6 className="fw-bold mb-1 text-dark">Community Confirmations</h6>
                   <p className="text-muted small mb-0">Validate real problems. Upvotes help highlight urgent issues.</p>
@@ -346,7 +341,7 @@ const AboutPage = () => {
 
             <Col md={3}>
               <div className="transparency-box">
-                <div className="transparency-icon"><Camera size={22} /></div>
+                <div className="transparency-icon"><i className="fa-solid fa-camera" style={{ fontSize: 20 }}></i></div>
                 <div>
                   <h6 className="fw-bold mb-1 text-dark">Before & After Evidence</h6>
                   <p className="text-muted small mb-0">Ensures real impact. Resolvers upload proof of work done.</p>
@@ -356,7 +351,7 @@ const AboutPage = () => {
 
             <Col md={3}>
               <div className="transparency-box">
-                <div className="transparency-icon"><ShieldCheck size={22} /></div>
+                <div className="transparency-icon"><i className="fa-solid fa-shield-halved" style={{ fontSize: 20 }}></i></div>
                 <div>
                   <h6 className="fw-bold mb-1 text-dark">Smart Priority Detection</h6>
                   <p className="text-muted small mb-0">Duplicate detection algorithms focus on what matters most.</p>
@@ -375,7 +370,7 @@ const AboutPage = () => {
               <Col xs={6} md={3}>
                 <div className="impact-metric-item justify-content-center justify-content-md-start">
                   <div className="impact-metric-icon bg-danger-subtle text-danger">
-                    <FileText size={22} />
+                    <i className="fa-solid fa-file-lines" style={{ fontSize: 20 }}></i>
                   </div>
                   <div>
                     <div className="impact-num">12,458+</div>
@@ -387,7 +382,7 @@ const AboutPage = () => {
               <Col xs={6} md={3}>
                 <div className="impact-metric-item justify-content-center justify-content-md-start">
                   <div className="impact-metric-icon bg-success-subtle text-success">
-                    <CheckCircle size={22} />
+                    <i className="fa-solid fa-circle-check" style={{ fontSize: 20 }}></i>
                   </div>
                   <div>
                     <div className="impact-num">8,374+</div>
@@ -399,7 +394,7 @@ const AboutPage = () => {
               <Col xs={6} md={3}>
                 <div className="impact-metric-item justify-content-center justify-content-md-start">
                   <div className="impact-metric-icon bg-primary-subtle text-primary">
-                    <Users size={22} />
+                    <i className="fa-solid fa-users" style={{ fontSize: 20 }}></i>
                   </div>
                   <div>
                     <div className="impact-num">24,682+</div>
@@ -411,7 +406,7 @@ const AboutPage = () => {
               <Col xs={6} md={3}>
                 <div className="impact-metric-item justify-content-center justify-content-md-start">
                   <div className="impact-metric-icon bg-warning-subtle text-warning">
-                    <AlertTriangle size={22} />
+                    <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: 20 }}></i>
                   </div>
                   <div>
                     <div className="impact-num">4,084+</div>
@@ -435,8 +430,8 @@ const AboutPage = () => {
             <Row className="align-items-center gy-4">
               <Col lg={8}>
                 <div className="d-flex align-items-center gap-3">
-                  <div className="p-3 bg-white bg-opacity-10 rounded-circle"style={{color:"#d97706"}}>
-                    <Users size={36} />
+                  <div className="p-3 bg-white bg-opacity-10 rounded-circle" style={{color:"#d97706"}}>
+                    <i className="fa-solid fa-users" style={{ fontSize: 32 }}></i>
                   </div>
                   <div>
                     <h3 className="fw-bold mb-1">Your Community. Your Voice. Your Fix.</h3>
@@ -446,10 +441,10 @@ const AboutPage = () => {
               </Col>
               <Col lg={4} className="d-flex justify-content-lg-end gap-2 flex-wrap">
                 <Link to="/register" className="btn-crimson">
-                  Report a Problem <ExternalLink size={16} />
+                  Report a Problem <i className="fa-solid fa-arrow-up-right-from-square ms-2"></i>
                 </Link>
                 <Link to="/explore" className="btn-navy-outlined">
-                  Explore Issues <Eye size={16} />
+                  Explore Issues <i className="fa-solid fa-eye ms-2"></i>
                 </Link>
               </Col>
             </Row>
