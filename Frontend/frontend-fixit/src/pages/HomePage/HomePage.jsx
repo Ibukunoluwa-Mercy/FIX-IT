@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import { ArrowRight, PlusCircle, Compass } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ImpactCounters from '../../components/ImpactCounters/ImpactCounters';
@@ -86,13 +85,13 @@ const HomePage = () => {
                 className="btn-primary-custom" 
                 onClick={() => navigate('/register')}
               >
-                <PlusCircle size={18} /> Report a Problem
+                <i className="fa-solid fa-circle-plus" style={{ marginRight: 6 }}></i> Report a Problem
               </button>
               <button 
                 className="btn-secondary-custom"
                 onClick={() => navigate('/map')}
               >
-                <Compass size={18} /> Explore Community Issues
+                <i className="fa-solid fa-compass" style={{ marginRight: 6 }}></i> Explore Community Issues
               </button>
             </div>
           </div>
@@ -114,7 +113,7 @@ const HomePage = () => {
               <p className="section-subtitle">See what's being reported and resolved near you.</p>
             </div>
             <Link to="/map" className="view-all-link">
-              View All Map <ArrowRight size={18} />
+              View All Map <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i>
             </Link>
           </div>
           <Row className="g-4">

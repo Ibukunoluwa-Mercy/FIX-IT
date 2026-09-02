@@ -1,6 +1,5 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import { FileText, ShieldCheck, AlertCircle, Eye, CheckSquare, ArrowRight } from 'lucide-react';
 import './HowItWorks.css';
 
 const steps = [
@@ -9,21 +8,21 @@ const steps = [
     title: 'Spot & Report',
     desc: 'Take a photo of the issue in your neighborhood, add a quick description and precise location.',
     iconClass: 'step-icon-orange',
-    icon: <AlertCircle size={28} />
+    icon: <i className="fa-solid fa-circle-exclamation" style={{ fontSize: 26 }}></i>
   },
   {
     number: '02',
     title: 'Community Verifies',
     desc: 'Neighbors confirm and upvote the issue, increasing its priority and visibility to local authorities.',
     iconClass: 'step-icon-blue',
-    icon: <Eye size={28} />
+    icon: <i className="fa-solid fa-eye" style={{ fontSize: 26 }}></i>
   },
   {
     number: '03',
     title: 'Track & Resolve',
     desc: 'Watch the issue status change from submitted to in-progress, and finally marked as resolved.',
     iconClass: 'step-icon-green',
-    icon: <CheckSquare size={28} />
+    icon: <i className="fa-solid fa-square-check" style={{ fontSize: 26 }}></i>
   }
 ];
 
