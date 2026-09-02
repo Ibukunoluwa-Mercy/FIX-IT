@@ -6,7 +6,7 @@
   padding-right: 36px !important;
   border-radius: 10px !important;
   border: 1px solid #e2e8f0 !important;
-  font-size: 0.9rem !important;
+  font-size: 14.4px !important;
   height: 42px !important;
   box-shadow: none !important;
 }
@@ -39,7 +39,7 @@
 .search-btn-explore {
   height: 42px !important;
   border-radius: 10px !important;
-  font-size: 0.9rem;
+  font-size: 14.4px;
 }
 
 .suggestions-dropdown {
@@ -90,7 +90,7 @@
   left: 12px;
   padding: 4px 8px;
   border-radius: 6px;
-  font-size: 0.75rem;
+  font-size: 12px;
   font-weight: 600;
   text-transform: capitalize;
 }
@@ -118,20 +118,20 @@
   color: #fff;
   padding: 3px 8px;
   border-radius: 6px;
-  font-size: 0.75rem;
+  font-size: 12px;
   display: flex;
   align-items: center;
 }
 
 .issue-feed-title {
-  font-size: 1.1rem;
+  font-size: 17.6px;
   color: #0f172a;
 }
 
 .status-pill {
   padding: 3px 10px;
   border-radius: 12px;
-  font-size: 0.75rem;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -159,7 +159,7 @@
   background: none;
   border: 1px solid #e2e8f0;
   color: #f97316;
-  font-size: 0.8rem;
+  font-size: 12.8px;
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 6px;
@@ -175,7 +175,7 @@
 }
 
 .btn-view-details {
-  font-size: 0.85rem;
+  font-size: 13.6px;
   font-weight: 600;
   color: #0f172a;
   display: inline-flex;
@@ -195,7 +195,7 @@
   background: #ffffff;
   border-radius: 8px;
   color: #4b5563;
-  font-size: 0.85rem;
+  font-size: 13.6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -216,7 +216,7 @@
 }
 
 .badge-trending-sev {
-  font-size: 0.7rem;
+  font-size: 11.2px;
   padding: 2px 6px;
   border-radius: 4px;
   font-weight: 600;

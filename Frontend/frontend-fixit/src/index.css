@@ -139,12 +139,12 @@ body {
 
 .custom-toast-content .toast-title {
   font-weight: 700;
-  font-size: 0.98rem;
+  font-size: 15.68px;
   color: #0d1b2a;
 }
 
 .custom-toast-content .toast-subtitle {
-  font-size: 0.84rem;
+  font-size: 13.44px;
   color: #4b5563;
   line-height: 1.45;
 }

@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowRight, CheckCircle, Eye, EyeOff, Lock } from 'lucide-react';
 import axios from 'axios';
-import logo from '../../assets/fixit-logo-black.png';
+import logo from '../../assets/fixit-logo-white.png';
 import './ResetPassword.css';
 
 const ResetPassword = () => {
@@ -90,9 +89,9 @@ const ResetPassword = () => {
       <div className="rp-card">
 
         {/* Fixit logo badge */}
-        <div className="rp-logo-badge" aria-label="Fixit">
-          <img src={logo} alt="Fixit logo" />
-        </div>
+        <Link to="/" className="rp-logo-link" aria-label="Fixit Homepage">
+          <img src={logo} alt="Fixit logo" className="rp-logo-img" />
+        </Link>
 
         {/* ════════════════════════════════
             FORM STATE
@@ -101,7 +100,7 @@ const ResetPassword = () => {
           <>
             {/* lock icon circle */}
             <div className="rp-lock-badge" aria-hidden="true">
-              <Lock size={26} strokeWidth={2.2} />
+              <i className="fa-solid fa-lock" style={{ fontSize: 26 }}></i>
             </div>
 
             <div className="rp-header">
@@ -115,7 +114,7 @@ const ResetPassword = () => {
               <div className="rp-field">
                 <label htmlFor="rp-new">New Password</label>
                 <div className={`rp-input-wrap ${errors.newPassword ? 'is-error' : ''}`}>
-                  <Lock size={16} className="rp-prefix-icon" />
+                  <i className="fa-solid fa-lock rp-prefix-icon"></i>
                   <input
                     id="rp-new"
                     name="newPassword"
@@ -131,16 +130,12 @@ const ResetPassword = () => {
                     onClick={() => setShowNew((v) => !v)}
                     aria-label={showNew ? 'Hide password' : 'Show password'}
                   >
-                    {showNew ? <EyeOff size={17} /> : <Eye size={17} />}
+                    {showNew ? <i className="fa-solid fa-eye-slash"></i> : <i className="fa-solid fa-eye"></i>}
                   </button>
                 </div>
                 {errors.newPassword && (
                   <span className="rp-error-msg">
-                    <svg className="rp-error-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                      <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.8"/>
-                      <line x1="10" y1="6" x2="10" y2="11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                      <circle cx="10" cy="14" r="1" fill="currentColor"/>
-                    </svg>
+                    <i className="fa-solid fa-circle-exclamation rp-error-icon"></i>
                     {errors.newPassword}
                   </span>
                 )}
@@ -150,7 +145,7 @@ const ResetPassword = () => {
               <div className="rp-field">
                 <label htmlFor="rp-confirm">Confirm New Password</label>
                 <div className={`rp-input-wrap ${errors.confirmPassword ? 'is-error' : ''}`}>
-                  <Lock size={16} className="rp-prefix-icon" />
+                  <i className="fa-solid fa-lock rp-prefix-icon"></i>
                   <input
                     id="rp-confirm"
                     name="confirmPassword"
@@ -166,16 +161,12 @@ const ResetPassword = () => {
                     onClick={() => setShowConfirm((v) => !v)}
                     aria-label={showConfirm ? 'Hide confirm password' : 'Show confirm password'}
                   >
-                    {showConfirm ? <EyeOff size={17} /> : <Eye size={17} />}
+                    {showConfirm ? <i className="fa-solid fa-eye-slash"></i> : <i className="fa-solid fa-eye"></i>}
                   </button>
                 </div>
                 {errors.confirmPassword && (
                   <span className="rp-error-msg">
-                    <svg className="rp-error-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                      <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.8"/>
-                      <line x1="10" y1="6" x2="10" y2="11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                      <circle cx="10" cy="14" r="1" fill="currentColor"/>
-                    </svg>
+                    <i className="fa-solid fa-circle-exclamation rp-error-icon"></i>
                     {errors.confirmPassword}
                   </span>
                 )}
@@ -190,7 +181,7 @@ const ResetPassword = () => {
                 {loading ? (
                   <><span className="rp-spinner" aria-hidden="true" /> Resetting…</>
                 ) : (
-                  <>Reset Password <ArrowRight size={18} /></>
+                  <>Reset Password <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i></>
                 )}
               </button>
             </form>
@@ -216,7 +207,7 @@ const ResetPassword = () => {
             <span className="sp sp6" aria-hidden="true">✦</span>
 
             <div className="rp-check-ring" aria-label="Password updated successfully">
-              <CheckCircle size={52} strokeWidth={2} />
+              <i className="fa-solid fa-circle-check" style={{ fontSize: 52 }}></i>
             </div>
 
             <h1 className="rp-success-title">Password Updated!</h1>
@@ -230,7 +221,7 @@ const ResetPassword = () => {
               className="rp-submit-btn"
               onClick={() => navigate('/login')}
             >
-              Proceed to Login <ArrowRight size={18} />
+              Proceed to Login <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i>
             </button>
 
             <div className="rp-divider" aria-hidden="true" />

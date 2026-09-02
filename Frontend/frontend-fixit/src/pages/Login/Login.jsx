@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ArrowRight, Eye, EyeOff, Lock, Mail, MapPin, Users } from 'lucide-react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import logo from '../../assets/fixit-logo-black.png';
+import logo from '../../assets/fixit-logo-white.png';
 import neighborhoodIllustration from '../../assets/neighborhood_illustration.png';
 import './Login.css';
 
@@ -69,9 +68,9 @@ const Login = () => {
       <div className="login-shell">
         <aside className="login-branding login-reveal login-reveal-hero" aria-label="Fixit portal branding">
           <div className="brand-row">
-            <div className="brand-badge" aria-label="Fixit logo">
+            <Link to="/" className="brand-link" aria-label="Fixit Homepage">
               <img src={logo} alt="Fixit" className="brand-logo" />
-            </div>
+            </Link>
           </div>
 
           <div className="login-copy-block">
@@ -88,7 +87,7 @@ const Login = () => {
           <div className="feature-grid">
             <div className="feature-card">
               <div className="feature-icon orange">
-                <MapPin size={18} />
+                <i className="fa-solid fa-location-dot"></i>
               </div>
               <div className="feature-copy">
                 <h2>Local Impact</h2>
@@ -98,7 +97,7 @@ const Login = () => {
 
             <div className="feature-card">
               <div className="feature-icon blue">
-                <Users size={18} />
+                <i className="fa-solid fa-users"></i>
               </div>
               <div className="feature-copy">
                 <h2>Community Driven</h2>
@@ -123,7 +122,7 @@ const Login = () => {
               <div className="field-group">
                 <label htmlFor="email">Email Address</label>
                 <div className="input-shell">
-                  <Mail size={16} className="field-icon" />
+                  <i className="fa-solid fa-envelope field-icon"></i>
                   <input
                     id="email"
                     type="email"
@@ -145,7 +144,7 @@ const Login = () => {
                 </div>
 
                 <div className="input-shell">
-                  <Lock size={16} className="field-icon" />
+                  <i className="fa-solid fa-lock field-icon"></i>
                   <input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
@@ -161,7 +160,7 @@ const Login = () => {
                     onClick={() => setShowPassword((current) => !current)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    {showPassword ? <i className="fa-solid fa-eye-slash"></i> : <i className="fa-solid fa-eye"></i>}
                   </button>
                 </div>
               </div>
@@ -170,7 +169,7 @@ const Login = () => {
 
               <button type="submit" className="login-submit" disabled={loading}>
                 {loading ? 'Logging in...' : 'Login'}
-                <ArrowRight size={18} />
+                <i className="fa-solid fa-arrow-right" style={{ marginLeft: 8 }}></i>
               </button>
             </form>
 

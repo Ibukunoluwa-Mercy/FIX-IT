@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowRight, CheckCircle, Eye, EyeOff, Lock, ShieldCheck, Mail } from 'lucide-react';
 import axios from 'axios';
 import neighborhoodIllustration from '../../assets/neighborhood_illustration.png';
-import logo from '../../assets/fixit-logo-black.png';
+import logo from '../../assets/fixit-logo-white.png';
 import './ForgotPassword.css';
 
 const ForgotPassword = () => {
@@ -56,7 +55,6 @@ const ForgotPassword = () => {
       const resetToken = searchParams.get('token') || 'dummy-token';
       const apiUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
       
-      // Attempt actual API call if token is provided, otherwise simulate success
       if (searchParams.get('token')) {
         const response = await axios.put(
           `${apiUrl}/api/auth/reset-password/${encodeURIComponent(resetToken)}`,
@@ -81,9 +79,9 @@ const ForgotPassword = () => {
         {/* ── Left branding panel ── */}
         <aside className="forgot-branding auth-reveal auth-reveal-hero" aria-label="Fixit portal branding">
           <div className="brand-row">
-            <div className="brand-badge" aria-label="Fixit logo">
+            <Link to="/" className="brand-link" aria-label="Fixit Homepage">
               <img src={logo} alt="Fixit" className="brand-logo" />
-            </div>
+            </Link>
           </div>
 
           <div className="forgot-copy-block">
@@ -99,7 +97,7 @@ const ForgotPassword = () => {
           <div className="forgot-feature-grid">
             <div className="forgot-feature-card">
               <div className="forgot-feature-icon orange">
-                <ShieldCheck size={18} />
+                <i className="fa-solid fa-shield-halved"></i>
               </div>
               <div className="forgot-feature-copy">
                 <h2>Secure &amp; Private</h2>
@@ -109,7 +107,7 @@ const ForgotPassword = () => {
 
             <div className="forgot-feature-card">
               <div className="forgot-feature-icon orange">
-                <Mail size={18} />
+                <i className="fa-solid fa-envelope"></i>
               </div>
               <div className="forgot-feature-copy">
                 <h2>Quick &amp; Easy</h2>
@@ -126,14 +124,12 @@ const ForgotPassword = () => {
         {/* ── Right card panel ── */}
         <section className="forgot-card-wrap auth-reveal auth-reveal-card">
           <div className="forgot-card">
-            
-
 
             {!success ? (
               <>
                 {/* Lock icon badge */}
                 <div className="card-lock-badge" aria-hidden="true">
-                  <Lock size={26} strokeWidth={2.2} />
+                  <i className="fa-solid fa-lock" style={{ fontSize: 26 }}></i>
                 </div>
 
                 <div className="forgot-card-header">
@@ -147,7 +143,7 @@ const ForgotPassword = () => {
                   <div className="field-group">
                     <label htmlFor="newPassword">New Password</label>
                     <div className={`input-shell ${errors.newPassword ? 'has-error' : ''}`}>
-                      <Lock size={16} className="field-icon" />
+                      <i className="fa-solid fa-lock field-icon"></i>
                       <input
                         id="newPassword"
                         name="newPassword"
@@ -163,16 +159,12 @@ const ForgotPassword = () => {
                         onClick={() => setShowNew((c) => !c)}
                         aria-label={showNew ? 'Hide password' : 'Show password'}
                       >
-                        {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
+                        {showNew ? <i className="fa-solid fa-eye-slash"></i> : <i className="fa-solid fa-eye"></i>}
                       </button>
                     </div>
                     {errors.newPassword && (
                       <span className="field-error">
-                        <svg className="error-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                          <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.8"/>
-                          <line x1="10" y1="6" x2="10" y2="11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                          <circle cx="10" cy="14" r="1" fill="currentColor"/>
-                        </svg>
+                        <i className="fa-solid fa-circle-exclamation error-icon"></i>
                         {errors.newPassword}
                       </span>
                     )}
@@ -182,7 +174,7 @@ const ForgotPassword = () => {
                   <div className="field-group">
                     <label htmlFor="confirmPassword">Confirm New Password</label>
                     <div className={`input-shell ${errors.confirmPassword ? 'has-error' : ''}`}>
-                      <Lock size={16} className="field-icon" />
+                      <i className="fa-solid fa-lock field-icon"></i>
                       <input
                         id="confirmPassword"
                         name="confirmPassword"
@@ -198,16 +190,12 @@ const ForgotPassword = () => {
                         onClick={() => setShowConfirm((c) => !c)}
                         aria-label={showConfirm ? 'Hide password' : 'Show password'}
                       >
-                        {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                        {showConfirm ? <i className="fa-solid fa-eye-slash"></i> : <i className="fa-solid fa-eye"></i>}
                       </button>
                     </div>
                     {errors.confirmPassword && (
                       <span className="field-error">
-                        <svg className="error-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                          <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.8"/>
-                          <line x1="10" y1="6" x2="10" y2="11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                          <circle cx="10" cy="14" r="1" fill="currentColor"/>
-                        </svg>
+                        <i className="fa-solid fa-circle-exclamation error-icon"></i>
                         {errors.confirmPassword}
                       </span>
                     )}
@@ -219,7 +207,7 @@ const ForgotPassword = () => {
                     {loading ? (
                       <><span className="spinner" aria-hidden="true" /> Resetting...</>
                     ) : (
-                      <>Reset Password <ArrowRight size={18} /></>
+                      <>Reset Password <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i></>
                     )}
                   </button>
                 </form>
@@ -243,7 +231,7 @@ const ForgotPassword = () => {
 
                 <div className="success-icon-wrap" aria-label="Password updated successfully">
                   <div className="success-icon-ring">
-                    <CheckCircle size={52} />
+                    <i className="fa-solid fa-circle-check" style={{ fontSize: 52 }}></i>
                   </div>
                 </div>
 
@@ -259,7 +247,7 @@ const ForgotPassword = () => {
                   onClick={() => navigate('/login')}
                 >
                   Proceed to Login
-                  <ArrowRight size={18} />
+                  <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i>
                 </button>
 
                 <div className="forgot-footer">

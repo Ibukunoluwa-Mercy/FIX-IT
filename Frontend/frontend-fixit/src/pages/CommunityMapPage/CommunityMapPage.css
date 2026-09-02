@@ -9,14 +9,14 @@
 }
 
 .page-title {
-  font-size: 2rem;
+  font-size: 32px;
   font-weight: 800;
   color: #0f172a;
   margin-bottom: 4px;
 }
 
 .page-subtitle {
-  font-size: 0.95rem;
+  font-size: 15.2px;
   color: #6b7280;
 }
 
@@ -38,7 +38,7 @@
   border: 1px solid #e2e8f0 !important;
   background-color: #fff !important;
   color: #374151 !important;
-  font-size: 0.9rem !important;
+  font-size: 14.4px !important;
   height: 44px !important;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
 }
@@ -100,7 +100,7 @@
   border: 1px solid #e2e8f0;
   background: #fff;
   color: #4b5563;
-  font-size: 0.85rem;
+  font-size: 13.6px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -186,7 +186,7 @@
 
 /* Map Legend */
 .map-legend {
-  font-size: 0.78rem;
+  font-size: 12.48px;
   font-weight: 500;
   color: #374151;
   white-space: nowrap;
@@ -235,7 +235,7 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
-  font-size: 0.85rem;
+  font-size: 13.6px;
   color: #374151;
   cursor: pointer;
 }
@@ -243,7 +243,7 @@
 /* View Toggle Buttons */
 .view-toggle-btn {
   padding: 6px 14px;
-  font-size: 0.8rem;
+  font-size: 12.8px;
   font-weight: 500;
   border-radius: 8px;
   border: 1px solid #e2e8f0;

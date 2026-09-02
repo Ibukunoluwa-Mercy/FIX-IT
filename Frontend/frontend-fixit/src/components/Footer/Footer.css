@@ -4,13 +4,13 @@
   color: var(--text-muted);
   padding: 80px 20px 20px;
   border-top: 1px solid #1e293b;
-  font-size: 0.9rem;
+  font-size: 14.4px;
 }
 .footer-heading {
   color: #fff;
   font-weight: 600;
   margin-bottom: 20px;
-  font-size: 1.1rem;
+  font-size: 17.6px;
 }
 .footer-links-list {
   list-style: none;

@@ -12,7 +12,7 @@
   border: 1px solid #e5e7eb;
 }
 .resolution-rate {
-  font-size: 5rem;
+  font-size: 80px;
   font-weight: 800;
   color: #0f172a;
   line-height: 1;
@@ -20,7 +20,7 @@
 .resolution-label {
   font-weight: 700;
   color: #16a34a;
-  font-size: 1.1rem;
+  font-size: 17.6px;
   margin-bottom: 15px;
 }
 .custom-progress {
@@ -39,12 +39,12 @@
 }
 .stat-name {
   color: #4b5563;
-  font-size: 0.95rem;
+  font-size: 15.2px;
 }
 .stat-number {
   font-weight: 800;
   color: #0f172a;
-  font-size: 1.1rem;
+  font-size: 17.6px;
 }
 .stat-divider {
   margin: 0;

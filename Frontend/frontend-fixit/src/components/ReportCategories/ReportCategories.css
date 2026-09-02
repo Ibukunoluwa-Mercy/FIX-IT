@@ -5,13 +5,13 @@
   padding: 80px 20px;
 }
 .report-categories-section .section-title {
-  font-size: 2rem;
+  font-size: 32px;
   font-weight: 700;
   margin-bottom: 5px;
 }
 .report-categories-section .section-subtitle {
   color: #6b7280;
-  font-size: 1rem;
+  font-size: 16px;
 }
 .category-card {
   background: #fff;
@@ -49,6 +49,6 @@
 
 .category-name {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 15.2px;
   color: #111827;
 }

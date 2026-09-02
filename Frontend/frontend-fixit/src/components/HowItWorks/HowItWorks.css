@@ -6,16 +6,16 @@
   margin-top: 80px;
 }
 .how-it-works-section .section-title {
-  font-size: 2.5rem;
+  font-size: 40px;
   font-weight: 700;
   margin-bottom: 10px;
 }
 .how-it-works-section .section-subtitle {
   color: #6b7280;
-  font-size: 1.1rem;
+  font-size: 17.6px;
 }
 .step-number {
-  font-size: 3.5rem;
+  font-size: 56px;
   font-weight: 900;
   color: #f1f5f9;
   line-height: 1;
@@ -53,11 +53,11 @@
 }
 .step-card-title {
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 19.2px;
   margin-bottom: 10px;
 }
 .step-card-desc {
   color: #6b7280;
-  font-size: 0.95rem;
+  font-size: 15.2px;
   line-height: 1.5;
 }

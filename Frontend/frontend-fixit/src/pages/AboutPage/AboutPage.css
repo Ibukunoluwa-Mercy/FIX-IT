@@ -23,14 +23,14 @@
 
 .about-hero-badge {
   color: #f59e0b;
-  font-size: 0.85rem;
+  font-size: 13.6px;
   font-weight: 800;
   letter-spacing: 1.5px;
   text-transform: uppercase;
 }
 
 .about-hero-title {
-  font-size: 3.2rem;
+  font-size: 51.2px;
   font-weight: 800;
   line-height: 1.15;
   color: #ffffff;
@@ -38,7 +38,7 @@
 
 .about-hero-desc {
   color: #94a3b8;
-  font-size: 1.05rem;
+  font-size: 16.8px;
   line-height: 1.65;
   max-width: 540px;
 }
@@ -104,7 +104,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 20px;
 }
 
 .workflow-icon-problem {
@@ -126,14 +126,14 @@
 }
 
 .workflow-label {
-  font-size: 0.85rem;
+  font-size: 13.6px;
   font-weight: 600;
   color: #e2e8f0;
 }
 
 .workflow-arrow {
   color: #64748b;
-  font-size: 1.3rem;
+  font-size: 20.8px;
 }
 
 /* Shared Section Heading Styles */
@@ -156,7 +156,7 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 15.2px;
   flex-shrink: 0;
 }
 
@@ -171,7 +171,7 @@
 }
 
 .section-heading-title {
-  font-size: 1.85rem;
+  font-size: 29.6px;
   font-weight: 800;
   color: #0d1b2a;
   margin-bottom: 0;
@@ -179,7 +179,7 @@
 
 .section-intro-text {
   color: #64748b;
-  font-size: 1rem;
+  font-size: 16px;
   line-height: 1.6;
 }
 
@@ -189,7 +189,7 @@
   align-items: flex-start;
   gap: 12px;
   margin-bottom: 12px;
-  font-size: 0.95rem;
+  font-size: 15.2px;
   color: #334155;
 }
 
@@ -226,7 +226,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 20px;
 }
 .bubble-wa { top: 20%; left: 10%; color: #25d366; }
 .bubble-fb { top: 25%; right: 10%; color: #1877f2; }
@@ -255,7 +255,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 19.2px;
   color: white;
 }
 .bg-step-report { background-color: #e63946; }
@@ -304,7 +304,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -316,7 +316,7 @@
   align-items: center;
   justify-content: center;
   margin: 10px auto 16px;
-  font-size: 1.4rem;
+  font-size: 22.4px;
 }
 .icon-step-1 { background: #fee2e2; color: #e63946; }
 .icon-step-2 { background: #e0f2fe; color: #0284c7; }
@@ -326,14 +326,14 @@
 .icon-step-6 { background: #dcfce7; color: #16a34a; }
 
 .step-title {
-  font-size: 1.05rem;
+  font-size: 16.8px;
   font-weight: 700;
   color: #0d1b2a;
   margin-bottom: 8px;
 }
 
 .step-desc {
-  font-size: 0.85rem;
+  font-size: 13.6px;
   color: #64748b;
   line-height: 1.5;
   margin-bottom: 0;
@@ -363,7 +363,7 @@
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 1.25rem;
+  font-size: 20px;
 }
 .role-community { background-color: #e63946; }
 .role-resolver { background-color: #0d1b2a; }
@@ -371,7 +371,7 @@
 
 .role-title {
   font-weight: 800;
-  font-size: 1.2rem;
+  font-size: 19.2px;
   margin-bottom: 0;
 }
 
@@ -384,7 +384,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 0.9rem;
+  font-size: 14.4px;
   color: #475569;
   margin-bottom: 10px;
 }
@@ -406,13 +406,13 @@
 }
 
 .report-grid-icon {
-  font-size: 1.6rem;
+  font-size: 25.6px;
   margin-bottom: 8px;
   color: #0d1b2a;
 }
 .report-grid-name {
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 13.6px;
   color: #0f172a;
 }
 
@@ -460,17 +460,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 19.2px;
 }
 
 .impact-num {
-  font-size: 1.6rem;
+  font-size: 25.6px;
   font-weight: 800;
   color: #0d1b2a;
   line-height: 1;
 }
 .impact-desc {
-  font-size: 0.8rem;
+  font-size: 12.8px;
   color: #64748b;
   font-weight: 600;
 }
