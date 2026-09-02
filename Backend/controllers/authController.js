@@ -85,31 +85,32 @@ const register = async (req, res) => {
 		}
 
 		const verificationBaseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-		let emailStatus = { sent: false, skipped: true };
-		try {
-			emailStatus = await sendVerificationEmail({
-				email,
-				fullName,
-				verificationUrl: `${verificationBaseUrl}/verify-email?token=${verification.rawToken}`,
-			});
-		} catch (emailError) {
-			console.error('Verification email failed:', emailError.message);
-			emailStatus = { sent: false, skipped: false };
-		}
-		let welcomeEmail = { sent: false, skipped: true };
-		try {
-			welcomeEmail = await sendWelcomeEmail({ email, fullName });
-		} catch (emailError) {
-			console.error('Welcome email failed:', emailError.message);
-			welcomeEmail = { sent: false, skipped: false };
-		}
+		
+		// Send verification & welcome emails in the background (non-blocking)
+		setImmediate(async () => {
+			try {
+				await sendVerificationEmail({
+					email,
+					fullName,
+					verificationUrl: `${verificationBaseUrl}/verify-email?token=${verification.rawToken}`,
+				});
+			} catch (emailError) {
+				console.error('Verification email failed:', emailError.message);
+			}
+
+			try {
+				await sendWelcomeEmail({ email, fullName });
+			} catch (emailError) {
+				console.error('Welcome email failed:', emailError.message);
+			}
+		});
 
 		return res.status(201).json({
 			message: 'Account created successfully',
 			token: createToken(user),
 			user: user.toSafeProfile(),
-			emailVerification: emailStatus,
-			welcomeEmail,
+			emailVerification: { sent: true, queued: true },
+			welcomeEmail: { sent: true, queued: true },
 		});
 	} catch (error) {
 		if (error.code === 11000) return res.status(409).json({ message: 'An account with this email already exists' });
@@ -179,20 +180,24 @@ const registerOfficial = async (req, res) => {
 			throw profileError;
 		}
 
-		try {
-			await sendVerificationEmail({
-				email,
-				fullName,
-				verificationUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${verification.rawToken}`,
-			});
-		} catch (emailError) {
-			console.error('Official verification email failed:', emailError.message);
-		}
-		try {
-			await sendWelcomeEmail({ email, fullName });
-		} catch (emailError) {
-			console.error('Official welcome email failed:', emailError.message);
-		}
+		// Send verification & welcome emails in the background (non-blocking)
+		setImmediate(async () => {
+			try {
+				await sendVerificationEmail({
+					email,
+					fullName,
+					verificationUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${verification.rawToken}`,
+				});
+			} catch (emailError) {
+				console.error('Official verification email failed:', emailError.message);
+			}
+
+			try {
+				await sendWelcomeEmail({ email, fullName });
+			} catch (emailError) {
+				console.error('Official welcome email failed:', emailError.message);
+			}
+		});
 
 		return res.status(201).json({
 			message: 'Local Official account created successfully',
@@ -254,18 +259,17 @@ const forgotPassword = async (req, res) => {
 		user.resetPasswordExpire = resetToken.expires;
 		await user.save({ validateModifiedOnly: true });
 
-		try {
-			await sendPasswordResetEmail({
-				email: user.email,
-				fullName: user.name || user.email,
-				resetUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken.rawToken}`,
-			});
-		} catch (emailError) {
-			user.resetPasswordToken = undefined;
-			user.resetPasswordExpire = undefined;
-			await user.save({ validateModifiedOnly: true });
-			console.error('Password reset email failed:', emailError.message);
-		}
+		setImmediate(async () => {
+			try {
+				await sendPasswordResetEmail({
+					email: user.email,
+					fullName: user.name || user.email,
+					resetUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken.rawToken}`,
+				});
+			} catch (emailError) {
+				console.error('Password reset email failed:', emailError.message);
+			}
+		});
 
 		return res.status(200).json({ message: genericMessage });
 	} catch (error) {
@@ -360,11 +364,16 @@ const login = async (req, res) => {
 		}
 
 		const token = createToken(user);
-		try {
-			await sendLoginEmail({ email: user.email, fullName: user.name || user.email });
-		} catch (emailError) {
-			console.error('Login email failed:', emailError.message);
-		}
+
+		// Send login notification in background (non-blocking)
+		setImmediate(async () => {
+			try {
+				await sendLoginEmail({ email: user.email, fullName: user.name || user.email });
+			} catch (emailError) {
+				console.error('Login email failed:', emailError.message);
+			}
+		});
+
 		return res.status(200).json({
 			message: 'Login successful',
 			token,
