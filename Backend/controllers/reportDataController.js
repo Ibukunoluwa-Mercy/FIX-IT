@@ -164,4 +164,58 @@ const getHomeData = async (req, res) => {
 	}
 };
 
-module.exports = { getHomeData, getCommunityOverview, getMapReports };
+const getNearbyReports = async (req, res) => {
+	try {
+		const lat = parseFloat(req.query.lat);
+		const lng = parseFloat(req.query.lng);
+		const radius = parseFloat(req.query.radius) || 150;
+
+		if (isNaN(lat) || isNaN(lng)) {
+			return res.status(400).json({ message: 'Invalid coordinates' });
+		}
+
+		const latDelta = radius / 111000;
+		const lngDelta = radius / (111000 * Math.cos((lat * Math.PI) / 180));
+
+		const minLat = lat - latDelta;
+		const maxLat = lat + latDelta;
+		const minLng = lng - lngDelta;
+		const maxLng = lng + lngDelta;
+
+		const reports = await Report.find({
+			'location.lat': { $gte: minLat, $lte: maxLat },
+			'location.lng': { $gte: minLng, $lte: maxLng }
+		}).select('_id title category location').lean();
+
+		const toRad = (val) => (val * Math.PI) / 180;
+		const R = 6371e3; // earth radius in meters
+
+		const nearbyReports = reports.filter(report => {
+			if (report.location?.lat == null || report.location?.lng == null) return false;
+			const phi1 = toRad(lat);
+			const phi2 = toRad(report.location.lat);
+			const deltaPhi = toRad(report.location.lat - lat);
+			const deltaLambda = toRad(report.location.lng - lng);
+
+			const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+				Math.cos(phi1) * Math.cos(phi2) *
+				Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+			const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+			const distance = R * c;
+			return distance <= radius;
+		}).map(report => ({
+			id: report._id,
+			title: report.title,
+			category: report.category,
+			lat: report.location.lat,
+			lng: report.location.lng
+		}));
+
+		return res.json(nearbyReports);
+	} catch (error) {
+		return res.status(500).json({ message: 'Unable to load nearby reports', error: error.message });
+	}
+};
+
+module.exports = { getHomeData, getCommunityOverview, getMapReports, getNearbyReports };
