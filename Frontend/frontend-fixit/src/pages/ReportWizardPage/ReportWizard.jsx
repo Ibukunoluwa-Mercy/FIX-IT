@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import LocationPickerMap from '../../components/map/LocationPickerMap';
 import './ReportWizard.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
@@ -24,6 +25,7 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [retryAction, setRetryAction] = useState(null);
+  const [nearbyReportsCount, setNearbyReportsCount] = useState(0);
 
   const update = (event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
 
@@ -139,11 +141,13 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
         return setError('Enter the issue location.');
       }
 
-      try {
-        await geocodeAddress(form.address);
-      } catch (requestError) {
-        setRetryAction('geocode');
-        return setError(requestError.response?.data?.message || requestError.message || 'Unable to verify this address.');
+      if (form.lat === '' || form.lng === '') {
+        try {
+          await geocodeAddress(form.address);
+        } catch (requestError) {
+          setRetryAction('geocode');
+          return setError(requestError.response?.data?.message || requestError.message || 'Unable to verify this address.');
+        }
       }
     }
 
@@ -289,23 +293,33 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
 
             {step === 2 && (
               <>
-                <label>
-                  Where is the issue located?
-                  <input
-                    name="address"
-                    value={form.address}
-                    onChange={update}
-                    placeholder="Search for a street, landmark, or area"
-                  />
-                </label>
-                <div className="wizard-map">
-                  <i className="fa-solid fa-location-dot" style={{ fontSize: 36, color: '#ea580c' }}></i>
-                  <span>Map preview</span>
-                </div>
-                <div className="address-preview">
-                  <i className="fa-solid fa-location-dot" style={{ fontSize: 14, color: '#64748b' }}></i>
-                  {form.address || 'Your selected address will appear here'}
-                </div>
+                <label>Where is the issue located?</label>
+                {nearbyReportsCount > 0 && (
+                  <div className="alert alert-info d-flex align-items-start gap-2 mb-3 px-3 py-2" style={{ backgroundColor: '#e0f2fe', color: '#0369a1', border: '1px solid #bae6fd', borderRadius: '8px', fontSize: '14px' }}>
+                    <i className="fa-solid fa-circle-info text-primary mt-1"></i>
+                    <div>
+                      <strong>{nearbyReportsCount} similar report{nearbyReportsCount > 1 ? 's' : ''}</strong> found nearby. 
+                      <a href="#wizard-map" className="ms-1 fw-bold text-primary text-decoration-none" onClick={(e) => {
+                        e.preventDefault();
+                        const mapElem = document.querySelector('.location-picker-container');
+                        if (mapElem) mapElem.scrollIntoView({ behavior: 'smooth' });
+                      }}>
+                        View on map
+                      </a>
+                    </div>
+                  </div>
+                )}
+                <LocationPickerMap 
+                  initialAddress={form.address}
+                  initialLat={form.lat !== '' ? Number(form.lat) : undefined}
+                  initialLng={form.lng !== '' ? Number(form.lng) : undefined}
+                  onNearbyReportsChange={(reports) => setNearbyReportsCount(reports.length)}
+                  onLocationSelect={(lat, lng, address) => {
+                    setForm(current => ({ ...current, lat, lng, address }));
+                    setError('');
+                    setRetryAction(null);
+                  }}
+                />
               </>
             )}
 

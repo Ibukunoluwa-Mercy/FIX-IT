@@ -1,0 +1,133 @@
+.location-picker-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.location-search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-controls-container {
+  position: relative;
+  width: 100%;
+}
+
+.search-input-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.current-location-btn {
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.current-location-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.location-search-input {
+  width: 100%;
+  padding: 10px 35px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+
+.location-search-input:focus {
+  outline: none;
+  border-color: #ea580c;
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+}
+
+.search-status-indicators {
+  position: absolute;
+  right: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.location-results-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 5px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  list-style: none;
+  padding: 0;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 1050; /* Ensure it stays above the map */
+}
+
+.location-result-item {
+  padding: 10px 15px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 14px;
+  color: #374151;
+  transition: background 0.15s ease;
+}
+
+.location-result-item:last-child {
+  border-bottom: none;
+}
+
+.location-result-item:hover {
+  background-color: #f9fafb;
+}
+
+.item-icon {
+  margin-top: 3px;
+  color: #6b7280;
+}
+
+.location-empty-message {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fef2f2;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.map-picker-wrapper {
+  position: relative;
+  margin-top: 15px;
+  z-index: 1000;
+}
+
+.map-picker-hint {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 6px 12px;
+  border-radius: 20px;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  pointer-events: none;
+  font-size: 12px;
+}
