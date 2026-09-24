@@ -15,6 +15,7 @@ const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const geocodeRoutes = require('./routes/geocodeRoutes');
 const userRoutes = require('./routes/userRoutes');
+const issuesRoutes = require('./routes/issuesRoutes');
 
 const app = express();
 const port = process.env.PORT || 5100;
@@ -48,6 +49,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/geocode', geocodeRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/issues', issuesRoutes);
 
 const startServer = async () => {
 	const connected = await connectDB();

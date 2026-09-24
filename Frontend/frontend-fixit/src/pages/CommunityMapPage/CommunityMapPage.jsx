@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import InteractiveMap from '../../components/map/InteractiveMap';
 import MapAnalytics from '../../components/map/MapAnalytics';
@@ -11,10 +11,51 @@ const CommunityMapPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [mapCenter, setMapCenter] = useState([41.8781, -87.6298]); // Default: Chicago
   const [activeCategory, setActiveCategory] = useState('All Issues');
+  const [issues, setIssues] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    const loadIssues = async () => {
+      setIsLoading(true);
+      setLoadError('');
+      try {
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
+        const response = await fetch(`${apiBaseUrl}/api/issues/map`);
+        if (!response.ok) throw new Error('Unable to load map issues');
+        const data = await response.json();
+        setIssues(data.map((issue) => ({
+          ...issue,
+          id: issue._id,
+          lat: Number(issue.location?.lat),
+          lng: Number(issue.location?.lng),
+        })).filter((issue) => Number.isFinite(issue.lat) && Number.isFinite(issue.lng)));
+      } catch (error) {
+        setLoadError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadIssues();
+  }, []);
+
+  const filteredIssues = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    return issues.filter((issue) => {
+      const matchesCategory = activeCategory === 'All Issues' ||
+        (activeCategory === 'Infrastructure' && ['Road/Pothole', 'Drainage'].includes(issue.category)) ||
+        (activeCategory === 'Utilities' && ['Streetlight', 'Water'].includes(issue.category)) ||
+        (activeCategory === 'Public Safety' && ['Safety', 'Public Facility'].includes(issue.category)) ||
+        (activeCategory === 'Environment' && ['Waste', 'Environment'].includes(issue.category)) ||
+        (activeCategory === 'Other' && !['Road/Pothole', 'Drainage', 'Streetlight', 'Water', 'Safety', 'Public Facility', 'Waste', 'Environment'].includes(issue.category));
+      const searchableText = `${issue.title} ${issue.category} ${issue.description} ${issue.location?.address}`.toLowerCase();
+      return matchesCategory && (!query || searchableText.includes(query));
+    });
+  }, [activeCategory, issues, searchQuery]);
 
   const handleSearch = async (e) => {
     e?.preventDefault();
@@ -60,7 +101,7 @@ const CommunityMapPage = () => {
 
           {/* Search Row */}
           <form onSubmit={handleSearch} className="search-bar-container mt-4 d-flex gap-2 align-items-center">
-            <div className="search-input-wrapper flex-grow-1 position-relative">
+            <div className="search-input-wrapper map-search-grow position-relative">
               <i className="fa-solid fa-magnifying-glass search-icon" style={{ color: '#9ca3af' }}></i>
               <input
                 ref={inputRef}
@@ -121,12 +162,14 @@ const CommunityMapPage = () => {
           </div>
         </div>
 
+        {loadError && <div className="alert alert-warning py-2 small">{loadError}</div>}
+
         {/* Analytics */}
         <MapAnalytics />
 
         {/* Map */}
         <div className="map-container-wrapper my-5">
-          <InteractiveMap center={mapCenter} />
+          <InteractiveMap center={mapCenter} issues={filteredIssues} isLoading={isLoading} />
         </div>
 
         {/* Filters — toggled by the settings button */}

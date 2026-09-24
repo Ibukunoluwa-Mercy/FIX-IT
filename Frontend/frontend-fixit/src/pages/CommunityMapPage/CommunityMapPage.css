@@ -24,6 +24,9 @@
 .search-input-wrapper {
   position: relative;
 }
+.map-search-grow {
+  flex-grow: 1;
+}
 .search-icon {
   position: absolute;
   left: 14px;
@@ -40,11 +43,11 @@
   color: #374151 !important;
   font-size: 14.4px !important;
   height: 44px !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+  box-shadow: 0 1px 3px #0000000d !important;
 }
 .map-search-input:focus {
   border-color: #3b82f6 !important;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.1) !important;
+  box-shadow: 0 0 0 3px #3b82f61a !important;
 }
 .map-search-input.is-invalid-search {
   border-color: #ef4444 !important;
@@ -63,7 +66,9 @@
   justify-content: center;
   z-index: 6;
 }
-.search-clear-btn:hover svg { color: #374151 !important; }
+.search-clear-btn:hover svg {
+  color: #374151 !important;
+}
 .search-submit-btn {
   height: 44px;
   width: 44px;
@@ -136,11 +141,26 @@
   justify-content: center;
   flex-shrink: 0;
 }
-.icon-purple { background: #ede9fe; color: #7c3aed; }
-.icon-green-light { background: #dcfce7; color: #16a34a; }
-.icon-orange { background: #ffedd5; color: #f97316; }
-.icon-green { background: #d1fae5; color: #059669; }
-.icon-red { background: #fee2e2; color: #ef4444; }
+.icon-purple {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+.icon-green-light {
+  background: #dcfce7;
+  color: #16a34a;
+}
+.icon-orange {
+  background: #ffedd5;
+  color: #f97316;
+}
+.icon-green {
+  background: #d1fae5;
+  color: #059669;
+}
+.icon-red {
+  background: #fee2e2;
+  color: #ef4444;
+}
 
 /* Map Wrapper */
 .map-wrapper {
@@ -162,7 +182,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 8px #0000004d;
 }
 .marker-number {
   transform: rotate(45deg);
@@ -209,7 +229,7 @@
   border-radius: 12px;
   padding: 0;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 30px #00000026;
 }
 .custom-popup .leaflet-popup-content {
   margin: 0;

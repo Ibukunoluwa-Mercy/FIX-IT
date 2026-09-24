@@ -21,6 +21,10 @@ const reportSchema = new mongoose.Schema(
 			capturedAt: { type: Date },
 			lowAccuracy: { type: Boolean, default: false },
 			coordinates: { type: mongoose.Schema.Types.Mixed },
+			geo: {
+				type: { type: String, enum: ['Point'] },
+				coordinates: { type: [Number] },
+			},
 		},
 		imageUrl: { type: String, trim: true, default: '' },
 		images: { type: [String], default: [] },
@@ -40,6 +44,8 @@ const reportSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
+reportSchema.index({ 'location.geo': '2dsphere' });
+
 reportSchema.pre('save', function normalizeReportData() {
 	const normalizedCategory = (this.category || '').trim();
 	if (!this.title && normalizedCategory) this.title = normalizedCategory;
@@ -53,6 +59,17 @@ reportSchema.pre('save', function normalizeReportData() {
 	if (this.location?.coordinates && this.location.lat == null && this.location.lng == null) {
 		this.location.lat = this.location.coordinates.lat;
 		this.location.lng = this.location.coordinates.lng;
+	}
+	const coordinates = this.location?.coordinates;
+	const point = Array.isArray(coordinates) && coordinates.length >= 2
+		? { lng: Number(coordinates[0]), lat: Number(coordinates[1]) }
+		: coordinates && Number.isFinite(Number(coordinates.lat)) && Number.isFinite(Number(coordinates.lng))
+			? { lng: Number(coordinates.lng), lat: Number(coordinates.lat) }
+			: this.location?.lat != null && this.location?.lng != null
+				? { lng: Number(this.location.lng), lat: Number(this.location.lat) }
+				: null;
+	if (point && Number.isFinite(point.lat) && Number.isFinite(point.lng)) {
+		this.location.geo = { type: 'Point', coordinates: [point.lng, point.lat] };
 	}
 });
 

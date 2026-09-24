@@ -8,7 +8,7 @@
   background: #fff;
   border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 25px #0000000d;
   border: 1px solid #e5e7eb;
 }
 .resolution-rate {

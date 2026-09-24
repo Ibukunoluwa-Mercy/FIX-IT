@@ -3,13 +3,17 @@
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid #e5e7eb;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   background: #ffffff;
   color: #111827;
 }
 .report-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 20px 25px -5px #0000001a,
+    0 10px 10px -5px #0000000a;
 }
 .report-card-img-wrapper {
   position: relative;

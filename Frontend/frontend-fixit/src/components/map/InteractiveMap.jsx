@@ -1,18 +1,32 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './InteractiveMap.css';
 
-// Custom icon factory
+const COLORS = {
+  High: '#ef4444',
+  Medium: '#f97316',
+  Low: '#eab308',
+  'In Progress': '#3b82f6',
+  Resolved: '#22c55e',
+  Other: '#6b7280',
+};
+
+const getMarkerColor = (issue) => {
+  if (issue.status === 'Resolved') return COLORS.Resolved;
+  if (issue.status === 'In Progress') return COLORS['In Progress'];
+  return COLORS[issue.severity] || COLORS.Other;
+};
+
 const createCustomIcon = (color, number = '', iconClass = '') => {
   return L.divIcon({
     className: 'custom-leaflet-marker',
     html: `
       <div class="marker-pin" style="background-color: ${color};">
         ${number ? `<span class="marker-number">${number}</span>` : ''}
-        ${iconClass ? `<i class="fa ${iconClass} marker-fa"></i>` : ''}
-        ${!number && !iconClass ? `<div class="marker-dot"></div>` : ''}
+        ${iconClass ? `<i class="fa-solid ${iconClass} marker-fa"></i>` : ''}
       </div>
     `,
     iconSize: [34, 34],
@@ -21,16 +35,38 @@ const createCustomIcon = (color, number = '', iconClass = '') => {
   });
 };
 
-const icons = {
-  high:        createCustomIcon('#ef4444', '15'),
-  medium1:     createCustomIcon('#f97316', '8'),
-  medium2:     createCustomIcon('#f97316', '4'),
-  low:         createCustomIcon('#eab308', '9'),
-  inProgress1: createCustomIcon('#3b82f6', '3'),
-  inProgress2: createCustomIcon('#3b82f6', '7'),
-  resolved:    createCustomIcon('#22c55e', '', 'fa-check'),
-  camera:      createCustomIcon('#9333ea', '12'),
-  streetlight: createCustomIcon('#ef4444', '', 'fa-exclamation'),
+const getIssueIcon = (issue, count = 1) => {
+  const iconClass = count === 1
+    ? (issue.status === 'Resolved' ? 'fa-check' : 'fa-exclamation')
+    : '';
+  return createCustomIcon(getMarkerColor(issue), count > 1 ? count : '', iconClass);
+};
+
+const userLocationIcon = L.divIcon({
+  className: 'community-user-location-marker',
+  html: '<span class="community-user-location-dot"><i></i></span>',
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
+});
+
+const getClusterGroups = (issues) => {
+  const groups = [];
+  const threshold = 0.008;
+
+  issues.forEach((issue) => {
+    const existingGroup = groups.find((group) =>
+      Math.abs(group.lat - issue.lat) <= threshold && Math.abs(group.lng - issue.lng) <= threshold
+    );
+    if (existingGroup) {
+      existingGroup.issues.push(issue);
+      existingGroup.lat = existingGroup.issues.reduce((sum, item) => sum + item.lat, 0) / existingGroup.issues.length;
+      existingGroup.lng = existingGroup.issues.reduce((sum, item) => sum + item.lng, 0) / existingGroup.issues.length;
+    } else {
+      groups.push({ lat: issue.lat, lng: issue.lng, issues: [issue] });
+    }
+  });
+
+  return groups;
 };
 
 // Smoothly fly to new centre whenever `center` prop changes
@@ -78,11 +114,75 @@ const FullscreenButton = () => {
   );
 };
 
-const InteractiveMap = ({ center }) => {
+const MapModeButton = ({ satellite, onToggle }) => (
+  <button className="map-mode-button" type="button" onClick={onToggle} title={satellite ? 'Show map' : 'Show satellite'}>
+    <i className={`fa-solid ${satellite ? 'fa-map' : 'fa-satellite'}`} />
+    <span>{satellite ? 'Map' : 'Satellite'}</span>
+  </button>
+);
+
+const ClusterMarker = ({ group }) => {
+  const map = useMap();
+  const representative = group.issues[0];
+  const icon = getIssueIcon(representative, group.issues.length);
+
+  if (group.issues.length === 1) {
+    return (
+      <Marker position={[group.lat, group.lng]} icon={icon}>
+        <IssuePopup issue={representative} />
+      </Marker>
+    );
+  }
+
+  return (
+    <Marker
+      position={[group.lat, group.lng]}
+      icon={icon}
+      eventHandlers={{ click: () => map.setView([group.lat, group.lng], Math.min(map.getZoom() + 2, 18)) }}
+      title={`${group.issues.length} reported issues`}
+    />
+  );
+};
+
+const IssuePopup = ({ issue }) => (
+  <Popup className="custom-popup" maxWidth={300} minWidth={260}>
+    <div className="popup-content">
+      <div className="popup-heading-row">
+        <h6>{issue.title || 'Reported issue'}</h6>
+        <span className="popup-status" style={{ color: getMarkerColor(issue) }}>{issue.status || 'Other'}</span>
+      </div>
+      <div className="popup-meta">{issue.category || 'Other'} <span aria-hidden="true">•</span> {issue.severity || 'Other'}</div>
+      <p className="popup-description">{issue.description || 'No description provided.'}</p>
+      <div className="popup-date">Reported {issue.reportedAt ? new Date(issue.reportedAt).toLocaleDateString() : 'date unavailable'}</div>
+      <Link to="/explore" className="popup-details-link">View details <i className="fa-solid fa-arrow-right" /></Link>
+    </div>
+  </Popup>
+);
+
+const EmptyMapState = () => (
+  <div className="map-empty-state">
+    <i className="fa-solid fa-location-dot" aria-hidden="true" />
+    <strong>No issues match these filters</strong>
+    <span>Try another category or search term.</span>
+  </div>
+);
+
+const InteractiveMap = ({ center, issues = [], isLoading = false, userLocation = null, satellite = false, onToggleSatellite }) => {
+  const groups = useMemo(() => getClusterGroups(issues), [issues]);
+  const tileUrl = satellite
+    ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+    : import.meta.env.VITE_MAPTILER_KEY && import.meta.env.VITE_MAPTILER_STYLE
+    ? `https://api.maptiler.com/maps/${import.meta.env.VITE_MAPTILER_STYLE}/{z}/{x}/{y}.png?key=${import.meta.env.VITE_MAPTILER_KEY}`
+    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const tileAttribution = satellite
+    ? 'Tiles &copy; Esri'
+    : import.meta.env.VITE_MAPTILER_KEY && import.meta.env.VITE_MAPTILER_STYLE
+      ? '&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
   return (
     <div
       className="map-wrapper position-relative rounded-4 overflow-hidden shadow-sm"
-      style={{ height: '600px' }}
     >
       <MapContainer
         center={center}
@@ -94,70 +194,30 @@ const InteractiveMap = ({ center }) => {
         <ZoomControl position="topleft" />
 
         <TileLayer
-          url={`https://api.maptiler.com/maps/${import.meta.env.VITE_MAPTILER_STYLE}/{z}/{x}/{y}.png?key=${import.meta.env.VITE_MAPTILER_KEY}`}
-          attribution='&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url={tileUrl}
+          attribution={tileAttribution}
           tileSize={512}
           zoomOffset={-1}
           minZoom={1}
         />
 
-        {/* Issue Markers */}
-        <Marker position={[center[0] + 0.040, center[1] - 0.060]} icon={icons.high} />
-        <Marker position={[center[0] + 0.020, center[1] - 0.030]} icon={icons.medium1} />
-        <Marker position={[center[0] - 0.010, center[1] - 0.050]} icon={icons.medium2} />
-        <Marker position={[center[0] - 0.070, center[1] - 0.030]} icon={icons.low} />
-        <Marker position={[center[0] - 0.050, center[1] - 0.080]} icon={icons.inProgress1} />
-        <Marker position={[center[0] + 0.010, center[1] + 0.010]} icon={icons.inProgress2} />
-        <Marker position={[center[0] - 0.040, center[1] + 0.080]} icon={icons.resolved} />
-        <Marker position={[center[0] + 0.030, center[1] + 0.020]} icon={icons.camera} />
+        {groups.map((group) => (
+          <ClusterMarker key={group.issues.map((issue) => issue.id || issue._id).join('-')} group={group} />
+        ))}
 
-        {/* Popup Marker */}
-        <Marker position={[center[0] + 0.025, center[1] + 0.060]} icon={icons.streetlight}>
-          <Popup className="custom-popup" maxWidth={300} minWidth={280}>
-            <div className="popup-content">
-              <div className="popup-img-wrapper mb-2 rounded overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1519999482648-25049ddd37b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-                  alt="Broken Streetlight"
-                  style={{ width: '100%', height: 140, objectFit: 'cover' }}
-                />
-              </div>
-              <h6 className="fw-bold mb-1">Broken Streetlight</h6>
-              <div className="d-flex justify-content-between align-items-center mb-2">
-                <span className="small text-muted">Park Entrance</span>
-                <span className="badge bg-warning text-dark" style={{ opacity: 0.85 }}>Medium</span>
-              </div>
-              <div className="small text-muted mb-1 d-flex align-items-center gap-2">
-                <i className="fas fa-map-marker-alt text-danger"></i> Riverside Park
-              </div>
-              <div className="small text-muted mb-2 d-flex align-items-center gap-2">
-                <i className="fas fa-users text-primary"></i> 54 Confirmations
-              </div>
-              <div className="small fw-semibold text-primary mb-3 d-flex align-items-center gap-2">
-                <i className="fas fa-tools"></i> In Progress
-              </div>
-              <div className="small text-muted mb-3">Reported 2 days ago</div>
-              <button className="btn btn-dark w-100 rounded-3 py-2 btn-sm fw-medium">
-                View Details
-              </button>
-            </div>
-          </Popup>
-        </Marker>
+        {userLocation && <Marker position={[userLocation.latitude, userLocation.longitude]} icon={userLocationIcon} title="You are here" />}
 
         <FullscreenButton />
+        {onToggleSatellite && <MapModeButton satellite={satellite} onToggle={onToggleSatellite} />}
       </MapContainer>
 
-      {/* Legend */}
-      <div className="position-absolute bottom-0 start-50 translate-middle-x mb-3" style={{ zIndex: 1000 }}>
-        <div className="bg-white px-4 py-2 rounded-pill shadow-sm d-flex align-items-center gap-4 map-legend">
-          <div className="legend-item"><span className="legend-dot" style={{ background: '#ef4444' }}></span>High</div>
-          <div className="legend-item"><span className="legend-dot" style={{ background: '#f97316' }}></span>Medium</div>
-          <div className="legend-item"><span className="legend-dot" style={{ background: '#eab308' }}></span>Low</div>
-          <div className="legend-item"><span className="legend-dot" style={{ background: '#3b82f6' }}></span>In Progress</div>
-          <div className="legend-item"><span className="legend-dot" style={{ background: '#22c55e' }}></span>Resolved</div>
-          <div className="legend-item"><span className="legend-dot" style={{ background: '#6b7280' }}></span>Other</div>
-        </div>
+      <div className="map-legend" aria-label="Map legend">
+        {Object.entries(COLORS).map(([label, color]) => (
+          <div className="legend-item" key={label}><span className="legend-dot" style={{ background: color }} />{label}</div>
+        ))}
       </div>
+      {isLoading && <div className="map-loading-overlay" aria-label="Loading map issues"><div className="map-loading-skeleton" /></div>}
+      {!isLoading && issues.length === 0 && <EmptyMapState />}
     </div>
   );
 };

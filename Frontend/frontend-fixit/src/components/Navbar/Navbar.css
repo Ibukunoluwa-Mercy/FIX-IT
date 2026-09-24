@@ -9,7 +9,8 @@
   margin: 0 10px;
   transition: color 0.3s;
 }
-.custom-navbar .nav-link:hover, .custom-navbar .nav-link.active {
+.custom-navbar .nav-link:hover,
+.custom-navbar .nav-link.active {
   color: var(--primary-amber) !important;
 }
 .custom-navbar .navbar-brand-text {

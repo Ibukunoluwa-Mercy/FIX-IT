@@ -1,11 +1,11 @@
-@import 'bootstrap/dist/css/bootstrap.min.css';
+@import "bootstrap/dist/css/bootstrap.min.css";
 
 /* ===================================================
    FIXIT GLOBAL THEME VARIABLES & BASE RESETS
 =================================================== */
 :root {
-  --bg-dark: #0f172a;        /* Main dark header / background */
-  --bg-darker: #0b1320;      /* Darkest navbar & footer background */
+  --bg-dark: #0f172a; /* Main dark header / background */
+  --bg-darker: #0b1320; /* Darkest navbar & footer background */
   --text-light: #f8fafc;
   --text-muted: #94a3b8;
   --primary-amber: #f59e0b;
@@ -15,13 +15,17 @@
   --icon-color-green: #16a34a;
 }
 
-body, button, input, select, textarea {
-  font-family: 'Google Sans', sans-serif;
+body,
+button,
+input,
+select,
+textarea {
+  font-family: "Google Sans", sans-serif;
 }
 
 body {
   margin: 0;
-  font-family: 'Google Sans', sans-serif;
+  font-family: "Google Sans", sans-serif;
   background-color: var(--bg-dark);
   color: var(--text-light);
   overflow-x: hidden;
@@ -44,9 +48,15 @@ body {
   opacity: 0;
 }
 
-.delay-100 { animation-delay: 0.1s; }
-.delay-200 { animation-delay: 0.2s; }
-.delay-300 { animation-delay: 0.3s; }
+.delay-100 {
+  animation-delay: 0.1s;
+}
+.delay-200 {
+  animation-delay: 0.2s;
+}
+.delay-300 {
+  animation-delay: 0.3s;
+}
 
 /* Global Buttons */
 .btn-primary-custom {
@@ -110,10 +120,12 @@ body {
   background: #ffffff !important;
   color: #0d1b2a !important;
   border-radius: 16px !important;
-  box-shadow: 0 16px 36px rgba(13, 27, 42, 0.14), 0 4px 12px rgba(234, 88, 12, 0.08) !important;
+  box-shadow:
+    0 16px 36px #0d1b2a24,
+    0 4px 12px #ea580c14 !important;
   border: 1px solid #fee4d7 !important;
   padding: 16px 18px !important;
-  font-family: 'Google Sans', sans-serif !important;
+  font-family: "Google Sans", sans-serif !important;
 }
 
 .Toastify__toast.fixit-custom-toast .Toastify__progress-bar--success {

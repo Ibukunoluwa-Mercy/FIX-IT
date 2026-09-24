@@ -65,12 +65,14 @@
 
 .issue-feed-card {
   border: 1px solid #e2e8f0 !important;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .issue-feed-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.06) !important;
+  box-shadow: 0 10px 25px #0000000f !important;
 }
 
 .issue-img-col {
@@ -114,7 +116,7 @@
   position: absolute;
   bottom: 12px;
   right: 12px;
-  background: rgba(0, 0, 0, 0.65);
+  background: #000000a6;
   color: #fff;
   padding: 3px 8px;
   border-radius: 6px;

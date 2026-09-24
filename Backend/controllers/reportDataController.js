@@ -121,14 +121,14 @@ const getMapReports = async (req, res) => {
 		if (category !== 'All') filters.push({ category: { $in: CATEGORY_GROUPS[category] || [category] } });
 		if (severity) filters.push({ severity });
 		const reports = await Report.find(filters.length ? { $and: filters } : {})
-			.select('_id title category severity status location createdAt')
+			.select('_id title description category severity status location createdAt')
 			.sort({ createdAt: -1 })
 			.lean();
 		return res.json(reports
 			.map((report) => ({ report, coordinates: getCoordinates(report.location?.coordinates) }))
 			.filter(({ coordinates }) => coordinates)
 			.map(({ report, coordinates }) => ({
-				_id: report._id, title: report.title, category: report.category, severity: report.severity, status: report.status,
+				_id: report._id, title: report.title, description: report.description, category: report.category, severity: report.severity, status: report.status,
 				location: { ...coordinates, address: report.location.address || '' }, createdAt: report.createdAt,
 			})));
 	} catch (error) {
@@ -168,9 +168,9 @@ const getNearbyReports = async (req, res) => {
 	try {
 		const lat = parseFloat(req.query.lat);
 		const lng = parseFloat(req.query.lng);
-		const radius = parseFloat(req.query.radius) || 150;
+		const radius = parseFloat(req.query.radius) || 5000;
 
-		if (isNaN(lat) || isNaN(lng)) {
+		if (isNaN(lat) || isNaN(lng) || !Number.isFinite(radius) || radius <= 0 || radius > 50000) {
 			return res.status(400).json({ message: 'Invalid coordinates' });
 		}
 
@@ -185,7 +185,7 @@ const getNearbyReports = async (req, res) => {
 		const reports = await Report.find({
 			'location.lat': { $gte: minLat, $lte: maxLat },
 			'location.lng': { $gte: minLng, $lte: maxLng }
-		}).select('_id title category location').lean();
+		}).select('_id title description category severity status location createdAt resolvedAt confirmedBy images photos imageUrl').lean();
 
 		const toRad = (val) => (val * Math.PI) / 180;
 		const R = 6371e3; // earth radius in meters
@@ -207,9 +207,17 @@ const getNearbyReports = async (req, res) => {
 		}).map(report => ({
 			id: report._id,
 			title: report.title,
+			description: report.description || '',
 			category: report.category,
+			severity: report.severity || 'Medium',
+			status: report.status || 'New',
 			lat: report.location.lat,
-			lng: report.location.lng
+			lng: report.location.lng,
+			areaName: report.location.address || report.location.addressText || '',
+			reportedAt: report.createdAt,
+			resolvedAt: report.resolvedAt || null,
+			upvotes: Array.isArray(report.confirmedBy) ? report.confirmedBy.length : 0,
+			thumbnailUrl: report.images?.[0] || report.photos?.[0] || report.imageUrl || null,
 		}));
 
 		return res.json(nearbyReports);

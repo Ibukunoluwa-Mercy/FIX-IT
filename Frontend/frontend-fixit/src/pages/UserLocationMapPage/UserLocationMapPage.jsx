@@ -1,16 +1,18 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Circle, MapContainer, Marker, TileLayer, useMap, ZoomControl } from 'react-leaflet';
-import L from 'leaflet';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
-import 'leaflet/dist/leaflet.css';
+import { Link, useNavigate } from 'react-router-dom';
+import InteractiveMap from '../../components/map/InteractiveMap';
+import logoWhite from '../../assets/fixit-white-logo.png';
 import './UserLocationMapPage.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
-const TILE_URL = import.meta.env.VITE_MAP_TILE_URL || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-const TILE_ATTRIBUTION = import.meta.env.VITE_MAP_TILE_ATTRIBUTION || '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-const LAGOS_CENTER = [6.5244, 3.3792];
-const locationIcon = L.divIcon({ className: 'user-location-icon', html: '<span class="user-location-dot"><i></i></span>', iconSize: [32, 32], iconAnchor: [16, 16] });
+const DEFAULT_CENTER = [6.5244, 3.3792];
+const RADIUS_METERS = 5000;
+const categoryChips = [['All Issues', null], ['Road & Potholes', 'Road/Pothole'], ['Water Problems', 'Water'], ['Streetlights', 'Streetlight'], ['New Problems', 'New'], ['Flooding & Drainage', 'Drainage'], ['Public Facilities', 'Public Facility']];
+const categoryOptions = ['Road/Pothole', 'Water', 'Streetlight', 'Drainage', 'Public Facility', 'Safety', 'Waste', 'Environment', 'Other'];
+const statusOptions = ['Verified', 'In Progress', 'Resolved', 'Pending'];
+const severityOptions = ['High', 'Medium', 'Low'];
+const initialFilters = { from: '', to: '', statuses: [], severities: [], categories: [], sort: 'Most Recent' };
 
 const distanceInMeters = (first, second) => {
   if (!first || !second) return Infinity;
@@ -20,199 +22,121 @@ const distanceInMeters = (first, second) => {
   const a = Math.sin(latDelta / 2) ** 2 + Math.cos(first.latitude * Math.PI / 180) * Math.cos(second.latitude * Math.PI / 180) * Math.sin(lngDelta / 2) ** 2;
   return earthRadius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
+const formatDistance = (meters) => meters < 1000 ? `${Math.round(meters)} m away` : `${(meters / 1000).toFixed(1)} km away`;
+const formatDate = (value) => value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(value)) : 'Recently reported';
+const normalizeStatus = (status) => status === 'New' ? 'Pending' : status || 'Pending';
 
-const MapViewport = ({ location, follow, onUserInteraction }) => {
-  const map = useMap();
-  const firstRender = useRef(true);
+const ResidentSidebar = ({ navigate }) => (
+  <aside className="nearby-sidebar">
+    <div className="nearby-brand-row"><Link to="/dashboard" className="nearby-brand"><img src={logoWhite} alt="FixIt" /><span>Fix<span>It</span></span></Link></div>
+    <nav aria-label="Resident dashboard navigation" className="nearby-nav">
+      {[['Dashboard', 'fa-grip', '/dashboard'], ['My Reports', 'fa-file-lines', '/reports'], ['Nearby Issues', 'fa-location-dot', '/map'], ['Notifications', 'fa-bell'], ['Messages', 'fa-message'], ['Saved Locations', 'fa-bookmark']].map(([label, icon, path]) => (
+        <button key={label} className={`nearby-nav-link ${label === 'Nearby Issues' ? 'active' : ''}`} onClick={() => path && navigate(path)}><i className={`fa-solid ${icon}`} /><span>{label}</span></button>
+      ))}
+      <div className="nearby-nav-divider" />
+      {['Help Center', 'Settings'].map((label) => <button key={label} className="nearby-nav-link"><i className={`fa-solid ${label === 'Settings' ? 'fa-gear' : 'fa-circle-question'}`} /><span>{label}</span></button>)}
+    </nav>
+    <div className="nearby-sidebar-user"><span className="nearby-avatar">R</span><span><strong>Resident</strong><small>Community member</small></span><i className="fa-solid fa-ellipsis" /></div>
+  </aside>
+);
 
-  useEffect(() => {
-    map.invalidateSize();
-    const handleResize = () => map.invalidateSize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [map]);
+const CheckGroup = ({ title, options, selected, onToggle }) => (
+  <fieldset className="nearby-filter-group"><legend>{title}</legend>{options.map((option) => <label key={option} className="nearby-check"><input type="checkbox" checked={selected.includes(option)} onChange={() => onToggle(option)} /><span>{option}</span></label>)}</fieldset>
+);
 
-  useEffect(() => {
-    if (!location) return;
-    const center = [location.latitude, location.longitude];
-    if (firstRender.current || follow) {
-      map.flyTo(center, 17, { animate: !firstRender.current, duration: 0.7 });
-      firstRender.current = false;
-    }
-  }, [location, follow, map]);
-
-  useEffect(() => {
-    const handleDragStart = () => onUserInteraction();
-    map.on('dragstart', handleDragStart);
-    return () => map.off('dragstart', handleDragStart);
-  }, [map, onUserInteraction]);
-
-  return null;
-};
-
-const PermissionMessage = ({ type, onRetry }) => {
-  const isDenied = type === 'denied';
-  return (
-    <div className="location-page-message">
-      <div className="location-message-icon"><i className="fa-solid fa-location-crosshairs"></i></div>
-      <h1>{isDenied ? 'Location access is off' : 'Turn on your location'}</h1>
-      <p>{isDenied ? 'Enable location access for FixIt to see your position.' : 'Please make sure Location/GPS is turned on on your device, then tap Enable Location and allow access when asked.'}</p>
-      {isDenied && <div className="location-instructions"><p><strong>iPhone:</strong> Settings &gt; Privacy &amp; Location Services &gt; Safari/Chrome</p><p><strong>Android:</strong> Settings &gt; Location, plus Chrome site permissions</p><p><strong>Desktop:</strong> select the lock icon in the address bar and allow Location</p></div>}
-      <button className="location-action-button" onClick={onRetry}>{isDenied ? 'Try Again' : 'Enable Location'}</button>
-    </div>
-  );
-};
+const NearbyIssueCard = ({ issue }) => (
+  <article className="nearby-issue-card">
+    {issue.thumbnailUrl ? <img src={issue.thumbnailUrl} alt="" className="nearby-issue-image" /> : <div className="nearby-issue-image nearby-image-placeholder"><i className="fa-solid fa-triangle-exclamation" /></div>}
+    <div className="nearby-issue-body"><div className="nearby-issue-topline"><span className="nearby-category-tag">{issue.category}</span><span className={`nearby-severity ${issue.severity.toLowerCase()}`}>{issue.severity}</span></div><h3>{issue.title || 'Reported issue'}</h3><p className="nearby-issue-meta"><i className="fa-solid fa-location-dot" /> {formatDistance(issue.distance)} <span>•</span> {formatDate(issue.reportedAt)}</p><p className="nearby-issue-description">{issue.description || 'No description provided.'}</p><div className="nearby-issue-footer"><span className={`nearby-status ${issue.status.toLowerCase().replace(/\s+/g, '-')}`}>{issue.status}</span><button type="button"><i className="fa-regular fa-thumbs-up" /> Track <span>{issue.upvotes || 0}</span></button></div></div>
+  </article>
+);
 
 const UserLocationMapPage = () => {
-  const [permission, setPermission] = useState('prompt');
-  const [location, setLocation] = useState(null);
-  const [address, setAddress] = useState('Finding your address...');
-  const [error, setError] = useState('');
-  const [isLocating, setIsLocating] = useState(true);
-  const [follow, setFollow] = useState(true);
-  const [isPreciseEnough, setIsPreciseEnough] = useState(true);
-  const watchId = useRef(null);
-  const fixTimer = useRef(null);
-  const bestFix = useRef(null);
-  const lastGeocoded = useRef(null);
-  const reverseTimer = useRef(null);
-  const lastSaved = useRef(null);
-  const lastSavedAt = useRef(0);
-
+  const navigate = useNavigate();
   const token = localStorage.getItem('fixitToken') || localStorage.getItem('token') || '';
-
-  const stopWatching = useCallback(() => {
-    if (watchId.current !== null && navigator.geolocation) navigator.geolocation.clearWatch(watchId.current);
-    watchId.current = null;
-    if (fixTimer.current) clearTimeout(fixTimer.current);
-  }, []);
-
-  const reverseGeocode = useCallback(async (nextLocation) => {
-    if (distanceInMeters(lastGeocoded.current, nextLocation) <= 50) return;
-    lastGeocoded.current = nextLocation;
-    if (reverseTimer.current) clearTimeout(reverseTimer.current);
-    reverseTimer.current = setTimeout(async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/geocode/reverse`, { params: { lat: nextLocation.latitude, lng: nextLocation.longitude } });
-        setAddress(response.data.address || 'Address unavailable');
-      } catch { setAddress('Address unavailable'); }
-    }, 500);
-  }, []);
-
-  const saveLocation = useCallback(async (nextLocation) => {
-    const now = Date.now();
-    if (now - lastSavedAt.current < 30000 || distanceInMeters(lastSaved.current, nextLocation) < 20) return;
-    lastSavedAt.current = now;
-    lastSaved.current = nextLocation;
-    try { await axios.put(`${API_URL}/api/users/me/location`, nextLocation, { headers: token ? { Authorization: `Bearer ${token}` } : {} }); } catch { /* Saving is best effort. */ }
-  }, [token]);
-
-  const handlePosition = useCallback((position) => {
-    const nextLocation = {
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-      accuracy: position.coords.accuracy,
-      capturedAt: new Date().toISOString(),
-    };
-    if (!bestFix.current || nextLocation.accuracy < bestFix.current.accuracy) bestFix.current = nextLocation;
-    setLocation(nextLocation);
-    setIsPreciseEnough(nextLocation.accuracy <= 100);
-    setIsLocating(false);
-    reverseGeocode(nextLocation);
-    saveLocation(nextLocation);
-    if (nextLocation.accuracy <= 30) {
-      if (fixTimer.current) clearTimeout(fixTimer.current);
-      setIsLocating(false);
-    }
-  }, [reverseGeocode, saveLocation]);
-
-  const handleError = useCallback((geoError) => {
-    stopWatching();
-    setIsLocating(false);
-    if (geoError.code === geoError.PERMISSION_DENIED) { setPermission('denied'); setError(''); return; }
-    if (geoError.code === geoError.POSITION_UNAVAILABLE) setError('Turn on Location/GPS on your device and try again.');
-    else if (geoError.code === geoError.TIMEOUT) setError('We could not get your location in time. Move outdoors and try again.');
-    else setError('We could not get your location. Try again or check your browser settings.');
-  }, [stopWatching]);
-
-  const startWatching = useCallback(() => {
-    setError('');
-    if (!window.isSecureContext) { setError('Precise location requires a secure HTTPS connection.'); setIsLocating(false); return; }
-    if (!navigator.geolocation) { setError('This browser does not support device location.'); setIsLocating(false); return; }
-    if (/FBAN|FBAV|Instagram|Line\/|; wv\)|WebView/i.test(navigator.userAgent || '')) { setError('This in-app browser may block location. Open FixIt in Chrome or Safari.'); setIsLocating(false); return; }
-    setPermission('granted');
-    setIsLocating(true);
-    bestFix.current = null;
-    stopWatching();
-    watchId.current = navigator.geolocation.watchPosition(handlePosition, handleError, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
-    fixTimer.current = setTimeout(() => {
-      setIsLocating(false);
-      if (bestFix.current) handlePosition({ coords: bestFix.current });
-    }, 15000);
-  }, [handleError, handlePosition, stopWatching]);
+  const [location, setLocation] = useState(null);
+  const [locationLoading, setLocationLoading] = useState(true);
+  const [locationMessage, setLocationMessage] = useState('');
+  const [issues, setIssues] = useState([]);
+  const [issuesLoading, setIssuesLoading] = useState(false);
+  const [issuesError, setIssuesError] = useState('');
+  const [search, setSearch] = useState('');
+  const [activeChip, setActiveChip] = useState(null);
+  const [filters, setFilters] = useState(initialFilters);
+  const [draftFilters, setDraftFilters] = useState(initialFilters);
+  const [showFilters, setShowFilters] = useState(true);
+  const [satellite, setSatellite] = useState(false);
 
   const loadSavedLocation = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/api/users/me/location`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
-      const savedLocation = response.data?.location;
-      if (savedLocation?.latitude != null && savedLocation?.longitude != null) {
-        setLocation(savedLocation);
-        reverseGeocode(savedLocation);
-        setIsLocating(false);
+      const saved = response.data?.location;
+      if (saved?.latitude != null && saved?.longitude != null) {
+        setLocation({ latitude: Number(saved.latitude), longitude: Number(saved.longitude), accuracy: saved.accuracy || 100 });
+        setLocationMessage('Using your saved location.');
+        return true;
       }
-    } catch { /* The enable screen remains available. */ }
-  }, [reverseGeocode, token]);
+    } catch { /* The location notice offers a retry when no saved location exists. */ }
+    return false;
+  }, [token]);
 
+  const resolveLocation = useCallback(() => {
+    setLocationLoading(true);
+    setLocationMessage('');
+    if (!navigator.geolocation) {
+      loadSavedLocation().then((found) => { if (!found) setLocationMessage('Location is unavailable. Allow browser access or add a saved location.'); setLocationLoading(false); });
+      return;
+    }
+    navigator.geolocation.getCurrentPosition((position) => {
+      setLocation({ latitude: position.coords.latitude, longitude: position.coords.longitude, accuracy: position.coords.accuracy });
+      setLocationMessage('Using your current location.');
+      setLocationLoading(false);
+    }, async () => {
+      const found = await loadSavedLocation();
+      if (!found) setLocationMessage('We could not access your location. Allow location access or add a saved location.');
+      setLocationLoading(false);
+    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 300000 });
+  }, [loadSavedLocation]);
+
+  useEffect(() => { resolveLocation(); }, [resolveLocation]);
   useEffect(() => {
+    if (!location) return undefined;
     let active = true;
-    const initialize = async () => {
-      if (!navigator.permissions?.query) { setPermission('prompt'); setIsLocating(false); return; }
-      try {
-        const result = await navigator.permissions.query({ name: 'geolocation' });
-        if (!active) return;
-        setPermission(result.state);
-        if (result.state === 'granted') startWatching();
-        else { setIsLocating(false); if (result.state !== 'denied') await loadSavedLocation(); }
-        result.onchange = () => setPermission(result.state);
-      } catch { setPermission('prompt'); setIsLocating(false); }
-    };
-    initialize();
-    return () => { active = false; stopWatching(); if (reverseTimer.current) clearTimeout(reverseTimer.current); };
-  }, [loadSavedLocation, startWatching, stopWatching]);
+    setIssuesLoading(true); setIssuesError('');
+    axios.get(`${API_URL}/api/reports/nearby`, { params: { lat: location.latitude, lng: location.longitude, radius: RADIUS_METERS } }).then((response) => {
+      if (!active) return;
+      setIssues((response.data || []).map((issue) => ({ ...issue, id: issue.id?.toString(), status: normalizeStatus(issue.status), severity: issue.severity || 'Medium', distance: distanceInMeters(location, { latitude: issue.lat, longitude: issue.lng }) })));
+    }).catch(() => { if (active) setIssuesError('Unable to load nearby issues. Please try again.'); }).finally(() => { if (active) setIssuesLoading(false); });
+    return () => { active = false; };
+  }, [location]);
 
-  useEffect(() => {
-    const handleVisibility = () => {
-      if (document.hidden) stopWatching();
-      else if (permission === 'granted') startWatching();
-    };
-    document.addEventListener('visibilitychange', handleVisibility);
-    return () => document.removeEventListener('visibilitychange', handleVisibility);
-  }, [permission, startWatching, stopWatching]);
+  const filteredIssues = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    const result = issues.filter((issue) => {
+      const reportedTime = issue.reportedAt ? new Date(issue.reportedAt).getTime() : 0;
+      const categoryMatch = activeChip === null || issue.category === activeChip;
+      const searchMatch = !query || `${issue.title} ${issue.description} ${issue.category} ${issue.areaName}`.toLowerCase().includes(query);
+      const fromMatch = !filters.from || reportedTime >= new Date(filters.from).getTime();
+      const toMatch = !filters.to || reportedTime <= new Date(`${filters.to}T23:59:59`).getTime();
+      return categoryMatch && searchMatch && (!filters.statuses.length || filters.statuses.includes(issue.status)) && (!filters.severities.length || filters.severities.includes(issue.severity)) && (!filters.categories.length || filters.categories.includes(issue.category)) && fromMatch && toMatch;
+    });
+    return result.sort((a, b) => filters.sort === 'Nearest' ? a.distance - b.distance : filters.sort === 'Highest Severity' ? ['High', 'Medium', 'Low'].indexOf(a.severity) - ['High', 'Medium', 'Low'].indexOf(b.severity) : new Date(b.reportedAt || 0) - new Date(a.reportedAt || 0));
+  }, [activeChip, filters, issues, search]);
 
-  const showEnableScreen = !location && !error && permission !== 'granted';
-  const showDenied = permission === 'denied' && !location;
-  const mapCenter = location ? [location.latitude, location.longitude] : LAGOS_CENTER;
+  const toggleDraft = (key, value) => setDraftFilters((current) => ({ ...current, [key]: current[key].includes(value) ? current[key].filter((item) => item !== value) : [...current[key], value] }));
+  const clearFilters = () => { setFilters(initialFilters); setDraftFilters(initialFilters); setActiveChip(null); setSearch(''); };
+  const hasFilters = Boolean(search || activeChip || filters.from || filters.to || filters.statuses.length || filters.severities.length || filters.categories.length || filters.sort !== 'Most Recent');
+  const mapIssues = filteredIssues.map((issue) => ({ ...issue, lat: Number(issue.lat), lng: Number(issue.lng) }));
+  const center = location ? [location.latitude, location.longitude] : DEFAULT_CENTER;
 
-  return (
-    <div className="user-location-page">
-      <header className="user-location-header"><Link to="/dashboard" className="back-dashboard-link"><i className="fa-solid fa-arrow-left"></i> Back to Dashboard</Link><h1>My Location</h1></header>
-      <div className="user-location-map-shell">
-        <MapContainer center={mapCenter} zoom={location ? 17 : 12} zoomControl={false} className="user-location-map">
-          <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} />
-          <ZoomControl position="bottomright" />
-          <MapViewport location={location} follow={follow} onUserInteraction={() => setFollow(false)} />
-          {location && <><Circle center={mapCenter} radius={location.accuracy} pathOptions={{ color: '#2563eb', fillColor: '#60a5fa', fillOpacity: 0.18, weight: 2 }} /><Marker position={mapCenter} icon={locationIcon} /></>}
-        </MapContainer>
-        {location && <div className="location-address-chip"><i className="fa-solid fa-location-dot"></i><span>{address}<small>Accurate to ±{Math.round(location.accuracy)} m</small></span></div>}
-        {location && <button className="my-location-button" aria-label="Center map on my location" title="My Location" onClick={() => { setFollow(true); setLocation((current) => current ? { ...current } : current); }}><i className="fa-solid fa-crosshairs"></i></button>}
-        {showEnableScreen && <div className="location-page-overlay"><PermissionMessage type="prompt" onRetry={startWatching} /></div>}
-        {showDenied && <div className="location-page-overlay"><PermissionMessage type="denied" onRetry={startWatching} /></div>}
-        {error && <div className="location-page-overlay"><PermissionMessage type="error" onRetry={startWatching} /><p className="location-page-error">{error}</p></div>}
-        {isLocating && <div className="locating-indicator"><span className="spinner-border spinner-border-sm"></span> Locating you...</div>}
-        {location && !isPreciseEnough && <div className="precision-banner">Your location isn&apos;t very precise. Move outdoors or turn on high-accuracy/GPS mode.</div>}
-      </div>
-    </div>
-  );
+  return <div className="nearby-page"><ResidentSidebar navigate={navigate} /><main className="nearby-main"><header className="nearby-header"><div className="nearby-mobile-brand"><img src={logoWhite} alt="FixIt" /><strong>Fix<span>It</span></strong></div><div className="nearby-header-actions"><button className="nearby-header-icon" aria-label="Notifications"><i className="fa-regular fa-bell" /></button><span className="nearby-header-avatar">R</span></div></header><div className="nearby-content">
+    <section className="nearby-page-intro"><div><p className="nearby-eyebrow">RESIDENT DASHBOARD</p><h1>Nearby Issues</h1><p>Explore issues around and update your nearest Zone/Ward. Click on a marker to view details and track progress.</p></div><div className="nearby-search"><i className="fa-solid fa-magnifying-glass" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search nearby issues..." aria-label="Search nearby issues" /></div></section>
+    <div className="nearby-chips">{categoryChips.map(([label, value]) => <button key={label} className={activeChip === value ? 'active' : ''} onClick={() => setActiveChip(value)}>{label}</button>)}</div>
+    {locationMessage && <div className="nearby-location-notice"><i className="fa-solid fa-location-dot" /><span>{locationMessage}</span><button onClick={resolveLocation}>Try again</button></div>}
+    <section className="nearby-map-card"><div className="nearby-map-heading"><div><h2>Community map</h2><span>Reports within {RADIUS_METERS / 1000} km of your location</span></div><button className="nearby-filter-toggle" onClick={() => setShowFilters((value) => !value)}><i className="fa-solid fa-sliders" /> Filters {hasFilters && <b>{filteredIssues.length}</b>}</button></div><div className="nearby-map-wrap"><InteractiveMap center={center} issues={mapIssues} isLoading={locationLoading || issuesLoading} userLocation={location} satellite={satellite} onToggleSatellite={() => setSatellite((value) => !value)} /></div></section>
+    <section className="nearby-list-section"><div className="nearby-section-heading"><div><h2>Issues near you</h2><span>{filteredIssues.length} of {issues.length} reports in your radius</span></div><button className="nearby-view-toggle active"><i className="fa-solid fa-list" /> List view</button></div>{issuesError && <div className="nearby-error">{issuesError}</div>}{!issuesLoading && !locationLoading && !issues.length && <div className="nearby-empty"><i className="fa-solid fa-location-dot" /><h3>No nearby issues</h3><p>There are currently no reports near your location.</p></div>}{!issuesLoading && issues.length > 0 && !filteredIssues.length && <div className="nearby-empty"><i className="fa-solid fa-filter-circle-xmark" /><h3>No issues match your filters</h3><p>Try changing your search or selected filters.</p><button onClick={clearFilters}>Clear filters</button></div>}<div className="nearby-issues-grid">{filteredIssues.map((issue) => <NearbyIssueCard key={issue.id} issue={issue} />)}</div></section>
+    <section className={`nearby-filters-card ${showFilters ? 'open' : ''}`}><div className="nearby-filters-heading"><div><h2>Filter nearby issues</h2><span>Refine the same reports shown on the map.</span></div><button onClick={clearFilters}>Clear all filters</button></div><div className="nearby-filter-grid"><label className="nearby-select-label">Date reported<div className="nearby-date-fields"><input type="date" value={draftFilters.from} onChange={(event) => setDraftFilters({ ...draftFilters, from: event.target.value })} /><input type="date" value={draftFilters.to} onChange={(event) => setDraftFilters({ ...draftFilters, to: event.target.value })} /></div></label><CheckGroup title="Issue status" options={statusOptions} selected={draftFilters.statuses} onToggle={(value) => toggleDraft('statuses', value)} /><CheckGroup title="Severity" options={severityOptions} selected={draftFilters.severities} onToggle={(value) => toggleDraft('severities', value)} /><label className="nearby-select-label">Category<select multiple value={draftFilters.categories} onChange={(event) => setDraftFilters({ ...draftFilters, categories: [...event.target.selectedOptions].map((option) => option.value) })}>{categoryOptions.map((category) => <option key={category}>{category}</option>)}</select></label><label className="nearby-select-label">Sort by<select value={draftFilters.sort} onChange={(event) => setDraftFilters({ ...draftFilters, sort: event.target.value })}><option>Most Recent</option><option>Nearest</option><option>Highest Severity</option></select></label></div><button className="nearby-apply-button" onClick={() => { setFilters(draftFilters); setShowFilters(true); }}>Apply filters</button></section>
+  </div></main></div>;
 };
 
 export default UserLocationMapPage;

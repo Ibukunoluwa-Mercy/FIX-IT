@@ -29,7 +29,7 @@ const Footer = () => {
             <ul className="footer-links-list">
               <li><a href="/">Home</a></li>
               <li><a href="/explore">Explore Issues</a></li>
-              <li><a href="/map">Community Map</a></li>
+              <li><a href="/community-map">Community Map</a></li>
               <li><a href="/register">Report a Problem</a></li>
             </ul>
           </Col>

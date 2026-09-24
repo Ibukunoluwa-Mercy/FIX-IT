@@ -17,7 +17,8 @@
 @keyframes loginReveal {
   from {
     opacity: 0;
-    transform: translateX(var(--login-slide-x, 0)) translateY(var(--login-slide-y, 0));
+    transform: translateX(var(--login-slide-x, 0))
+      translateY(var(--login-slide-y, 0));
   }
   to {
     opacity: 1;
@@ -32,12 +33,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Google Sans', 'Segoe UI', sans-serif;
+  font-family: "Google Sans", "Segoe UI", sans-serif;
 }
 
 .login-reveal {
   opacity: 0;
-  animation: loginReveal 0.65s cubic-bezier(.22, 1, .36, 1) forwards;
+  animation: loginReveal 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .login-reveal-hero {
@@ -83,7 +84,9 @@
   align-items: center;
   text-decoration: none;
   background: transparent;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .brand-link:hover {
@@ -102,7 +105,7 @@
   height: 70px;
   width: 70px;
   object-fit: contain;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.08));
+  filter: drop-shadow(0 2px 6px #00000014);
 }
 
 .brand-label {
@@ -193,7 +196,7 @@
   background: #dfeaf4;
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 16px 30px #0f172a0f;
 }
 
 .illustration-image {
@@ -211,10 +214,10 @@
 .login-card {
   width: 100%;
   max-width: 470px;
-  background: rgba(255, 255, 255, 0.95);
+  background: #fffffff2;
   border-radius: 28px;
   border: 1px solid #f0ece7;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 18px 40px #0f172a14;
   padding: 30px 32px 26px;
 }
 
@@ -262,13 +265,16 @@
   border-radius: 12px;
   padding: 0 14px;
   min-height: 54px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 
 .input-shell:focus-within {
-  border-color: rgba(234, 88, 12, 0.8);
+  border-color: #ea580ccc;
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.08);
+  box-shadow: 0 0 0 3px #ea580c14;
 }
 
 .field-icon {
@@ -336,13 +342,16 @@
   justify-content: center;
   gap: 10px;
   cursor: pointer;
-  box-shadow: 0 12px 20px rgba(234, 88, 12, 0.22);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 12px 20px #ea580c38;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .login-submit:hover {
   transform: translateY(-1px);
-  box-shadow: 0 18px 26px rgba(234, 88, 12, 0.25);
+  box-shadow: 0 18px 26px #ea580c40;
 }
 
 .login-submit:disabled {

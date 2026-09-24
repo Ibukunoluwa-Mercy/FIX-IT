@@ -139,7 +139,7 @@ const ExploreIssuesPage = () => {
             <button className="view-mode-btn active">
               <i className="fa-solid fa-list me-1"></i> List View
             </button>
-            <button className="view-mode-btn" onClick={() => navigate('/map')}>
+            <button className="view-mode-btn" onClick={() => navigate('/community-map')}>
               <i className="fa-solid fa-map me-1"></i> Map View
             </button>
           </div>

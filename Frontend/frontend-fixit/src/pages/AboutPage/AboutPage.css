@@ -14,7 +14,11 @@
 /* 1. Hero Section */
 .about-hero-section {
   background-color: #0d1b2a;
-  background-image: radial-gradient(circle at top right, #1e3a5f 0%, #0d1b2a 70%);
+  background-image: radial-gradient(
+    circle at top right,
+    #1e3a5f 0%,
+    #0d1b2a 70%
+  );
   color: #ffffff;
   padding: 80px 0 100px;
   position: relative;
@@ -63,10 +67,10 @@
 }
 
 .btn-navy-outlined {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: #ffffff14;
   color: #ffffff;
   font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid #ffffff40;
   padding: 12px 26px;
   border-radius: 8px;
   display: inline-flex;
@@ -76,15 +80,15 @@
   text-decoration: none;
 }
 .btn-navy-outlined:hover {
-  background-color: rgba(255, 255, 255, 0.18);
+  background-color: #ffffff2e;
   color: #ffffff;
   transform: translateY(-2px);
 }
 
 /* Hero Workflow Indicator Box */
 .hero-workflow-card {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #ffffff0f;
+  border: 1px solid #ffffff1f;
   backdrop-filter: blur(10px);
   border-radius: 16px;
   padding: 24px 30px;
@@ -108,21 +112,21 @@
 }
 
 .workflow-icon-problem {
-  background: rgba(230, 57, 70, 0.2);
+  background: #e6394633;
   color: #e63946;
-  border: 1px solid rgba(230, 57, 70, 0.4);
+  border: 1px solid #e6394666;
 }
 
 .workflow-icon-action {
-  background: rgba(69, 123, 157, 0.25);
+  background: #457b9d40;
   color: #a8dadc;
-  border: 1px solid rgba(69, 123, 157, 0.4);
+  border: 1px solid #457b9d66;
 }
 
 .workflow-icon-resolved {
-  background: rgba(42, 157, 143, 0.25);
+  background: #2a9d8f40;
   color: #4ade80;
-  border: 1px solid rgba(42, 157, 143, 0.4);
+  border: 1px solid #2a9d8f66;
 }
 
 .workflow-label {
@@ -222,16 +226,32 @@
   height: 44px;
   border-radius: 50%;
   background: white;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 25px #00000026;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 20px;
 }
-.bubble-wa { top: 20%; left: 10%; color: #25d366; }
-.bubble-fb { top: 25%; right: 10%; color: #1877f2; }
-.bubble-msg { bottom: 35%; left: 5%; color: #8b5cf6; }
-.bubble-q { top: 0%; left: 45%; color: #e63946; }
+.bubble-wa {
+  top: 20%;
+  left: 10%;
+  color: #25d366;
+}
+.bubble-fb {
+  top: 25%;
+  right: 10%;
+  color: #1877f2;
+}
+.bubble-msg {
+  bottom: 35%;
+  left: 5%;
+  color: #8b5cf6;
+}
+.bubble-q {
+  top: 0%;
+  left: 45%;
+  color: #e63946;
+}
 
 /* 3. Our Solution Section */
 .solution-flow-card {
@@ -258,11 +278,21 @@
   font-size: 19.2px;
   color: white;
 }
-.bg-step-report { background-color: #e63946; }
-.bg-step-verify { background-color: #0d1b2a; }
-.bg-step-prioritize { background-color: #1e3a5f; }
-.bg-step-track { background-color: #457b9d; }
-.bg-step-resolve { background-color: #2a9d8f; }
+.bg-step-report {
+  background-color: #e63946;
+}
+.bg-step-verify {
+  background-color: #0d1b2a;
+}
+.bg-step-prioritize {
+  background-color: #1e3a5f;
+}
+.bg-step-track {
+  background-color: #457b9d;
+}
+.bg-step-resolve {
+  background-color: #2a9d8f;
+}
 
 .solution-quote-card {
   background: white;
@@ -284,11 +314,13 @@
   text-align: center;
   position: relative;
   height: 100%;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 .step-timeline-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 12px 24px #0000000f;
 }
 
 .step-num-pill {
@@ -318,12 +350,30 @@
   margin: 10px auto 16px;
   font-size: 22.4px;
 }
-.icon-step-1 { background: #fee2e2; color: #e63946; }
-.icon-step-2 { background: #e0f2fe; color: #0284c7; }
-.icon-step-3 { background: #fef3c7; color: #d97706; }
-.icon-step-4 { background: #ede9fe; color: #7c3aed; }
-.icon-step-5 { background: #ffedd5; color: #ea580c; }
-.icon-step-6 { background: #dcfce7; color: #16a34a; }
+.icon-step-1 {
+  background: #fee2e2;
+  color: #e63946;
+}
+.icon-step-2 {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+.icon-step-3 {
+  background: #fef3c7;
+  color: #d97706;
+}
+.icon-step-4 {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+.icon-step-5 {
+  background: #ffedd5;
+  color: #ea580c;
+}
+.icon-step-6 {
+  background: #dcfce7;
+  color: #16a34a;
+}
 
 .step-title {
   font-size: 16.8px;
@@ -365,9 +415,15 @@
   color: white;
   font-size: 20px;
 }
-.role-community { background-color: #e63946; }
-.role-resolver { background-color: #0d1b2a; }
-.role-admin { background-color: #2a9d8f; }
+.role-community {
+  background-color: #e63946;
+}
+.role-resolver {
+  background-color: #0d1b2a;
+}
+.role-admin {
+  background-color: #2a9d8f;
+}
 
 .role-title {
   font-weight: 800;
@@ -397,7 +453,9 @@
   padding: 20px 10px;
   text-align: center;
   height: 100%;
-  transition: transform 0.2s, border-color 0.2s;
+  transition:
+    transform 0.2s,
+    border-color 0.2s;
   cursor: pointer;
 }
 .report-grid-card:hover {
@@ -478,7 +536,11 @@
 /* Bottom Call to Action Bar */
 .about-bottom-cta {
   background-color: #0d1b2a;
-  background-image: radial-gradient(circle at bottom left, #1e3a5f 0%, #0d1b2a 80%);
+  background-image: radial-gradient(
+    circle at bottom left,
+    #1e3a5f 0%,
+    #0d1b2a 80%
+  );
   color: white;
   border-radius: 18px;
   padding: 40px;
