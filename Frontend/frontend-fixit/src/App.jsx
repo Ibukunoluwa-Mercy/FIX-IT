@@ -19,11 +19,13 @@ import 'react-toastify/dist/ReactToastify.css';
 // Auth-only routes that should render without the Navbar/Footer shell
 const AUTH_ROUTES = ['/register', '/login', '/forgot-password', '/reset-password'];
 const DASHBOARD_ROUTES = ['/dashboard', '/reports', '/my-reports'];
+const LOCATION_ROUTES = ['/map'];
 
 function AppShell() {
   const location = useLocation();
   const isAuthPage = AUTH_ROUTES.includes(location.pathname);
   const isDashboard = DASHBOARD_ROUTES.includes(location.pathname);
+  const isLocationPage = LOCATION_ROUTES.includes(location.pathname);
 
   if (isAuthPage) {
     return (
@@ -45,6 +47,8 @@ function AppShell() {
       </Routes>
     );
   }
+
+  if (isLocationPage) return <Routes><Route path="/map" element={<UserLocationMapPage />} /></Routes>;
 
   return (
     <div className="app-container" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>

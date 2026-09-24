@@ -108,7 +108,7 @@ const MyReports = () => {
         <div className="resident-brand-row">
           <Link to="/dashboard" className="resident-brand" aria-label="Fixit dashboard">
             <img src={logoWhite} alt="FixIt" className="brand-logo-img" />
-            <span className="brand-word">Fi<span style={{ color: '#f59e0b' }}>xIt</span></span>
+            <span className="brand-word">Fix<span style={{ color: '#f59e0b' }}>It</span></span>
           </Link>
           <button className="icon-button sidebar-toggle" onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}>
             {isSidebarCollapsed ? <i className="fa-solid fa-bars"></i> : <i className="fa-solid fa-xmark"></i>}

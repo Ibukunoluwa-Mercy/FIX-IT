@@ -194,7 +194,7 @@ const UserLocationMapPage = () => {
   const mapCenter = location ? [location.latitude, location.longitude] : LAGOS_CENTER;
 
   return (
-    <div className="user-location-page" style={{ height: 'calc(100vh - 72px)' }}>
+    <div className="user-location-page">
       <header className="user-location-header"><Link to="/dashboard" className="back-dashboard-link"><i className="fa-solid fa-arrow-left"></i> Back to Dashboard</Link><h1>My Location</h1></header>
       <div className="user-location-map-shell">
         <MapContainer center={mapCenter} zoom={location ? 17 : 12} zoomControl={false} className="user-location-map">
