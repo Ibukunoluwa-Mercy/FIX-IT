@@ -1,13 +1,28 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import logoWhite from '../../assets/fixit-logo-white.png';
+import logoWhite from '../../assets/fixit-white-logo.png';
 import './MyReports.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
 
 const formatDate = (value) => value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : 'Just now';
 const statusClass = (status = 'Pending') => status.toLowerCase().replace(/\s+/g, '-');
+
+const navGroups = [
+  [
+    { label: 'Dashboard', iconClass: 'fa-solid fa-grip' },
+    { label: 'My Reports', iconClass: 'fa-solid fa-file-lines', active: true },
+    { label: 'Nearby Issues', iconClass: 'fa-solid fa-location-dot' },
+    { label: 'Notifications', iconClass: 'fa-solid fa-bell', badge: 0 },
+    { label: 'Messages', iconClass: 'fa-solid fa-message' },
+    { label: 'Saved Locations', iconClass: 'fa-solid fa-bookmark' },
+  ],
+  [
+    { label: 'Help Center', iconClass: 'fa-solid fa-circle-question' },
+    { label: 'Settings', iconClass: 'fa-solid fa-gear' },
+  ],
+];
 
 const MyReports = () => {
   const navigate = useNavigate();
@@ -99,13 +114,45 @@ const MyReports = () => {
             {isSidebarCollapsed ? <i className="fa-solid fa-bars"></i> : <i className="fa-solid fa-xmark"></i>}
           </button>
         </div>
-        <nav className="resident-nav">
-          <div className="nav-group">
-            <button className="resident-nav-link" onClick={() => navigate('/dashboard')}><i className="fa-solid fa-grip"></i><span>Dashboard</span></button>
-            <button className="resident-nav-link active"><i className="fa-solid fa-file-lines"></i><span>My Reports</span></button>
-            <button className="resident-nav-link" onClick={() => navigate('/map')}><i className="fa-solid fa-location-dot"></i><span>Nearby Issues</span></button>
-          </div>
+        <nav className="resident-nav" aria-label="Dashboard navigation">
+          {navGroups.map((group, groupIndex) => (
+            <div className={`nav-group ${groupIndex ? 'nav-group-secondary' : ''}`} key={groupIndex}>
+              {group.map(({ label, iconClass, badge, active }) => (
+                <button 
+                  key={label} 
+                  className={`resident-nav-link ${active ? 'active' : ''}`} 
+                  onClick={() => {
+                    if (label === 'Dashboard') navigate('/dashboard');
+                    if (label === 'My Reports') navigate('/reports');
+                    if (label === 'Nearby Issues') navigate('/map');
+                  }} 
+                  title={label}
+                >
+                  <i className={`${iconClass}`} style={{ fontSize: 16 }}></i>
+                  <span>{label}</span>
+                  {Boolean(badge && badge > 0) && <b className="nav-badge">{badge}</b>}
+                </button>
+              ))}
+            </div>
+          ))}
         </nav>
+        <div className="resident-profile-wrap">
+          {showProfileMenu && (
+            <div className="profile-menu">
+              <button onClick={() => navigate('/dashboard')}>
+                <i className="fa-solid fa-gear" style={{ fontSize: 14 }}></i> Account settings
+              </button>
+              <button onClick={logout}>
+                <i className="fa-solid fa-arrow-right-from-bracket" style={{ fontSize: 14 }}></i> Sign out
+              </button>
+            </div>
+          )}
+          <button className="resident-profile" onClick={() => setShowProfileMenu((value) => !value)}>
+            <span className="avatar avatar-photo">{firstName.charAt(0)}</span>
+            <span className="profile-copy"><strong>{userName}</strong><small>Resident</small></span>
+            <i className="fa-solid fa-chevron-down" style={{ fontSize: 12 }}></i>
+          </button>
+        </div>
       </aside>
 
       <main className="resident-main">

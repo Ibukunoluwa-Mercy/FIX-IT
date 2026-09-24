@@ -10,7 +10,7 @@ const Navbar = () => {
   const links = [
     { to: '/',        label: 'Home'            },
     { to: '/explore', label: 'Explore Issues'  },
-    { to: '/map',     label: 'Community Map'   },
+    { to: '/map',     label: 'My Location'     },
     { to: '/about',   label: 'About'           },
   ];
 

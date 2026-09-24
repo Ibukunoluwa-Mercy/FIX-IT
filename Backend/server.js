@@ -14,6 +14,7 @@ const reportRoutes = require('./routes/reportRoutes');
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const geocodeRoutes = require('./routes/geocodeRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 const port = process.env.PORT || 5100;
@@ -44,6 +45,7 @@ app.get('/api/health', (req, res) => res.status(mongoose.connection.readyState =
 app.use('/api/auth', authRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/geocode', geocodeRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
 const startServer = async () => {

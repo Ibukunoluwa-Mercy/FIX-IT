@@ -31,10 +31,14 @@ const nearbyIcon = L.divIcon({
 
 const NEARBY_RADIUS = 150;
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('fixitToken') || localStorage.getItem('token') || '';
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
 const reverseGeocode = async (lat, lng) => {
   try {
-    const res = await fetch(`${API_URL}/api/geocode/reverse?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}`);
+    const res = await fetch(`${API_URL}/api/geocode/reverse?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}`, { headers: getAuthHeaders() });
     if (!res.ok) throw new Error('Geocode failed');
     const data = await res.json();
     return data.address;
@@ -208,7 +212,7 @@ const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat
     setEmptyMessage('');
 
     try {
-      const response = await fetch(`${API_URL}/api/geocode/search?q=${encodeURIComponent(searchQuery)}`);
+      const response = await fetch(`${API_URL}/api/geocode/search?q=${encodeURIComponent(searchQuery)}`, { headers: getAuthHeaders() });
       
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();

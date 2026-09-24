@@ -28,3 +28,4 @@
 /* Brand Logo Image */
 .brand-logo-img{height:36px;width:auto;object-fit:contain;display:block}
 .sidebar-collapsed .brand-logo-img{height:32px;margin:0 auto}
+.issue-map-preview-button{position:relative;display:block;width:100%;height:100%;min-height:124px;padding:0;border:0;overflow:hidden;background:#e8f2e4;cursor:pointer;text-align:center}.issue-map-preview-button:hover .map-grid{opacity:.65}.dashboard-user-dot{position:absolute;z-index:2;left:50%;top:50%;width:18px;height:18px;transform:translate(-50%,-50%);border:3px solid #fff;border-radius:50%;background:#2563eb;box-shadow:0 0 0 8px #60a5fa66,0 2px 8px #1e3a8a55}.location-preview-placeholder{position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%);width:max-content;max-width:calc(100% - 24px);padding:9px 13px;border-radius:999px;background:#fff;color:#64748b;font-size:12px;box-shadow:0 3px 10px #0f172a18}

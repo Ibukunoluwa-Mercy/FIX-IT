@@ -29,4 +29,10 @@ const validateLocation = (location = {}) => {
 
 const locationCacheKey = (latitude, longitude) => `${Number(latitude).toFixed(5)},${Number(longitude).toFixed(5)}`;
 
-module.exports = { LOCATION_SOURCES, validateCoordinates, validateLocation, locationCacheKey };
+const isValidCapturedAt = (capturedAt, now = new Date()) => {
+	if (typeof capturedAt !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/.test(capturedAt)) return false;
+	const date = new Date(capturedAt);
+	return Boolean(capturedAt) && !Number.isNaN(date.getTime()) && date <= now;
+};
+
+module.exports = { LOCATION_SOURCES, validateCoordinates, validateLocation, locationCacheKey, isValidCapturedAt };

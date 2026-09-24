@@ -22,6 +22,12 @@ const userSchema = new mongoose.Schema(
 		password: { type: String, required: true, minlength: 8, select: false },
 		role: { type: String, enum: ['resident', 'admin', 'Community Member', 'Issue Resolver', 'Administrator'], default: 'resident', required: true },
 		location: { type: String, trim: true, default: '' },
+		lastKnownLocation: {
+			latitude: { type: Number, min: -90, max: 90 },
+			longitude: { type: Number, min: -180, max: 180 },
+			accuracy: { type: Number, min: 0 },
+			capturedAt: { type: Date },
+		},
 		isActive: { type: Boolean, default: true },
 		emailVerified: { type: Boolean, default: false },
 		emailVerificationTokenHash: { type: String, select: false },

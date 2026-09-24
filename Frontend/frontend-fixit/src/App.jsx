@@ -11,13 +11,14 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
 import ResetPassword from './pages/ResetPassword/ResetPassword'
 import ResidentDashboard from './pages/ResidentDashboard/ResidentDashboard'
 import MyReports from './pages/MyReports/MyReports'
+import UserLocationMapPage from './pages/UserLocationMapPage/UserLocationMapPage'
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Auth-only routes that should render without the Navbar/Footer shell
 const AUTH_ROUTES = ['/register', '/login', '/forgot-password', '/reset-password'];
-const DASHBOARD_ROUTES = ['/dashboard'];
+const DASHBOARD_ROUTES = ['/dashboard', '/reports', '/my-reports'];
 
 function AppShell() {
   const location = useLocation();
@@ -35,7 +36,15 @@ function AppShell() {
     );
   }
 
-  if (isDashboard) return <Routes><Route path="/dashboard" element={<ResidentDashboard />} /></Routes>;
+  if (isDashboard) {
+    return (
+      <Routes>
+        <Route path="/dashboard" element={<ResidentDashboard />} />
+        <Route path="/my-reports" element={<MyReports />} />
+        <Route path="/reports" element={<MyReports />} />
+      </Routes>
+    );
+  }
 
   return (
     <div className="app-container" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -43,10 +52,9 @@ function AppShell() {
       <main style={{ flexGrow: 1 }}>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/map" element={<CommunityMapPage />} />
+          <Route path="/map" element={<UserLocationMapPage />} />
+          <Route path="/community-map" element={<CommunityMapPage />} />
           <Route path="/explore" element={<ExploreIssuesPage />} />
-          <Route path="/my-reports" element={<MyReports />} />
-          <Route path="/reports" element={<MyReports />} />
           <Route path="/about" element={<AboutPage />} />
         </Routes>
       </main>

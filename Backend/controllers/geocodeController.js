@@ -2,6 +2,7 @@ const { locationCacheKey, validateCoordinates } = require('../utils/locationUtil
 
 const reverseCache = new Map();
 const searchCache = new Map();
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 let lastProviderRequestAt = 0;
 
 const provider = () => process.env.GEOCODING_PROVIDER || 'nominatim';
@@ -40,14 +41,16 @@ const reverseGeocode = async (req, res) => {
 	const coordinates = validateCoordinates(req.query.lat, req.query.lng);
 	if (!coordinates.valid) return res.status(400).json({ error: coordinates.error });
 	const key = locationCacheKey(coordinates.latitude, coordinates.longitude);
-	if (reverseCache.has(key)) return res.json(reverseCache.get(key));
+	const cached = reverseCache.get(key);
+	if (cached && cached.expiresAt > Date.now()) return res.json(cached.value);
+	if (cached) reverseCache.delete(key);
 	try {
 		const result = await providerRequest('/reverse', { format: 'jsonv2', addressdetails: 1, lat: coordinates.latitude, lon: coordinates.longitude });
 		const normalized = normalizeAddress(result);
-		reverseCache.set(key, normalized);
+		reverseCache.set(key, { value: normalized, expiresAt: Date.now() + CACHE_TTL_MS });
 		return res.json(normalized);
 	} catch (error) {
-		return res.status(502).json({ error: 'Unable to resolve this location right now.' });
+		return res.status(502).json({ error: 'Address unavailable' });
 	}
 };
 
@@ -55,11 +58,13 @@ const searchGeocode = async (req, res) => {
 	const query = String(req.query.q || '').trim();
 	if (query.length < 3) return res.status(400).json({ error: 'Search must be at least 3 characters.' });
 	const key = query.toLowerCase();
-	if (searchCache.has(key)) return res.json(searchCache.get(key));
+	const cached = searchCache.get(key);
+	if (cached && cached.expiresAt > Date.now()) return res.json(cached.value);
+	if (cached) searchCache.delete(key);
 	try {
 		const results = await providerRequest('/search', { format: 'jsonv2', addressdetails: 1, limit: 5, countrycodes: 'ng', viewbox: '3.0,6.8,3.8,6.3', bounded: 0, q: `${query}, Lagos, Nigeria` });
 		const normalized = results.slice(0, 5).map((result) => ({ label: result.display_name, latitude: Number(result.lat), longitude: Number(result.lon) }));
-		searchCache.set(key, normalized);
+		searchCache.set(key, { value: normalized, expiresAt: Date.now() + CACHE_TTL_MS });
 		return res.json(normalized);
 	} catch (error) {
 		return res.status(502).json({ error: 'Unable to search locations right now.' });

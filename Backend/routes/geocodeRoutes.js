@@ -1,5 +1,6 @@
 const express = require('express');
 const { reverseGeocode, searchGeocode } = require('../controllers/geocodeController');
+const { requireAuth } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 const requestLog = new Map();
@@ -13,7 +14,7 @@ const rateLimitGeocode = (req, res, next) => {
 	return next();
 };
 
-router.use(rateLimitGeocode);
+router.use(requireAuth, rateLimitGeocode);
 router.get('/reverse', reverseGeocode);
 router.get('/search', searchGeocode);
 
