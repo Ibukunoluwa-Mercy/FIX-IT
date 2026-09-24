@@ -1,5 +1,6 @@
 const Report = require('../models/Report');
 const User = require('../models/User');
+const { validateLocation } = require('../utils/locationUtils');
 
 const getAuthenticatedUserId = (req) => req.user?.id || req.user?._id;
 
@@ -142,19 +143,32 @@ const submitWizardReport = async (req, res) => {
 		const rawSeverity = String(req.body.severity || 'Medium').trim();
 		const validSeverities = ['Low', 'Medium', 'High'];
 		const normalizedSeverity = validSeverities.includes(rawSeverity) ? rawSeverity : 'Medium';
-		const normalizedLat = req.body.location?.lat ?? req.body.lat;
-		const normalizedLng = req.body.location?.lng ?? req.body.lng;
-		const parsedLat = Number(normalizedLat);
-		const parsedLng = Number(normalizedLng);
+		const submittedLocation = req.body.location || {};
+		const validatedLocation = validateLocation({
+			latitude: submittedLocation.latitude ?? submittedLocation.lat,
+			longitude: submittedLocation.longitude ?? submittedLocation.lng,
+			accuracy: submittedLocation.accuracy,
+			source: submittedLocation.source,
+			capturedAt: submittedLocation.capturedAt,
+		});
+		if (!validatedLocation.valid) return res.status(400).json({ error: validatedLocation.error, message: validatedLocation.error });
+		const parsedLat = validatedLocation.latitude;
+		const parsedLng = validatedLocation.longitude;
 		const location = {
 			address: rawAddress,
-			...(Number.isFinite(parsedLat) ? { lat: parsedLat } : {}),
-			...(Number.isFinite(parsedLng) ? { lng: parsedLng } : {}),
+			lat: parsedLat,
+			lng: parsedLng,
+			latitude: parsedLat,
+			longitude: parsedLng,
+			accuracy: validatedLocation.accuracy,
+			source: validatedLocation.source,
+			addressText: String(submittedLocation.addressText || rawAddress).trim(),
+			capturedAt: validatedLocation.capturedAt,
+			lowAccuracy: validatedLocation.source === 'gps' && validatedLocation.accuracy > 100,
 		};
 
 		if (!rawCategory) return res.status(400).json({ message: 'Category is required.' });
 		if (!rawDescription) return res.status(400).json({ message: 'Description is required.' });
-		if (!rawAddress) return res.status(400).json({ message: 'Address is required.' });
 		if (!normalizedSeverity) return res.status(400).json({ message: 'Severity is required.' });
 
 		const user = await User.findById(userId).select('name impactScore');
@@ -187,17 +201,34 @@ const submitWizardReport = async (req, res) => {
 };
 
 const submitReport = async (req, res) => {
-	const { title, description = '', address = '', lat, lng, imageUrl = '' } = req.body;
-	if (!title || !address) {
-		return res.status(400).json({ message: 'Title and address are required' });
-	}
+	const { title = req.body.category, category = title, description = '', address = req.body.location?.addressText || '', imageUrl = '' } = req.body;
 	try {
 		const userId = getAuthenticatedUserId(req);
+		const submittedLocation = req.body.location || {};
+		const validatedLocation = validateLocation({
+			latitude: submittedLocation.latitude ?? req.body.lat,
+			longitude: submittedLocation.longitude ?? req.body.lng,
+			accuracy: submittedLocation.accuracy,
+			source: submittedLocation.source,
+			capturedAt: submittedLocation.capturedAt,
+		});
+		if (!title || !address) return res.status(400).json({ error: 'Title and address are required', message: 'Title and address are required' });
+		if (!validatedLocation.valid) return res.status(400).json({ error: validatedLocation.error, message: validatedLocation.error });
 		const reportId = await getNextReportId();
-		const hasCoordinates = Number.isFinite(Number(lat)) && Number.isFinite(Number(lng));
 		const report = await Report.create({
-			reportId, user: userId, createdBy: userId, title, description,
-			location: { address, ...(hasCoordinates ? { coordinates: { lat: Number(lat), lng: Number(lng) } } : {}) },
+			reportId, user: userId, createdBy: userId, title, category, description,
+			location: {
+				address,
+				lat: validatedLocation.latitude,
+				lng: validatedLocation.longitude,
+				latitude: validatedLocation.latitude,
+				longitude: validatedLocation.longitude,
+				accuracy: validatedLocation.accuracy,
+				source: validatedLocation.source,
+				addressText: String(submittedLocation.addressText || address).trim(),
+				capturedAt: validatedLocation.capturedAt,
+				lowAccuracy: validatedLocation.source === 'gps' && validatedLocation.accuracy > 100,
+			},
 			status: 'New', imageUrl, images: imageUrl ? [imageUrl] : [],
 			updates: [{ type: 'SUBMITTED', text: 'Report submitted and pending review.', author: req.user?.name || '', timestamp: new Date() }],
 		});

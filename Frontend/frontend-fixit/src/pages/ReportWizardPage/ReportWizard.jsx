@@ -20,6 +20,14 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
     address: '',
     lat: '',
     lng: '',
+    location: {
+      latitude: null,
+      longitude: null,
+      accuracy: null,
+      source: null,
+      addressText: '',
+      capturedAt: null,
+    },
   });
   const [photos, setPhotos] = useState([]);
   const [submitting, setSubmitting] = useState(false);
@@ -141,14 +149,7 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
         return setError('Enter the issue location.');
       }
 
-      if (form.lat === '' || form.lng === '') {
-        try {
-          await geocodeAddress(form.address);
-        } catch (requestError) {
-          setRetryAction('geocode');
-          return setError(requestError.response?.data?.message || requestError.message || 'Unable to verify this address.');
-        }
-      }
+      if (form.location.latitude === null || form.location.longitude === null) return setError('Choose a location using your device, search, or the map pin.');
     }
 
     if (step === 3 && photos.length) {
@@ -179,13 +180,16 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
         severity: form.severity,
         photos: uploadedUrls,
         location: {
-          address: form.address.trim(),
-          lat: form.lat !== '' ? Number(form.lat) : undefined,
-          lng: form.lng !== '' ? Number(form.lng) : undefined,
+          latitude: form.location.latitude,
+          longitude: form.location.longitude,
+          accuracy: form.location.accuracy,
+          source: form.location.source,
+          addressText: form.location.addressText,
+          capturedAt: form.location.capturedAt,
         },
       };
 
-      await axios.post(`${API_URL}/api/reports/submit`, payload, {
+      await axios.post(`${API_URL}/api/reports`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -311,11 +315,13 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
                 )}
                 <LocationPickerMap 
                   initialAddress={form.address}
-                  initialLat={form.lat !== '' ? Number(form.lat) : undefined}
-                  initialLng={form.lng !== '' ? Number(form.lng) : undefined}
+                  initialLat={form.location.latitude !== null ? form.location.latitude : (form.lat !== '' ? Number(form.lat) : undefined)}
+                  initialLng={form.location.longitude !== null ? form.location.longitude : (form.lng !== '' ? Number(form.lng) : undefined)}
+                  initialAccuracy={form.location.accuracy}
+                  initialSource={form.location.source}
                   onNearbyReportsChange={(reports) => setNearbyReportsCount(reports.length)}
-                  onLocationSelect={(lat, lng, address) => {
-                    setForm(current => ({ ...current, lat, lng, address }));
+                  onLocationSelect={(location) => {
+                    setForm(current => ({ ...current, lat: location.latitude, lng: location.longitude, address: location.addressText, location }));
                     setError('');
                     setRetryAction(null);
                   }}
@@ -393,7 +399,7 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
               )}
 
               {step < 4 ? (
-                <button className="wizard-primary" onClick={next}>
+                <button className="wizard-primary" disabled={step === 2 && (form.location.latitude === null || form.location.longitude === null)} onClick={next}>
                   Next: {steps[step]} <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i>
                 </button>
               ) : (
