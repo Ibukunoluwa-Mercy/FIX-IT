@@ -20,10 +20,15 @@ const issuesRoutes = require('./routes/issuesRoutes');
 const app = express();
 const port = process.env.PORT || 5100;
 const uploadDirectory = path.join(__dirname, 'uploads');
-const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
+const configuredOrigins = (process.env.FRONTEND_URL || '')
 	.split(',')
 	.map((origin) => origin.trim().replace(/\/$/, ''))
 	.filter(Boolean);
+const allowedOrigins = [...new Set([
+	...configuredOrigins,
+	'http://localhost:5173',
+	'http://127.0.0.1:5173',
+])];
 
 fs.mkdirSync(uploadDirectory, { recursive: true });
 app.disable('x-powered-by');
@@ -52,9 +57,11 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/issues', issuesRoutes);
 
 const startServer = async () => {
+	const server = app.listen(port, () => console.log(`Server running on port ${port}`));
+	// Start accepting requests before database retries finish so local clients get
+	// a useful API response instead of a browser-level network error.
 	const connected = await connectDB();
 	if (!connected) console.error('Database unavailable. API started, but database-backed requests will return an error until MongoDB reconnects.');
-	const server = app.listen(port, () => console.log(`Server running on port ${port}`));
 	const shutdown = async () => {
 		server.close();
 		if (mongoose.connection.readyState !== 0) await mongoose.connection.close();
