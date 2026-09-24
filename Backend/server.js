@@ -21,7 +21,7 @@ const port = process.env.PORT || 5100;
 const uploadDirectory = path.join(__dirname, 'uploads');
 const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
 	.split(',')
-	.map((origin) => origin.trim())
+	.map((origin) => origin.trim().replace(/\/$/, ''))
 	.filter(Boolean);
 
 fs.mkdirSync(uploadDirectory, { recursive: true });
@@ -32,6 +32,7 @@ app.use(cors({
 		if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
 		return callback(new Error('Origin is not allowed by CORS'));
 	},
+	credentials: true
 }));
 app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: process.env.URLENCODED_BODY_LIMIT || '2mb' }));
