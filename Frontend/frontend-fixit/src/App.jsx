@@ -10,6 +10,7 @@ import Login from './pages/Login/Login'
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
 import ResetPassword from './pages/ResetPassword/ResetPassword'
 import ResidentDashboard from './pages/ResidentDashboard/ResidentDashboard'
+import MyReports from './pages/MyReports/MyReports'
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -44,7 +45,8 @@ function AppShell() {
           <Route path="/" element={<HomePage />} />
           <Route path="/map" element={<CommunityMapPage />} />
           <Route path="/explore" element={<ExploreIssuesPage />} />
-          <Route path="/reports" element={<ExploreIssuesPage />} />
+          <Route path="/my-reports" element={<MyReports />} />
+          <Route path="/reports" element={<MyReports />} />
           <Route path="/about" element={<AboutPage />} />
         </Routes>
       </main>

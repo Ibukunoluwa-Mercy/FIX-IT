@@ -218,4 +218,76 @@ const getNearbyReports = async (req, res) => {
 	}
 };
 
-module.exports = { getHomeData, getCommunityOverview, getMapReports, getNearbyReports };
+const getReportsByMe = async (req, res) => {
+	try {
+		const userId = req.user?._id;
+		if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+		
+		const { status = 'all', q = '', page = 1, limit = 5 } = req.query;
+		const pageNum = parseInt(page, 10) || 1;
+		const limitNum = parseInt(limit, 10) || 5;
+		
+		const baseFilter = { user: userId };
+		if (q.trim()) {
+			const searchPattern = new RegExp(escapeRegex(q.trim()), 'i');
+			baseFilter.$or = [
+				{ title: searchPattern },
+				{ description: searchPattern },
+				{ 'location.addressText': searchPattern },
+				{ 'location.address': searchPattern }
+			];
+		}
+		
+		const [allCount, pendingCount, inProgressCount, resolvedCount, rejectedCount] = await Promise.all([
+			Report.countDocuments(baseFilter),
+			Report.countDocuments({ ...baseFilter, status: { $regex: /^New$|^Pending$/i } }),
+			Report.countDocuments({ ...baseFilter, status: { $regex: /In Progress/i } }),
+			Report.countDocuments({ ...baseFilter, status: { $regex: /Resolved/i } }),
+			Report.countDocuments({ ...baseFilter, status: { $regex: /Rejected/i } }),
+		]);
+		
+		const counts = {
+			all: allCount,
+			pending: pendingCount,
+			in_progress: inProgressCount,
+			resolved: resolvedCount,
+			rejected: rejectedCount
+		};
+		
+		const queryFilter = { ...baseFilter };
+		if (status !== 'all') {
+			if (status === 'pending') queryFilter.status = { $regex: /^New$|^Pending$/i };
+			else if (status === 'in_progress') queryFilter.status = { $regex: /In Progress/i };
+			else if (status === 'resolved') queryFilter.status = { $regex: /Resolved/i };
+			else if (status === 'rejected') queryFilter.status = { $regex: /Rejected/i };
+		}
+		
+		const total = await Report.countDocuments(queryFilter);
+		const reports = await Report.find(queryFilter)
+			.sort({ createdAt: -1 })
+			.skip((pageNum - 1) * limitNum)
+			.limit(limitNum)
+			.lean();
+			
+		const data = reports.map(r => ({
+			id: r._id,
+			title: r.title,
+			category: r.category,
+			description: r.description,
+			status: r.status,
+			addressText: r.location?.addressText || r.location?.address || '',
+			thumbnailUrl: r.images?.[0] || r.photos?.[0] || r.imageUrl || null,
+			createdAt: r.createdAt
+		}));
+		
+		res.json({
+			data,
+			pagination: { page: pageNum, limit: limitNum, total, totalPages: Math.ceil(total / limitNum) },
+			counts
+		});
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+};
+
+module.exports = { getHomeData, getCommunityOverview, getMapReports, getNearbyReports, getReportsByMe };

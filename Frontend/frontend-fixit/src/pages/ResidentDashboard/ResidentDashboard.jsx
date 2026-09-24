@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import ReportWizard from '../ReportWizardPage/ReportWizard';
-import logoWhite from '../../assets/fixit-logo-white.png';
+import logoWhite from '../../assets/fixit-white-logo.png';
 import './ResidentDashboard.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
@@ -78,7 +78,7 @@ const ResidentDashboard = () => {
           <Link to="/dashboard" className="resident-brand" aria-label="Fixit dashboard">
             <img src={logoWhite} alt="FixIt" className="brand-logo-img" />
             <span className="brand-word">
-              Fi<span style={{ color: '#f59e0b' }}>xIt</span>
+              Fix<span style={{ color: '#f59e0b' }}>It</span>
             </span>
           </Link>
           <button className="icon-button sidebar-toggle" onClick={() => setIsSidebarCollapsed((value) => !value)} aria-label="Toggle sidebar" title="Toggle sidebar">
