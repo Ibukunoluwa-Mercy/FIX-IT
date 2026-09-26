@@ -1,5 +1,6 @@
 import { Button, Form, Spinner } from 'react-bootstrap';
 import OfficialInfoSection from './OfficialInfoSection';
+import '../OfficialSettings.css';
 
 const AccountInfoCard = ({
   account,
@@ -160,7 +161,7 @@ const AccountInfoCard = ({
             </div>
           ))}
         </div>
-        {account.isOfficial && (
+        {(account.isOfficial || account.role === 'admin') && (
           <OfficialInfoSection
             account={account}
             editingAccount={editingAccount}

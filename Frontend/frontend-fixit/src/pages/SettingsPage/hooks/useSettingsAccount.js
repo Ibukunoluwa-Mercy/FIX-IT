@@ -44,7 +44,9 @@ export const useSettingsAccount = (token, navigate) => {
     axios.get(`${API_URL}/api/settings/account`, { headers: { Authorization: `Bearer ${token}` } })
       .then(({ data }) => {
         if (!mounted) return;
+        console.log('[useSettingsAccount] API response:', data);
         const nextAccount = normalizeSettingsAccount(data);
+        console.log('[useSettingsAccount] normalized:', { isOfficial: nextAccount.isOfficial, role: nextAccount.role, office: nextAccount.office });
         setAccount(nextAccount);
         setAccountForm({
           fullName: nextAccount.fullName, email: nextAccount.email, phone: nextAccount.phone,

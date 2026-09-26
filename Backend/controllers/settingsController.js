@@ -44,8 +44,10 @@ const formatAccount = (user, officialProfile = null) => {
 const getAccount = async (req, res) => {
 	try {
 		const officialProfile = await OfficialProfile.findOne({ user: req.user._id }).lean();
+		console.log('[getAccount] user:', req.user?.email, 'role:', req.user?.role, 'officialProfile found:', !!officialProfile);
 		return res.json(formatAccount(req.user, officialProfile));
-	} catch {
+	} catch (err) {
+		console.error('[getAccount] Error fetching official profile:', err.message);
 		return res.json(formatAccount(req.user));
 	}
 };
