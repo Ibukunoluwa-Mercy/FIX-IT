@@ -1,0 +1,136 @@
+/* ─── Terms Checkbox ─── */
+.reg-terms {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.reg-terms-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 13.12px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.reg-checkbox {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  accent-color: #ea580c;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.reg-link {
+  color: #ea580c;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+
+.reg-link:hover {
+  color: #c2410c;
+  text-decoration: underline;
+}
+
+/* ─── Submit Button ─── */
+.reg-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15.2px;
+  font-weight: 700;
+  font-family: "Google Sans", sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.01em;
+  box-shadow: 0 4px 16px #ea580c4d;
+  margin-top: 4px;
+}
+
+.reg-submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #c2410c 0%, #9a3412 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px #ea580c66;
+}
+
+.reg-submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.reg-submit-btn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.reg-spinner {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Footer Link ─── */
+.reg-footer-link {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 13.28px;
+  color: #6b7280;
+}
+
+/* ─── Reveal Animations ─── */
+@keyframes registerReveal {
+  from {
+    opacity: 0;
+    transform: translateX(var(--register-slide-x, 0))
+      translateY(var(--register-slide-y, 0));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.register-reveal {
+  opacity: 0;
+  animation: registerReveal 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.register-reveal-hero {
+  --register-slide-x: -48px;
+  animation-delay: 0.08s;
+}
+.register-reveal-card {
+  --register-slide-x: 48px;
+  animation-delay: 0.24s;
+}
+.register-reveal-strip {
+  --register-slide-y: 28px;
+  animation-delay: 0.42s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .register-reveal {
+    opacity: 1;
+    animation: none;
+    transform: none;
+  }
+}

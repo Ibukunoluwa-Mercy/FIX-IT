@@ -1,0 +1,153 @@
+/* ============================================================
+   Register Hero & Brand Styles
+   ============================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap");
+
+/* ─── Root Page Shell ─── */
+.register-page {
+  min-height: 100vh;
+  background-color: #faf8f5;
+  font-family: "Google Sans", sans-serif;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 24px;
+}
+
+/* ─── Logo Bar ─── */
+.register-logo-bar {
+  position: absolute;
+  top: 24px;
+  left: 36px;
+  z-index: 100;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.register-logo {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 4px #00000014);
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+
+.register-logo:hover {
+  opacity: 0.85;
+  transform: scale(1.02);
+}
+
+/* ─── Split Layout Container (Centered) ─── */
+.register-split {
+  display: flex;
+  width: 100%;
+  max-width: 1100px;
+  min-height: auto;
+  background: transparent;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+}
+
+/* ═══════════════════════════════════════════════
+   LEFT — Hero Section
+   ═══════════════════════════════════════════════ */
+.register-hero {
+  flex: 1.1;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px 0 0 0;
+  overflow: visible;
+  position: relative;
+}
+
+.register-hero-content {
+  max-width: 500px;
+}
+
+.register-hero-headline {
+  font-size: clamp(35.2px, 3.2vw, 51.2px);
+  font-weight: 800;
+  color: #0d1b2a;
+  line-height: 1.12;
+  margin-bottom: 18px;
+  letter-spacing: -0.6px;
+}
+
+.hero-accent {
+  color: #ea580c;
+  display: block;
+}
+
+.register-hero-subtitle {
+  font-size: 16.8px;
+  color: #52616b;
+  line-height: 1.6;
+  margin-bottom: 32px;
+  max-width: 440px;
+}
+
+/* Feature Badges */
+.register-badges {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+
+.register-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  max-width: 210px;
+}
+
+.badge-icon-wrap {
+  width: 44px;
+  height: 44px;
+  background: #fdeee7;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ea580c;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.badge-title {
+  font-weight: 700;
+  font-size: 15.2px;
+  color: #0d1b2a;
+  margin-bottom: 4px;
+}
+
+.badge-desc {
+  font-size: 13.12px;
+  color: #6b7280;
+  line-height: 1.45;
+}
+
+/* Illustration */
+.register-illustration-wrap {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px #0d1b2a0f;
+}
+
+.register-illustration {
+  width: 100%;
+  height: auto;
+  max-height: 280px;
+  object-fit: cover;
+  display: block;
+  border-radius: 20px;
+}

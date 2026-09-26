@@ -1,0 +1,249 @@
+/* ═══════════════════════════════════════════════
+   RIGHT — Auth Card Section & Resident Fields
+   ═══════════════════════════════════════════════ */
+.register-form-side {
+  flex: 0 0 460px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  min-height: auto;
+}
+
+.register-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid #f0eae1;
+  box-shadow:
+    0 12px 40px #0d1b2a12,
+    0 2px 8px #0d1b2a08;
+  padding: 36px 32px 30px 32px;
+}
+
+/* Progress Bar */
+.register-progress-bar {
+  margin-bottom: 24px;
+}
+
+.progress-track {
+  display: flex;
+  gap: 6px;
+}
+
+.progress-filled {
+  flex: 1;
+  height: 4px;
+  background: #ea580c;
+  border-radius: 99px;
+}
+
+.progress-empty {
+  flex: 2;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 99px;
+}
+
+/* Title */
+.register-card-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #0d1b2a;
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
+}
+
+.register-card-sub {
+  font-size: 13.6px;
+  color: #6b7280;
+  margin-bottom: 14px;
+}
+
+/* ─── Role Tabs ─── */
+.register-role-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.role-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 10px;
+  border-radius: 12px;
+  border: 1.5px solid #e5e7eb;
+  background: #fff;
+  color: #374151;
+  font-size: 13.6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: "Google Sans", sans-serif;
+}
+
+.role-tab:hover {
+  border-color: #ea580c;
+  color: #ea580c;
+  background: #fff7f3;
+}
+
+.role-tab.active {
+  border-color: #ea580c;
+  background: #fff7f3;
+  color: #ea580c;
+  box-shadow: 0 0 0 3px #ea580c1a;
+}
+
+.role-tab-icon {
+  opacity: 0.9;
+}
+
+/* ─── Admin Banner ─── */
+.register-admin-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff7f2;
+  border: 1px solid #fddccc;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 22px;
+}
+
+.admin-banner-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.admin-banner-label {
+  font-size: 12.8px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.admin-banner-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 13.6px;
+  font-weight: 700;
+  color: #ea580c;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.15s;
+}
+
+.admin-banner-link:hover {
+  color: #c2410c;
+  text-decoration: underline;
+}
+
+.admin-banner-icon {
+  color: #ea580c;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+/* ─── Form Fields ─── */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.reg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.reg-label {
+  font-size: 13.12px;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.01em;
+}
+
+.reg-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s,
+    background 0.18s;
+  overflow: hidden;
+}
+
+.reg-input-wrap:focus-within {
+  border-color: #ea580c;
+  background: #fff;
+  box-shadow: 0 0 0 3px #ea580c1a;
+}
+
+.reg-input-wrap.has-error {
+  border-color: #ef4444;
+  background: #fff8f8;
+}
+
+.reg-input-wrap.has-error:focus-within {
+  box-shadow: 0 0 0 3px #ef44441a;
+}
+
+.reg-input-icon {
+  color: #9ca3af;
+  margin-left: 13px;
+  flex-shrink: 0;
+}
+
+.reg-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 11px 12px;
+  font-size: 14px;
+  color: #0d1b2a;
+  font-family: "Google Sans", sans-serif;
+  outline: none;
+}
+
+.reg-input::placeholder {
+  color: #b0b7c3;
+}
+
+.reg-eye-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 13px;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+.reg-eye-btn:hover {
+  color: #ea580c;
+}
+
+.reg-error {
+  font-size: 12px;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
