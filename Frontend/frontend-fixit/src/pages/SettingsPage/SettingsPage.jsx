@@ -146,7 +146,8 @@ const SettingsPage = () => {
             setAccount((current) => ({ ...current, ...updatedAccount }));
             setAccountForm({ fullName: updatedAccount.fullName, email: updatedAccount.email, phone: updatedAccount.phone, location: updatedAccount.location });
             setEditingAccount(false);
-            toast.success('Account information updated.');
+            if (changedFields.email) toast.info('Check your new email address for a verification link.');
+            else toast.success('Account information updated.');
         } catch (error) {
             toast.error(getErrorMessage(error, 'Unable to update account information.'));
         } finally {

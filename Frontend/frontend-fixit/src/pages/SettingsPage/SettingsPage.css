@@ -1,6 +1,6 @@
 .settings-dashboard {
   --settings-ink: #13223a;
-  --settings-muted: #73839a;
+  --settings-muted: #5f7188;
   --settings-line: #e4eaf2;
   --settings-orange: #f59e0b;
   background: #f5f8fc;
@@ -97,7 +97,7 @@
   border-radius: 7px;
   background: transparent;
   color: var(--settings-ink);
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
 }
 
@@ -136,7 +136,7 @@
   background: transparent;
   color: var(--settings-ink);
   text-align: left;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
 }
 
@@ -173,7 +173,7 @@
 .settings-page-heading h1 {
   margin: 0;
   color: var(--settings-ink);
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
 }
 
@@ -181,7 +181,7 @@
 .settings-card-heading p {
   margin: 2px 0 0;
   color: var(--settings-muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .settings-layout {
@@ -204,14 +204,14 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  min-height: 39px;
-  padding: 8px 11px;
+  min-height: 43px;
+  padding: 9px 11px;
   border: 0;
   border-radius: 6px;
   background: transparent;
   color: #30435d;
   text-align: left;
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
 }
 
@@ -223,7 +223,7 @@
   width: 16px;
   color: #45688e;
   text-align: center;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .settings-subnav button:hover {
@@ -269,7 +269,7 @@
 .settings-card-heading h2 {
   margin: 0;
   color: #20334e;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
 }
 
@@ -284,11 +284,11 @@
   align-items: center;
   gap: 7px;
   white-space: nowrap;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .settings-action i {
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .settings-edit-actions {
@@ -297,7 +297,7 @@
 }
 
 .settings-edit-actions .btn {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .settings-profile-summary {
@@ -346,7 +346,7 @@
   border-radius: 50%;
   background: #edf4ff;
   color: #345f91;
-  font-size: 9px;
+  font-size: 11px;
   cursor: pointer;
 }
 
@@ -360,11 +360,11 @@
   gap: 3px;
   min-width: 0;
   color: #263a56;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .settings-profile-copy > strong {
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .settings-profile-copy > span:not(.settings-verified, .settings-unverified) {
@@ -385,7 +385,7 @@
   border-radius: 12px;
   background: #e6f8ef;
   color: #17814e;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .settings-unverified {
@@ -401,7 +401,7 @@
 
 .settings-avatar-actions .btn {
   padding: 3px 8px;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .settings-account-fields {
@@ -425,7 +425,7 @@
   width: 14px;
   margin-top: 4px;
   text-align: center;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .settings-account-field > div {
@@ -436,14 +436,14 @@
 }
 
 .settings-account-field span {
-  color: #71839a;
-  font-size: 9px;
+  color: #586d86;
+  font-size: 12px;
 }
 
 .settings-account-field strong {
   overflow: hidden;
   color: #354b67;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -453,7 +453,7 @@
   max-width: 100%;
   min-height: 28px;
   padding: 4px 7px;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .settings-heading-icon {
@@ -488,7 +488,7 @@
 .settings-password-fields .form-label {
   margin-bottom: 4px;
   color: #50627a;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .settings-password-input {
@@ -498,7 +498,7 @@
 .settings-password-input .form-control {
   min-height: 34px;
   padding: 7px 32px 7px 9px;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .settings-password-input button {
@@ -512,14 +512,14 @@
   border: 0;
   background: transparent;
   color: #68809c;
-  font-size: 10px;
+  font-size: 12px;
   cursor: pointer;
 }
 
 .settings-inline-error {
   margin-top: 8px;
   color: #bd3030;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .settings-notification-list {
@@ -531,7 +531,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  min-height: 37px;
+  min-height: 42px;
   border-top: 1px solid #edf1f6;
 }
 
@@ -541,14 +541,14 @@
 
 .settings-notification-row strong {
   color: #263b57;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .settings-notification-row p {
   margin: 0;
-  color: #8391a3;
-  font-size: 9px;
+  color: #65778e;
+  font-size: 12px;
 }
 
 .settings-switch {
@@ -583,7 +583,7 @@
   border-radius: 8px;
   background: #fff;
   color: var(--settings-muted);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .settings-load-error {
@@ -609,12 +609,12 @@
 
 .settings-location-value strong {
   color: #30445f;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .settings-location-value span {
   color: #8291a4;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 @media (max-width: 1050px) {
