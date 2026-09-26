@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { publishResidentAvatar } from '../../../components/residentAvatarEvents';
-import { setResidentAvatar } from '../../../components/ResidentAvatar';
 import {
   emptyAccount,
   normalizeSettingsAccount,

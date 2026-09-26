@@ -5,6 +5,8 @@ import WizardStepDetails from './components/WizardStepDetails';
 import WizardStepLocation from './components/WizardStepLocation';
 import WizardStepPhotos from './components/WizardStepPhotos';
 import WizardStepReview from './components/WizardStepReview';
+import WizardStepper from './components/WizardStepper';
+import WizardActions from './components/WizardActions';
 import './ReportWizard.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
@@ -223,18 +225,11 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
         </div>
 
         <div className="wizard-body">
-          <aside className="wizard-stepper">
-            {steps.map((label, index) => (
-              <button
-                key={label}
-                className={step === index + 1 ? 'current' : step > index + 1 ? 'complete' : ''}
-                onClick={() => step > index + 1 && setStep(index + 1)}
-              >
-                <span>{step > index + 1 ? <i className="fa-solid fa-check" style={{ fontSize: 13 }}></i> : index + 1}</span>
-                {label}
-              </button>
-            ))}
-          </aside>
+          <WizardStepper
+            step={step}
+            steps={steps}
+            onStepClick={(nextStep) => setStep(nextStep)}
+          />
 
           <section className="wizard-card">
             {step === 1 && (
@@ -285,27 +280,15 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
               </>
             )}
 
-            <footer className="wizard-actions">
-              {step > 1 && (
-                <button className="wizard-secondary" onClick={() => setStep((current) => current - 1)}>
-                  <i className="fa-solid fa-arrow-left" style={{ marginRight: 6 }}></i> Back
-                </button>
-              )}
-
-              {step < 4 ? (
-                <button
-                  className="wizard-primary"
-                  disabled={step === 2 && (form.location.latitude === null || form.location.longitude === null)}
-                  onClick={next}
-                >
-                  Next: {steps[step]} <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i>
-                </button>
-              ) : (
-                <button className="wizard-primary" disabled={submitting} onClick={submit}>
-                  {submitting ? 'Submitting...' : 'Submit Report'} <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i>
-                </button>
-              )}
-            </footer>
+            <WizardActions
+              step={step}
+              steps={steps}
+              submitting={submitting}
+              form={form}
+              onBack={() => setStep((current) => current - 1)}
+              onNext={next}
+              onSubmit={submit}
+            />
           </section>
         </div>
       </div>
