@@ -10,6 +10,7 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const connectDB = require('./config/db');
+const { uploadDirectory: reportUploadDirectory } = require('./middleware/reportUpload');
 const reportRoutes = require('./routes/reportRoutes');
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
@@ -51,6 +52,7 @@ app.use(cors({
 }));
 app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: process.env.URLENCODED_BODY_LIMIT || '2mb' }));
+app.use('/uploads/reports', express.static(reportUploadDirectory, { maxAge: '1d' }));
 app.use('/uploads', express.static(uploadDirectory, { maxAge: '1d' }));
 
 app.get('/api/health', (req, res) => res.status(mongoose.connection.readyState === 1 ? 200 : 503).json({

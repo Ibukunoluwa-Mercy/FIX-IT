@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
 
-const uploadDirectory = path.join(__dirname, '..', 'uploads', 'reports');
+const uploadDirectory = process.env.REPORT_UPLOADS_DIR || path.join(__dirname, '..', 'uploads', 'reports');
 fs.mkdirSync(uploadDirectory, { recursive: true });
 
 const storage = multer.diskStorage({
@@ -24,4 +24,4 @@ const reportPhotosUpload = multer({
 	limits: { fileSize: 5 * 1024 * 1024, files: 5 },
 }).array('photos', 5);
 
-module.exports = { reportPhotosUpload };
+module.exports = { reportPhotosUpload, uploadDirectory };
