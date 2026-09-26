@@ -1,0 +1,76 @@
+.settings-dashboard {
+  --settings-ink: #13223a;
+  --settings-muted: #5f7188;
+  --settings-line: #e4eaf2;
+  --settings-orange: #f59e0b;
+  background: #f5f8fc;
+}
+
+.settings-dashboard[data-settings-theme="dark"] {
+  --settings-ink: #e5edf7;
+  --settings-muted: #a1b1c5;
+  --settings-line: #34445a;
+  background: #101a2b;
+}
+
+.settings-dashboard[data-settings-theme="dark"] .settings-main,
+.settings-dashboard[data-settings-theme="dark"] .resident-header {
+  background: #101a2b;
+}
+
+.settings-dashboard[data-settings-theme="dark"] .resident-header,
+.settings-dashboard[data-settings-theme="dark"] .settings-card,
+.settings-dashboard[data-settings-theme="dark"] .settings-subnav,
+.settings-dashboard[data-settings-theme="dark"] .settings-header-menu {
+  border-color: #34445a;
+  background: #17243a;
+  color: #e5edf7;
+}
+
+.settings-dashboard[data-settings-theme="dark"] .settings-page-heading h1,
+.settings-dashboard[data-settings-theme="dark"] .settings-card-heading h2,
+.settings-dashboard[data-settings-theme="dark"] .settings-notification-row strong,
+.settings-dashboard[data-settings-theme="dark"] .settings-location-value strong {
+  color: #e5edf7;
+}
+
+.settings-dashboard[data-settings-theme="dark"] .settings-subnav button,
+.settings-dashboard[data-settings-theme="dark"] .settings-header-profile,
+.settings-dashboard[data-settings-theme="dark"] .settings-header-menu button {
+  color: #c5d2e2;
+}
+
+.settings-dashboard[data-settings-theme="dark"] .settings-subnav button:hover,
+.settings-dashboard[data-settings-theme="dark"] .settings-header-profile:hover,
+.settings-dashboard[data-settings-theme="dark"] .settings-header-menu button:hover {
+  background: #223149;
+}
+
+.settings-dashboard[data-settings-theme="dark"] .settings-subnav button.active {
+  background: #44351e;
+  color: #ffd28a;
+}
+
+.settings-dashboard[data-settings-theme="dark"] .settings-profile-summary,
+.settings-dashboard[data-settings-theme="dark"] .settings-notification-row {
+  border-color: #34445a;
+}
+
+.settings-dashboard[data-settings-theme="dark"] .settings-account-field strong,
+.settings-dashboard[data-settings-theme="dark"] .settings-account-field span,
+.settings-dashboard[data-settings-theme="dark"] .settings-password-fields .form-label {
+  color: #b7c5d7;
+}
+
+.settings-dashboard[data-settings-theme="dark"] .settings-location-value,
+.settings-dashboard[data-settings-theme="dark"] .settings-password-input .form-control,
+.settings-dashboard[data-settings-theme="dark"] .settings-account-field .form-control,
+.settings-dashboard[data-settings-theme="dark"] .settings-card .form-select {
+  border-color: #465a73;
+  background-color: #101a2b;
+  color: #e5edf7;
+}
+
+.settings-brand-orange {
+  color: #f59e0b;
+}

@@ -1,0 +1,100 @@
+/* 6. What You Can Report Grid */
+.report-grid-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 20px 10px;
+  text-align: center;
+  height: 100%;
+  transition:
+    transform 0.2s,
+    border-color 0.2s;
+  cursor: pointer;
+}
+.report-grid-card:hover {
+  transform: translateY(-3px);
+  border-color: #457b9d;
+}
+
+.report-grid-icon {
+  font-size: 25.6px;
+  margin-bottom: 8px;
+  color: #0d1b2a;
+}
+.report-grid-name {
+  font-weight: 700;
+  font-size: 13.6px;
+  color: #0f172a;
+}
+
+/* 7. Transparency & Accountability */
+.transparency-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px 20px;
+  height: 100%;
+}
+.transparency-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background-color: #f1f5f9;
+  color: #0d1b2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Live Impact Counter Banner */
+.live-impact-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 30px;
+}
+
+.impact-metric-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.impact-metric-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19.2px;
+}
+
+.impact-num {
+  font-size: 25.6px;
+  font-weight: 800;
+  color: #0d1b2a;
+  line-height: 1;
+}
+.impact-desc {
+  font-size: 12.8px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* Bottom Call to Action Bar */
+.about-bottom-cta {
+  background-color: #0d1b2a;
+  background-image: radial-gradient(
+    circle at bottom left,
+    #1e3a5f 0%,
+    #0d1b2a 80%
+  );
+  color: white;
+  border-radius: 18px;
+  padding: 40px;
+}

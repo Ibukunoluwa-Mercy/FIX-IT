@@ -1,0 +1,83 @@
+@media (max-width: 1050px) {
+  .settings-layout {
+    grid-template-columns: 190px minmax(0, 1fr);
+  }
+
+  .settings-page-content {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+}
+
+@media (max-width: 760px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-subnav {
+    display: flex;
+    min-height: 0;
+    gap: 5px;
+    overflow-x: auto;
+    padding: 6px;
+  }
+
+  .settings-subnav button {
+    flex: 0 0 auto;
+    width: auto;
+    min-height: 36px;
+    white-space: nowrap;
+  }
+
+  .settings-subnav button + button {
+    margin-top: 0;
+  }
+
+  .settings-main .resident-header {
+    padding: 0 16px;
+  }
+
+  .settings-page-content {
+    padding: 18px 14px 26px;
+  }
+}
+
+@media (max-width: 560px) {
+  .settings-main .resident-header {
+    gap: 8px;
+  }
+
+  .settings-header-profile > span:not(.avatar) {
+    display: none;
+  }
+
+  .settings-page-heading h1 {
+    font-size: 21px;
+  }
+
+  .settings-account-fields,
+  .settings-password-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-card {
+    padding: 12px;
+  }
+
+  .settings-card-heading {
+    flex-wrap: wrap;
+  }
+
+  .settings-card-heading .settings-action,
+  .settings-edit-actions {
+    margin-left: auto;
+  }
+
+  .settings-card-heading > div:nth-child(2) {
+    flex: 1;
+  }
+
+  .settings-delete-card .settings-card-heading > div:nth-child(2) {
+    flex-basis: calc(100% - 48px);
+  }
+}

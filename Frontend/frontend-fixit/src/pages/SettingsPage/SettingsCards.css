@@ -1,0 +1,210 @@
+.settings-card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--settings-line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 7px #152b4507;
+}
+
+.settings-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.settings-card-heading > div:nth-child(2),
+.settings-card-heading > div:first-child:not(.settings-heading-icon) {
+  min-width: 0;
+}
+
+.settings-card-heading h2 {
+  margin: 0;
+  color: #20334e;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.settings-card-heading .settings-action,
+.settings-edit-actions {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.settings-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.settings-action i {
+  font-size: 11px;
+}
+
+.settings-edit-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.settings-edit-actions .btn {
+  font-size: 12px;
+}
+
+.settings-profile-summary {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-height: 82px;
+  margin-top: 6px;
+  padding: 8px 0 12px;
+  border-bottom: 1px solid #edf1f6;
+}
+
+.settings-avatar-wrap {
+  position: relative;
+  flex: 0 0 56px;
+  width: 56px;
+  height: 56px;
+}
+
+.settings-avatar {
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #e7eef7;
+}
+
+.settings-avatar-initial {
+  display: grid;
+  place-items: center;
+  color: #315c91;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.settings-avatar-camera {
+  position: absolute;
+  right: -2px;
+  bottom: -1px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #edf4ff;
+  color: #345f91;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.settings-avatar-camera:hover {
+  background: #dbeafe;
+}
+
+.settings-profile-copy {
+  display: grid;
+  justify-items: start;
+  gap: 3px;
+  min-width: 0;
+  color: #263a56;
+  font-size: 13px;
+}
+
+.settings-profile-copy > strong {
+  font-size: 14px;
+}
+
+.settings-profile-copy > span:not(.settings-verified, .settings-unverified) {
+  overflow: hidden;
+  max-width: 100%;
+  color: var(--settings-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-verified,
+.settings-unverified {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  padding: 3px 7px;
+  border-radius: 12px;
+  background: #e6f8ef;
+  color: #17814e;
+  font-size: 12px;
+}
+
+.settings-unverified {
+  background: #fff5e8;
+  color: #a65c00;
+}
+
+.settings-avatar-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.settings-avatar-actions .btn {
+  padding: 3px 8px;
+  font-size: 12px;
+}
+
+.settings-account-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+  row-gap: 0;
+  padding-top: 9px;
+}
+
+.settings-account-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  padding: 6px 3px;
+  color: #426387;
+}
+
+.settings-account-field > i {
+  width: 14px;
+  margin-top: 4px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.settings-account-field > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.settings-account-field span {
+  color: #586d86;
+  font-size: 12px;
+}
+
+.settings-account-field strong {
+  overflow: hidden;
+  color: #354b67;
+  font-size: 13px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-account-field .form-control {
+  max-width: 100%;
+  min-height: 28px;
+  padding: 4px 7px;
+  font-size: 13px;
+}

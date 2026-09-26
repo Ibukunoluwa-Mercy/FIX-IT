@@ -1,0 +1,160 @@
+.settings-heading-icon {
+  flex-basis: 36px;
+  width: 36px;
+  height: 36px;
+  font-size: 14px;
+}
+
+.password-icon {
+  background: #e8f1ff;
+  color: #1973db;
+}
+
+.notifications-icon {
+  background: #f2ebff;
+  color: #7652da;
+}
+
+.delete-icon {
+  background: #fff0f0;
+  color: #dc3545;
+}
+
+.settings-password-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 13px;
+}
+
+.settings-password-fields .form-label {
+  margin-bottom: 4px;
+  color: #50627a;
+  font-size: 12px;
+}
+
+.settings-password-input {
+  position: relative;
+}
+
+.settings-password-input .form-control {
+  min-height: 34px;
+  padding: 7px 32px 7px 9px;
+  font-size: 13px;
+}
+
+.settings-password-input button {
+  position: absolute;
+  top: 0;
+  right: 3px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: #68809c;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.settings-inline-error {
+  margin-top: 8px;
+  color: #bd3030;
+  font-size: 13px;
+}
+
+.settings-notification-list {
+  margin-top: 8px;
+}
+
+.settings-notification-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 42px;
+  border-top: 1px solid #edf1f6;
+}
+
+.settings-notification-row > div {
+  min-width: 0;
+}
+
+.settings-notification-row strong {
+  color: #263b57;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.settings-notification-row p {
+  margin: 0;
+  color: #65778e;
+  font-size: 12px;
+}
+
+.settings-switch {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.settings-switch .form-check-input {
+  float: none;
+  width: 2em;
+  height: 1.1em;
+  margin: 0;
+  cursor: pointer;
+}
+
+.settings-delete-card {
+  border-color: #f1dede;
+}
+
+.settings-delete-card .settings-card-heading p {
+  max-width: 560px;
+}
+
+.settings-loading,
+.settings-load-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 180px;
+  justify-content: center;
+  border: 1px solid var(--settings-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--settings-muted);
+  font-size: 14px;
+}
+
+.settings-load-error {
+  flex-direction: column;
+  color: #b42318;
+}
+
+.settings-location-value {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0 14px;
+  padding: 12px;
+  border-radius: 6px;
+  background: #f7faff;
+  color: #315c91;
+}
+
+.settings-location-value div {
+  display: grid;
+  gap: 3px;
+}
+
+.settings-location-value strong {
+  color: #30445f;
+  font-size: 14px;
+}
+
+.settings-location-value span {
+  color: #8291a4;
+  font-size: 12px;
+}
