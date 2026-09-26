@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { getReportImageUrls } from '../../../utils/reportImages';
 
 const formatDate = (value) =>
   value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(value)) : 'Just now';
@@ -29,15 +30,17 @@ const DashboardRecentReports = ({
         </div>
       ) : reports.length ? (
         <div className="reports-list">
-          {reports.map((report) => (
+          {reports.map((report) => {
+            const [imageUrl] = getReportImageUrls(report);
+            return (
             <button
               className="report-row"
               key={report._id || report.reportId}
               onClick={() => onSelectReport(report)}
             >
               <span className="report-thumb">
-                {report.imageUrl ? (
-                  <img src={report.imageUrl} alt="" />
+                {imageUrl ? (
+                  <img src={imageUrl} alt="" />
                 ) : (
                   <i className="fa-solid fa-file-lines" style={{ fontSize: 18, color: '#94a3b8' }}></i>
                 )}
@@ -57,7 +60,8 @@ const DashboardRecentReports = ({
               </span>
               <i className="fa-solid fa-chevron-right row-chevron" style={{ fontSize: 14 }}></i>
             </button>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="empty-state empty-state-reports">

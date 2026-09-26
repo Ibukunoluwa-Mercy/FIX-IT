@@ -7,6 +7,7 @@ import DashboardStatsGrid from './components/DashboardStatsGrid';
 import DashboardRecentReports from './components/DashboardRecentReports';
 import DashboardRecentUpdates from './components/DashboardRecentUpdates';
 import ResidentAvatar from '../../components/ResidentAvatar';
+import { getReportImageUrls } from '../../utils/reportImages';
 import logoWhite from '../../assets/fixit-white-logo.png';
 import './ResidentDashboard.css';
 
@@ -28,7 +29,6 @@ const navGroups = [
 ];
 
 const statusClass = (status = 'Pending') => status.toLowerCase().replace(/\s+/g, '-');
-
 const ResidentDashboard = () => {
   const navigate = useNavigate();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -226,6 +226,13 @@ const ResidentDashboard = () => {
             <button className="modal-close" onClick={() => setSelectedReport(null)} aria-label="Close">
               <i className="fa-solid fa-xmark"></i>
             </button>
+            {getReportImageUrls(selectedReport).length > 0 && (
+              <div className="detail-report-images">
+                {getReportImageUrls(selectedReport).map((image, index) => (
+                  <img key={`${image}-${index}`} src={image} alt={`${selectedReport.title} report photo ${index + 1}`} />
+                ))}
+              </div>
+            )}
             <small>{selectedReport.reportId || selectedReport.id}</small>
             <h2>{selectedReport.title}</h2>
             <p>{selectedReport.location?.address || 'Location unavailable'}</p>

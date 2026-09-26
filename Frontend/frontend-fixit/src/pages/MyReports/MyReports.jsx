@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import ResidentAvatar from '../../components/ResidentAvatar';
+import { normalizeReportImageUrl } from '../../utils/reportImages';
 import logoWhite from '../../assets/fixit-white-logo.png';
 import './MyReports.css';
 
@@ -223,7 +224,7 @@ const MyReports = () => {
                 ) : (
                   reports.map(report => (
                     <div className="report-card" key={report.id} style={{ display: 'flex', gap: '15px', padding: '15px', border: '1px solid #eee', borderRadius: '8px', marginBottom: '10px' }}>
-                      <img src={report.thumbnailUrl || 'https://via.placeholder.com/60'} alt="Thumbnail" style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover' }} />
+                      <img src={normalizeReportImageUrl(report.thumbnailUrl) || 'https://via.placeholder.com/60'} alt="Thumbnail" style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover' }} />
                       <div style={{ flex: 1 }}>
                         <h3 style={{ margin: '0 0 5px 0', fontSize: '16px' }}>{report.category}</h3>
                         <p style={{ margin: '0 0 5px 0', fontSize: '14px', color: '#666' }}><i className="fa-solid fa-location-dot"></i> {report.addressText}</p>
