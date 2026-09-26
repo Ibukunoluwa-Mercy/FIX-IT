@@ -40,7 +40,10 @@ const uploadReportPhotos = async (req, res) => {
 		if (!req.files || !req.files.length) {
 			return res.status(400).json({ success: false, message: 'At least one photo is required.' });
 		}
-		const publicBaseUrl = (process.env.PUBLIC_BASE_URL || `${req.protocol}://${req.get('host')}` || 'http://localhost:5100').replace(/\/$/, '');
+		const requestBaseUrl = `${req.protocol}://${req.get('host')}`;
+		const configuredBaseUrl = process.env.PUBLIC_BASE_URL?.trim().replace(/\/$/, '');
+		const configuredUrlIsLocal = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(configuredBaseUrl || '');
+		const publicBaseUrl = configuredBaseUrl && !configuredUrlIsLocal ? configuredBaseUrl : requestBaseUrl;
 		const urls = req.files.map((file) => `${publicBaseUrl}/uploads/reports/${file.filename}`);
 		return res.status(200).json({ success: true, urls });
 	} catch (error) {

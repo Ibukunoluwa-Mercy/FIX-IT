@@ -49,10 +49,9 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
 
     const nextPhotos = [...photos, ...validFiles]
       .slice(0, 5)
-      .map((file) => ({
-        file,
-        preview: URL.createObjectURL(file),
-      }));
+      .map((photo) => photo.file
+        ? photo
+        : { file: photo, preview: URL.createObjectURL(photo) });
 
     setPhotos(nextPhotos);
     setUploadedUrls([]);
@@ -74,7 +73,6 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
     const response = await axios.post(`${API_URL}/api/reports/upload-photos`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data',
       },
     });
 

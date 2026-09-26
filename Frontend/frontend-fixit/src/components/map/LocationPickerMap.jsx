@@ -125,7 +125,6 @@ const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat
   }, []);
 
   useEffect(() => () => {
-    if (debounceTimer.current) clearTimeout(debounceTimer.current);
     if (watchTimer.current) clearTimeout(watchTimer.current);
     if (watchId.current !== null && navigator.geolocation) navigator.geolocation.clearWatch(watchId.current);
   }, []);
