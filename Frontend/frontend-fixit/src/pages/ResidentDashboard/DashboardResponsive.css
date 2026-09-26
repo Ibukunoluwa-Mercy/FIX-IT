@@ -1,0 +1,123 @@
+.mobile-brand {
+  display: none;
+}
+@media (max-width: 900px) {
+  .resident-sidebar {
+    flex-basis: 76px;
+  }
+  .resident-sidebar .brand-word,
+  .resident-sidebar .resident-nav-link span,
+  .resident-sidebar .profile-copy,
+  .resident-sidebar .resident-profile > svg {
+    display: none;
+  }
+  .resident-sidebar .resident-nav-link {
+    justify-content: center;
+    padding: 11px 0;
+  }
+  .resident-sidebar .nav-badge {
+    position: absolute;
+    right: 7px;
+    top: 5px;
+  }
+  .resident-sidebar .resident-profile {
+    justify-content: center;
+  }
+  .resident-brand-row {
+    padding-left: 10px;
+    padding-right: 2px;
+  }
+  .resident-brand {
+    margin: auto;
+  }
+  .sidebar-toggle {
+    display: none;
+  }
+  .resident-header {
+    padding: 0 18px;
+  }
+  .mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: auto;
+  }
+  .mobile-brand .brand-mark {
+    width: 27px;
+    height: 27px;
+  }
+  .resident-content {
+    padding: 22px 18px;
+  }
+  .dashboard-intro {
+    align-items: start;
+    gap: 15px;
+  }
+  .intro-search {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .resident-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 76px;
+  }
+  .resident-main {
+    margin-left: 76px;
+  }
+  .resident-header {
+    height: 58px;
+  }
+  .new-report-button {
+    font-size: 0;
+    padding: 9px;
+  }
+  .new-report-button svg {
+    margin: 0;
+  }
+  .header-actions {
+    gap: 8px;
+  }
+  .dashboard-intro h1 {
+    font-size: 20px;
+  }
+  .dashboard-intro p {
+    line-height: 1.5;
+  }
+  .report-cta {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .report-cta button {
+    margin-left: 52px;
+  }
+  .report-filter {
+    max-width: 180px;
+    overflow: auto;
+  }
+  .report-row {
+    gap: 8px;
+  }
+  .report-row img {
+    width: 49px;
+    height: 49px;
+  }
+  .status-pill {
+    font-size: 8px;
+    padding: 4px 5px;
+  }
+  .row-chevron {
+    display: none;
+  }
+  .map-label {
+    font-size: 8px;
+    padding: 5px 8px;
+  }
+  .resident-content {
+    padding: 20px 12px;
+  }
+  .dashboard-panel {
+    padding: 14px 10px;
+  }
+}
