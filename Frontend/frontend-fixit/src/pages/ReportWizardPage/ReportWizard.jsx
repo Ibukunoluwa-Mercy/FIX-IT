@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import axios from 'axios';
-import LocationPickerMap from '../../components/map/LocationPickerMap';
+import WizardIntro from './components/WizardIntro';
+import WizardStepDetails from './components/WizardStepDetails';
+import WizardStepLocation from './components/WizardStepLocation';
+import WizardStepPhotos from './components/WizardStepPhotos';
+import WizardStepReview from './components/WizardStepReview';
 import './ReportWizard.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
 const steps = ['Issue Details', 'Location', 'Add Photos', 'Review & Submit'];
-const categories = ['Potholes & Road Damage', 'Streetlight Outages', 'Garbage & Litter', 'Water Leaks', 'Others'];
-const severities = [['Low', 'Minor issue'], ['Medium', 'Moderate issue'], ['High', 'Urgent issue']];
 
 const getAuthToken = () => localStorage.getItem('fixitToken') || localStorage.getItem('token') || '';
 
@@ -34,10 +36,9 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
   const [error, setError] = useState('');
   const [retryAction, setRetryAction] = useState(null);
   const [nearbyReportsCount, setNearbyReportsCount] = useState(0);
+  const [uploadedUrls, setUploadedUrls] = useState([]);
 
   const update = (event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
-
-  const [uploadedUrls, setUploadedUrls] = useState([]);
 
   const choosePhotos = (event) => {
     const incomingFiles = Array.from(event.target.files || []);
@@ -149,7 +150,9 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
         return setError('Enter the issue location.');
       }
 
-      if (form.location.latitude === null || form.location.longitude === null) return setError('Choose a location using your device, search, or the map pin.');
+      if (form.location.latitude === null || form.location.longitude === null) {
+        return setError('Choose a location using your device, search, or the map pin.');
+      }
     }
 
     if (step === 3 && photos.length) {
@@ -172,13 +175,13 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
       const token = getAuthToken();
       if (!token) throw new Error('Please sign in before submitting a report.');
 
-      const uploadedUrls = photos.length ? await uploadPhotos() : [];
+      const uploaded = photos.length ? await uploadPhotos() : [];
       const payload = {
         category: form.category,
         description: form.description.trim(),
         address: form.address.trim(),
         severity: form.severity,
-        photos: uploadedUrls,
+        photos: uploaded,
         location: {
           latitude: form.location.latitude,
           longitude: form.location.longitude,
@@ -203,27 +206,7 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
   };
 
   if (stage === 0) {
-    return (
-      <div className="wizard-backdrop">
-        <div className="wizard-intro" role="dialog" aria-modal="true">
-          <button className="wizard-close" onClick={onClose} aria-label="Close"><i className="fa-solid fa-xmark"></i></button>
-          <span className="wizard-intro-icon"><i className="fa-solid fa-image" style={{ fontSize: 24 }}></i></span>
-          <h2>Report a New Problem</h2>
-          <p>Help keep our community safe and clean by letting us know what&apos;s happening.</p>
-          {[['Quick & Easy', 'Report issues in just a few steps.'], ['Track Progress', 'We&apos;ll keep you updated on the status.'], ['Stronger Community', 'Your report helps make a difference.']].map(([title, text], index) => (
-            <div className="intro-benefit" key={title}>
-              <span>{index + 1}</span>
-              <div>
-                <strong>{title}</strong>
-                <small>{text}</small>
-              </div>
-            </div>
-          ))}
-          <button className="wizard-primary" onClick={() => setStage(1)}>Report Now <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i></button>
-          <button className="wizard-cancel" onClick={onClose}>Cancel</button>
-        </div>
-      </div>
-    );
+    return <WizardIntro onStart={() => setStage(1)} onClose={onClose} />;
   }
 
   return (
@@ -255,130 +238,41 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
 
           <section className="wizard-card">
             {step === 1 && (
-              <>
-                <label>
-                  What type of issue is this?
-                  <select name="category" value={form.category} onChange={update}>
-                    <option value="">Select issue category</option>
-                    {categories.map((category) => <option key={category} value={category}>{category}</option>)}
-                  </select>
-                </label>
-
-                <label>
-                  Describe the issue
-                  <textarea
-                    name="description"
-                    maxLength="500"
-                    value={form.description}
-                    onChange={update}
-                    placeholder="Provide a clear description of the problem..."
-                  />
-                  <small className="counter">{form.description.length}/500</small>
-                </label>
-
-                <fieldset>
-                  <legend>How severe is the issue?</legend>
-                  <div className="severity-grid">
-                    {severities.map(([name, note]) => (
-                      <button
-                        type="button"
-                        className={`severity ${form.severity === name ? 'selected' : ''}`}
-                        key={name}
-                        onClick={() => setForm((current) => ({ ...current, severity: name }))}
-                      >
-                        <b className={name.toLowerCase()} />{name}
-                        <small>{note}</small>
-                      </button>
-                    ))}
-                  </div>
-                </fieldset>
-              </>
+              <WizardStepDetails
+                form={form}
+                onUpdate={update}
+                onSeverityChange={(name) => setForm((current) => ({ ...current, severity: name }))}
+              />
             )}
 
             {step === 2 && (
-              <>
-                <label>Where is the issue located?</label>
-                {nearbyReportsCount > 0 && (
-                  <div className="alert alert-info d-flex align-items-start gap-2 mb-3 px-3 py-2" style={{ backgroundColor: '#e0f2fe', color: '#0369a1', border: '1px solid #bae6fd', borderRadius: '8px', fontSize: '14px' }}>
-                    <i className="fa-solid fa-circle-info text-primary mt-1"></i>
-                    <div>
-                      <strong>{nearbyReportsCount} similar report{nearbyReportsCount > 1 ? 's' : ''}</strong> found nearby. 
-                      <a href="#wizard-map" className="ms-1 fw-bold text-primary text-decoration-none" onClick={(e) => {
-                        e.preventDefault();
-                        const mapElem = document.querySelector('.location-picker-container');
-                        if (mapElem) mapElem.scrollIntoView({ behavior: 'smooth' });
-                      }}>
-                        View on map
-                      </a>
-                    </div>
-                  </div>
-                )}
-                <LocationPickerMap 
-                  initialAddress={form.address}
-                  initialLat={form.location.latitude !== null ? form.location.latitude : (form.lat !== '' ? Number(form.lat) : undefined)}
-                  initialLng={form.location.longitude !== null ? form.location.longitude : (form.lng !== '' ? Number(form.lng) : undefined)}
-                  initialAccuracy={form.location.accuracy}
-                  initialSource={form.location.source}
-                  onNearbyReportsChange={(reports) => setNearbyReportsCount(reports.length)}
-                  onLocationSelect={(location) => {
-                    setForm(current => ({ ...current, lat: location.latitude, lng: location.longitude, address: location.addressText, location }));
-                    setError('');
-                    setRetryAction(null);
-                  }}
-                />
-              </>
+              <WizardStepLocation
+                form={form}
+                nearbyReportsCount={nearbyReportsCount}
+                onNearbyReportsChange={(reports) => setNearbyReportsCount(reports.length)}
+                onLocationSelect={(location) => {
+                  setForm((current) => ({
+                    ...current,
+                    lat: location.latitude,
+                    lng: location.longitude,
+                    address: location.addressText,
+                    location,
+                  }));
+                  setError('');
+                  setRetryAction(null);
+                }}
+              />
             )}
 
             {step === 3 && (
-              <>
-                <label>Add photos to show the issue</label>
-                <div className="drop-zone">
-                  <i className="fa-solid fa-cloud-arrow-up" style={{ fontSize: 28, color: '#94a3b8' }}></i>
-                  <strong>Drag and drop photos here</strong>
-                  <small>JPG, PNG, WEBP. Max 5MB each.</small>
-                  <label className="choose-files">
-                    Choose Files
-                    <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={choosePhotos} />
-                  </label>
-                </div>
-
-                <div className="photo-grid">
-                  {photos.map((photo, index) => (
-                    <div key={`${photo.preview}-${index}`}>
-                      <img src={photo.preview} alt="Report preview" />
-                      <button type="button" onClick={() => setPhotos((current) => current.filter((_, photoIndex) => photoIndex !== index))}>
-                        <i className="fa-solid fa-xmark" style={{ fontSize: 12 }}></i>
-                      </button>
-                    </div>
-                  ))}
-
-                  <label className="add-photo">
-                    <i className="fa-solid fa-plus" style={{ fontSize: 18 }}></i>
-                    <small>Add more</small>
-                    <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={choosePhotos} />
-                  </label>
-                </div>
-              </>
+              <WizardStepPhotos
+                photos={photos}
+                onChoosePhotos={choosePhotos}
+                onRemovePhoto={(index) => setPhotos((current) => current.filter((_, photoIndex) => photoIndex !== index))}
+              />
             )}
 
-            {step === 4 && (
-              <>
-                <div className="review-list">
-                  <p><b>Issue Type</b><span>{form.category}</span></p>
-                  <p><b>Location</b><span>{form.address}</span></p>
-                  <p><b>Description</b><span>{form.description}</span></p>
-                  <p><b>Severity</b><span className={`review-severity ${form.severity.toLowerCase()}`}>{form.severity}</span></p>
-                </div>
-
-                {photos.length > 0 && (
-                  <div className="review-photos">
-                    {photos.map((photo, index) => (
-                      <img key={`${photo.preview}-${index}`} src={photo.preview} alt="Report preview" />
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
+            {step === 4 && <WizardStepReview form={form} photos={photos} />}
 
             {error && (
               <>
@@ -399,7 +293,11 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
               )}
 
               {step < 4 ? (
-                <button className="wizard-primary" disabled={step === 2 && (form.location.latitude === null || form.location.longitude === null)} onClick={next}>
+                <button
+                  className="wizard-primary"
+                  disabled={step === 2 && (form.location.latitude === null || form.location.longitude === null)}
+                  onClick={next}
+                >
                   Next: {steps[step]} <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i>
                 </button>
               ) : (

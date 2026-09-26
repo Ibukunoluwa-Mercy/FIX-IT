@@ -2,6 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import ReportWizard from '../ReportWizardPage/ReportWizard';
+import DashboardLocationPreview from './components/DashboardLocationPreview';
+import DashboardStatsGrid from './components/DashboardStatsGrid';
+import DashboardRecentReports from './components/DashboardRecentReports';
+import DashboardRecentUpdates from './components/DashboardRecentUpdates';
 import logoWhite from '../../assets/fixit-white-logo.png';
 import './ResidentDashboard.css';
 
@@ -22,49 +26,7 @@ const navGroups = [
   ],
 ];
 
-const formatDate = (value) => value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(value)) : 'Just now';
 const statusClass = (status = 'Pending') => status.toLowerCase().replace(/\s+/g, '-');
-
-const DashboardLocationPreview = ({ onOpen }) => {
-  const [location, setLocation] = useState(null);
-  const token = localStorage.getItem('fixitToken') || localStorage.getItem('token') || '';
-
-  useEffect(() => {
-    let active = true;
-    const headers = token ? { Authorization: `Bearer ${token}` } : {};
-    const loadSavedLocation = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/users/me/location`, { headers });
-        const savedLocation = response.data?.location;
-        if (active && savedLocation?.latitude != null && savedLocation?.longitude != null) setLocation(savedLocation);
-      } catch { /* The placeholder remains when no saved location exists. */ }
-    };
-    const loadQuietly = () => {
-      if (!navigator.geolocation) return loadSavedLocation();
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          if (active) setLocation({ latitude: position.coords.latitude, longitude: position.coords.longitude, accuracy: position.coords.accuracy });
-        },
-        () => loadSavedLocation(),
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
-      );
-    };
-    if (!navigator.permissions?.query) loadSavedLocation();
-    else navigator.permissions.query({ name: 'geolocation' }).then((permission) => {
-      if (!active) return;
-      if (permission.state === 'granted') loadQuietly();
-      else loadSavedLocation();
-    }).catch(loadSavedLocation);
-    return () => { active = false; };
-  }, [token]);
-
-  return (
-    <button type="button" className="issue-map-preview-button" onClick={onOpen} aria-label="Open my location map">
-      <span className="map-grid" />
-      {location ? <span className="dashboard-user-dot" aria-hidden="true" /> : <span className="location-preview-placeholder">Enable location to see where you are</span>}
-    </button>
-  );
-};
 
 const ResidentDashboard = () => {
   const navigate = useNavigate();
@@ -99,6 +61,7 @@ const ResidentDashboard = () => {
       setError(requestError.response?.data?.message || 'Unable to load your dashboard.');
     } finally { setLoading(false); }
   }, [navigate, token]);
+
   useEffect(() => { loadDashboard(); }, [loadDashboard]);
 
   const reports = dashboard.recentReports || [];
@@ -217,27 +180,7 @@ const ResidentDashboard = () => {
           </section>
           {error && <div className="dashboard-alert" role="alert">{error}</div>}
 
-          <section className="row g-3 stats-grid" aria-label="Overview statistics">
-            {[
-              ['My Reports', stats.totalActiveReports ?? 0, 'Active', 'fa-solid fa-file-lines', 'orange', '/reports'],
-              ['Resolved', stats.resolvedThisMonth ?? 0, 'This Month', 'fa-solid fa-chart-line', 'green', '/reports'],
-              ['Impact Score', stats.impactScore ?? 0, 'Keep it going!', 'fa-solid fa-star', 'amber', null],
-              ['Community Rank', stats.rank || 'Top 0%', 'In your city', 'fa-solid fa-users', 'blue', '/map']
-            ].map(([label, value, note, iconClass, tone, path]) => (
-              <article className="col-12 col-sm-6 col-xl-3" key={label}>
-                <div className={`stat-card stat-${tone}`}>
-                  <span className="stat-icon"><i className={iconClass} style={{ fontSize: 17 }}></i></span>
-                  <span className="stat-label">{label}</span>
-                  <strong className="stat-value">{loading ? <span className="skeleton skeleton-value" /> : value}</strong>
-                  <small>{note}</small>
-                  <button onClick={() => path ? navigate(path) : console.info(`${label} details`)}>
-                    {label === 'Impact Score' ? 'Details' : label === 'Community Rank' ? 'View leaderboard' : 'View all'}
-                    <i className="fa-solid fa-chevron-right ms-1" style={{ fontSize: 11 }}></i>
-                  </button>
-                </div>
-              </article>
-            ))}
-          </section>
+          <DashboardStatsGrid stats={stats} loading={loading} />
 
           <section className="report-cta">
             <div className="cta-icon"><i className="fa-solid fa-plus" style={{ fontSize: 24 }}></i></div>
@@ -251,115 +194,17 @@ const ResidentDashboard = () => {
           </section>
 
           <div className="dashboard-panels-stacked">
-            <section className="dashboard-panel reports-panel">
-              <div className="panel-heading">
-                <h2>Recent Reports</h2>
-                <button className="panel-header-link" onClick={() => navigate('/reports')}>
-                  View All <i className="fa-solid fa-chevron-right ms-1" style={{ fontSize: 12 }}></i>
-                </button>
-              </div>
-              {loading ? (
-                <div className="empty-state">
-                  <span className="skeleton skeleton-line" />
-                  <span className="skeleton skeleton-line" />
-                </div>
-              ) : visibleReports.length ? (
-                <div className="reports-list">
-                  {visibleReports.map((report) => (
-                    <button className="report-row" key={report._id || report.reportId} onClick={() => setSelectedReport(report)}>
-                      <span className="report-thumb">
-                        {report.imageUrl ? <img src={report.imageUrl} alt="" /> : <i className="fa-solid fa-file-lines" style={{ fontSize: 18, color: '#94a3b8' }}></i>}
-                      </span>
-                      <span className="report-details">
-                        <small>{report.reportId || `#${String(report._id).slice(-8)}`}</small>
-                        <strong>{report.title}</strong>
-                        <span>{formatDate(report.createdAt)} &nbsp;•&nbsp; {report.location?.address || 'Location unavailable'}</span>
-                        <i className={`progress-line ${statusClass(report.status)}`} />
-                      </span>
-                      <span className={`status-pill ${statusClass(report.status)}`}><i />{report.status}</span>
-                      <i className="fa-solid fa-chevron-right row-chevron" style={{ fontSize: 14 }}></i>
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="empty-state empty-state-reports">
-                  <div className="empty-illustration-reports">
-                    <svg width="180" height="110" viewBox="0 0 180 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <ellipse cx="90" cy="70" rx="64" ry="34" fill="#FFF4EA" opacity="0.6"/>
-                      <path d="M20 92C32 82 50 84 62 87" stroke="#FFE3CC" strokeWidth="2" strokeLinecap="round" strokeDasharray="3 3"/>
-                      <path d="M42 90V76" stroke="#52B788" strokeWidth="2.5" strokeLinecap="round"/>
-                      <circle cx="36" cy="73" r="4.5" fill="#74C69D"/>
-                      <circle cx="48" cy="70" r="4.5" fill="#74C69D"/>
-                      <circle cx="42" cy="64" r="5" fill="#52B788"/>
-                      <path d="M142 90V78" stroke="#52B788" strokeWidth="2.5" strokeLinecap="round"/>
-                      <circle cx="137" cy="75" r="4" fill="#74C69D"/>
-                      <circle cx="147" cy="73" r="4" fill="#74C69D"/>
-                      <circle cx="142" cy="67" r="4.5" fill="#52B788"/>
-                      <rect x="64" y="24" width="52" height="66" rx="8" fill="#FFFFFF" stroke="#8E857B" strokeWidth="2.5"/>
-                      <rect x="79" y="19" width="22" height="9" rx="3.5" fill="#4B5563"/>
-                      <circle cx="90" cy="17" r="3" fill="#D1D5DB"/>
-                      <rect x="76" y="36" width="28" height="2.5" rx="1.25" fill="#9CA3AF"/>
-                      <rect x="72" y="44" width="36" height="2.5" rx="1.25" fill="#CBD5E1"/>
-                      <rect x="72" y="52" width="24" height="2.5" rx="1.25" fill="#CBD5E1"/>
-                      <rect x="72" y="60" width="30" height="2.5" rx="1.25" fill="#CBD5E1"/>
-                      <rect x="72" y="68" width="18" height="2.5" rx="1.25" fill="#CBD5E1"/>
-                      <circle cx="102" cy="64" r="12" fill="#FFFFFF" stroke="#374151" strokeWidth="3"/>
-                      <line x1="111" y1="73" x2="122" y2="84" stroke="#374151" strokeWidth="3.5" strokeLinecap="round"/>
-                    </svg>
-                  </div>
-                  <h3 className="empty-title">No reports yet</h3>
-                  <p className="empty-subtitle">You haven&apos;t submitted any community reports.</p>
-                  <button className="empty-cta-btn" onClick={() => setShowReportWizard(true)}>
-                    Create Your First Report
-                  </button>
-                </div>
-              )}
-            </section>
+            <DashboardRecentReports
+              loading={loading}
+              reports={visibleReports}
+              onSelectReport={setSelectedReport}
+              onCreateReport={() => setShowReportWizard(true)}
+            />
 
-            <section className="dashboard-panel updates-panel">
-              <div className="panel-heading">
-                <h2>Recent Updates</h2>
-              </div>
-              {loading ? (
-                <div className="empty-state compact">
-                  <span className="skeleton skeleton-line" />
-                  <span className="skeleton skeleton-line" />
-                </div>
-              ) : dashboard.recentUpdates?.length ? (
-                <div className="timeline">
-                  {dashboard.recentUpdates.map((update, index) => (
-                    <div className="timeline-item" key={`${update.timestamp}-${index}`}>
-                      <span className={`timeline-dot ${index % 2 ? 'grey' : 'orange'}`}>
-                        <i className="fa-solid fa-chart-line" style={{ fontSize: 12 }}></i>
-                      </span>
-                      <div>
-                        <small>{update.type?.replace('_', ' ')}</small>
-                        <p>{update.text}</p>
-                        <time>{formatDate(update.timestamp)}</time>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="empty-state-updates">
-                  <div className="empty-bell-circle">
-                    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M22 11C17.5817 11 14 14.5817 14 19V24.5C14 25.5 13 26.5 11.5 27.5C10.8 27.97 11.15 29 12 29H32C32.85 29 33.2 27.97 32.5 27.5C31 26.5 30 25.5 30 24.5V19C30 14.5817 26.4183 11 22 11Z" fill="#FDBA74"/>
-                      <circle cx="22" cy="8.5" r="2.5" fill="#FB923C"/>
-                      <ellipse cx="22" cy="31" rx="3.5" ry="2" fill="#F97316"/>
-                      <line x1="8" y1="17" x2="10" y2="18.5" stroke="#FB923C" strokeWidth="2" strokeLinecap="round"/>
-                      <line x1="36" y1="17" x2="34" y2="18.5" stroke="#FB923C" strokeWidth="2" strokeLinecap="round"/>
-                      <line x1="9" y1="23" x2="6.5" y2="23.5" stroke="#FB923C" strokeWidth="2" strokeLinecap="round"/>
-                      <line x1="35" y1="23" x2="37.5" y2="23.5" stroke="#FB923C" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                  </div>
-                  <div className="empty-updates-text">
-                    <strong>No updates available</strong>
-                    <span>Updates related to your reports will appear here.</span>
-                  </div>
-                </div>
-              )}
-            </section>
+            <DashboardRecentUpdates
+              loading={loading}
+              updates={dashboard.recentUpdates}
+            />
           </div>
 
           <section className="dashboard-panel issue-map-panel">

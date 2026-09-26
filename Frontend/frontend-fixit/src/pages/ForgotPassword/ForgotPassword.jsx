@@ -1,14 +1,13 @@
 import { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
-import neighborhoodIllustration from '../../assets/neighborhood_illustration.png';
-import logo from '../../assets/fixit-logo-white.png';
+import ForgotPasswordBranding from './components/ForgotPasswordBranding';
+import ForgotPasswordSuccess from './components/ForgotPasswordSuccess';
 import './ForgotPassword.css';
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const ForgotPassword = () => {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const resetToken = searchParams.get('token');
 
@@ -111,61 +110,12 @@ const ForgotPassword = () => {
   return (
     <div className="forgot-password-page">
       <div className="forgot-password-shell">
-        
-        {/* ── Left branding panel ── */}
-        <aside className="forgot-branding auth-reveal auth-reveal-hero" aria-label="Fixit portal branding">
-          <div className="brand-row">
-            <Link to="/" className="brand-link" aria-label="Fixit Homepage">
-              <img src={logo} alt="Fixit" className="brand-logo" />
-            </Link>
-          </div>
+        <ForgotPasswordBranding resetToken={resetToken} />
 
-          <div className="forgot-copy-block">
-            <h1 className="forgot-headline">
-              No worries,
-              <span className="headline-highlight">we&apos;ve got you.</span>
-            </h1>
-            <p className="forgot-subtext">
-              {resetToken
-                ? 'Create a strong, secure new password to regain access to your account.'
-                : 'Enter your email address and choose a new password to quickly regain access.'}
-            </p>
-          </div>
-
-          <div className="forgot-feature-grid">
-            <div className="forgot-feature-card">
-              <div className="forgot-feature-icon orange">
-                <i className="fa-solid fa-shield-halved"></i>
-              </div>
-              <div className="forgot-feature-copy">
-                <h2>Secure &amp; Private</h2>
-                <p>Your information is safe with us.</p>
-              </div>
-            </div>
-
-            <div className="forgot-feature-card">
-              <div className="forgot-feature-icon orange">
-                <i className="fa-solid fa-envelope"></i>
-              </div>
-              <div className="forgot-feature-copy">
-                <h2>Quick &amp; Easy</h2>
-                <p>Reset your password in just a few minutes.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="forgot-illustration-wrap">
-            <img src={neighborhoodIllustration} alt="Neighborhood illustration" className="forgot-illustration" />
-          </div>
-        </aside>
-
-        {/* ── Right card panel ── */}
         <section className="forgot-card-wrap auth-reveal auth-reveal-card">
           <div className="forgot-card">
-
             {!success ? (
               <>
-                {/* Lock icon badge */}
                 <div className="card-lock-badge" aria-hidden="true">
                   <i className="fa-solid fa-lock" style={{ fontSize: 26 }}></i>
                 </div>
@@ -180,8 +130,6 @@ const ForgotPassword = () => {
                 </div>
 
                 <form className="forgot-form" onSubmit={handleSubmit} noValidate>
-
-                  {/* Email Address (shown when direct reset without token link) */}
                   {!resetToken && (
                     <div className="field-group">
                       <label htmlFor="email">Email Address</label>
@@ -206,7 +154,6 @@ const ForgotPassword = () => {
                     </div>
                   )}
                   
-                  {/* New Password */}
                   <div className="field-group">
                     <label htmlFor="newPassword">New Password</label>
                     <div className={`input-shell ${errors.newPassword ? 'has-error' : ''}`}>
@@ -237,7 +184,6 @@ const ForgotPassword = () => {
                     )}
                   </div>
 
-                  {/* Confirm Password */}
                   <div className="field-group">
                     <label htmlFor="confirmPassword">Confirm New Password</label>
                     <div className={`input-shell ${errors.confirmPassword ? 'has-error' : ''}`}>
@@ -285,43 +231,7 @@ const ForgotPassword = () => {
                 </div>
               </>
             ) : (
-              /* ── Success / Password Updated screen ── */
-              <div className="success-state">
-                <div className="success-sparkles" aria-hidden="true">
-                  <span className="sparkle s1">✦</span>
-                  <span className="sparkle s2">◆</span>
-                  <span className="sparkle s3">✦</span>
-                  <span className="sparkle s4">◆</span>
-                  <span className="sparkle s5">✦</span>
-                  <span className="sparkle s6">◆</span>
-                </div>
-
-                <div className="success-icon-wrap" aria-label="Password updated successfully">
-                  <div className="success-icon-ring">
-                    <i className="fa-solid fa-circle-check" style={{ fontSize: 52 }}></i>
-                  </div>
-                </div>
-
-                <h2>Password Updated!</h2>
-                <p>
-                  Your password has been successfully reset.<br />
-                  You can now sign in with your new password.
-                </p>
-
-                <button
-                  type="button"
-                  className="proceed-button"
-                  onClick={() => navigate('/login')}
-                >
-                  Proceed to Login
-                  <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i>
-                </button>
-
-                <div className="forgot-footer">
-                  Remember your password?{' '}
-                  <Link to="/login">Back to Login</Link>
-                </div>
-              </div>
+              <ForgotPasswordSuccess />
             )}
           </div>
         </section>

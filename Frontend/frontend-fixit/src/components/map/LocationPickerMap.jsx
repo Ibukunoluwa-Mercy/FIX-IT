@@ -1,36 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, useMap, Circle, Popup } from 'react-leaflet';
-import L from 'leaflet';
+import { MapContainer, TileLayer, Marker, Circle, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { nearbyIcon, MapFlyTo, MapClickCapture, DraggableMarker } from './LocationMapMarkers';
+import LocationSearchControls from './LocationSearchControls';
+import LocationPermissionModal from './LocationPermissionModal';
 import './LocationPickerMap.css';
-
-// Custom marker icon
-const defaultIcon = L.divIcon({
-  className: 'custom-leaflet-marker',
-  html: `
-    <div class="marker-pin" style="background-color: #ea580c;">
-      <div class="marker-dot"></div>
-    </div>
-  `,
-  iconSize: [34, 34],
-  iconAnchor: [17, 34],
-});
-
-// Nearby report icon
-const nearbyIcon = L.divIcon({
-  className: 'custom-leaflet-marker',
-  html: `
-    <div class="marker-pin" style="background-color: #3b82f6;">
-      <div class="marker-dot" style="background-color: white;"></div>
-    </div>
-  `,
-  iconSize: [30, 30],
-  iconAnchor: [15, 30],
-  popupAnchor: [0, -32]
-});
 
 const NEARBY_RADIUS = 150;
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
+
 const getAuthHeaders = () => {
   const token = localStorage.getItem('fixitToken') || localStorage.getItem('token') || '';
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -46,60 +24,6 @@ const reverseGeocode = async (lat, lng) => {
     console.error('Reverse geocode error:', err);
     return null;
   }
-};
-
-// Component to handle smooth flying to new locations
-const MapFlyTo = ({ center, zoom }) => {
-  const map = useMap();
-  useEffect(() => {
-    if (center) {
-      map.flyTo(center, zoom, { animate: true, duration: 1.5 });
-    }
-  }, [center, zoom, map]);
-  return null;
-};
-
-// Component to capture map clicks and update marker
-const MapClickCapture = ({ onLocationSelected }) => {
-  const map = useMap();
-  useEffect(() => {
-    const handleMapClick = (e) => {
-      const { lat, lng } = e.latlng;
-      onLocationSelected(lat, lng);
-    };
-    map.on('click', handleMapClick);
-    return () => {
-      map.off('click', handleMapClick);
-    };
-  }, [map, onLocationSelected]);
-  return null;
-};
-
-// Draggable Marker Component
-const DraggableMarker = ({ position, onDragEnd }) => {
-  const markerRef = useRef(null);
-  const eventHandlers = React.useMemo(
-    () => ({
-      dragend() {
-        const marker = markerRef.current;
-        if (marker != null) {
-          const { lat, lng } = marker.getLatLng();
-          onDragEnd(lat, lng);
-        }
-      },
-    }),
-    [onDragEnd],
-  );
-
-  return (
-    <Marker
-      draggable={true}
-      eventHandlers={eventHandlers}
-      position={position}
-      ref={markerRef}
-      icon={defaultIcon}
-    />
-  );
 };
 
 const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat, initialLng, initialAddress, initialAccuracy, initialSource }) => {
@@ -120,8 +44,7 @@ const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat
   
   const [nearbyReports, setNearbyReports] = useState([]);
 
-  // Default to a central location (e.g., center of a default city) if no initial lat/lng
-  const [mapCenter, setMapCenter] = useState([initialLat || 6.5244, initialLng || 3.3792]); // Lagos default
+  const [mapCenter, setMapCenter] = useState([initialLat || 6.5244, initialLng || 3.3792]);
   const [markerPos, setMarkerPos] = useState(initialLat && initialLng ? [initialLat, initialLng] : null);
   
   const lastRequestTime = useRef(0);
@@ -129,6 +52,7 @@ const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat
   const watchId = useRef(null);
   const watchTimer = useRef(null);
   const bestReading = useRef(null);
+  const dropdownRef = useRef(null);
 
   const fetchNearbyReports = useCallback(async (lat, lng) => {
     try {
@@ -144,7 +68,6 @@ const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat
       }
     } catch (err) {
       console.error('Error fetching nearby reports:', err);
-      // For demonstration if API isn't ready
       setNearbyReports([]);
       if (onNearbyReportsChange) onNearbyReportsChange([]);
     }
@@ -166,7 +89,6 @@ const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat
   }, [onLocationSelect, fetchNearbyReports]);
 
   const updateLocationWithReverseGeocode = useCallback(async (lat, lng, recenter = true, source = 'manual', accuracyValue = 0) => {
-    // Optimistic UI update
     setQuery('Fetching address...');
     setMarkerPos([lat, lng]);
     if (recenter) {
@@ -177,7 +99,6 @@ const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat
     setLocationSource(source);
     setAccuracy(source === 'gps' ? accuracyValue : null);
     
-    // Fetch nearby reports in parallel with reverse geocode
     fetchNearbyReports(lat, lng);
 
     const address = await reverseGeocode(lat, lng);
@@ -198,11 +119,9 @@ const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat
       return;
     }
 
-    // Rate limiting: Ensure at least 1 second between requests
     const now = Date.now();
     const timeSinceLastReq = now - lastRequestTime.current;
     if (timeSinceLastReq < 1000) {
-      // If we are too fast, wait and try again
       debounceTimer.current = setTimeout(() => searchNominatim(searchQuery), 1000 - timeSinceLastReq);
       return;
     }
@@ -213,13 +132,11 @@ const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat
 
     try {
       const response = await fetch(`${API_URL}/api/geocode/search?q=${encodeURIComponent(searchQuery)}`, { headers: getAuthHeaders() });
-      
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       
       setResults(data);
       setShowDropdown(true);
-      
       if (data.length === 0) {
         setEmptyMessage('No matching locations found.');
       }
@@ -235,12 +152,7 @@ const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat
   const handleInputChange = (e) => {
     const val = e.target.value;
     setQuery(val);
-    
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-    }
-    
-    // Debounce 500ms
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
     debounceTimer.current = setTimeout(() => {
       searchNominatim(val);
     }, 500);
@@ -249,10 +161,8 @@ const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat
   const handleResultSelect = (result) => {
     const lat = parseFloat(result.latitude);
     const lon = parseFloat(result.longitude);
-    
     setShowDropdown(false);
     setResults([]);
-    
     setMapLocation(lat, lon, result.label, 'search', 0, true);
   };
 
@@ -341,8 +251,6 @@ const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat
     setShowLocationPrompt(true);
   };
 
-  // Click outside to close dropdown
-  const dropdownRef = useRef(null);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -355,80 +263,27 @@ const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat
 
   return (
     <div className="location-picker-container">
-      <div className="location-search-wrapper" ref={dropdownRef}>
-        <div className="search-controls-container d-flex gap-2 mb-2">
-          <div className="search-input-box location-search-grow position-relative">
-            <i className="fa-solid fa-magnifying-glass search-icon"></i>
-            <input
-              type="text"
-              className="form-control location-search-input"
-              placeholder="Search for a street, landmark, or area..."
-              value={query}
-              onChange={handleInputChange}
-              onFocus={() => { if (results.length > 0) setShowDropdown(true); }}
-            />
-            <div className="search-status-indicators">
-              {(isSearching || isReverseGeocoding) ? (
-                <span className="spinner-border spinner-border-sm text-muted" role="status" />
-              ) : coordsLocked ? (
-                <i className="fa-solid fa-circle-check text-success" title="Coordinates locked"></i>
-              ) : null}
-            </div>
-          </div>
-          <button 
-            type="button" 
-            className="btn btn-secondary current-location-btn d-flex align-items-center gap-2" 
-            onClick={handleGetCurrentLocation}
-            disabled={isLocating}
-          >
-            {isLocating ? (
-              <span className="spinner-border spinner-border-sm" role="status"></span>
-            ) : (
-              <i className="fa-solid fa-location-crosshairs"></i>
-            )}
-            <span className="d-none d-sm-inline">Use Current Location</span>
-          </button>
-        </div>
-        
-        {locationError && (
-          <div className="location-empty-message location-error-message mb-2" role="alert">
-            <i className="fa-solid fa-circle-exclamation"></i><span>{locationError}</span><button type="button" onClick={handleGetCurrentLocation}>Try Again</button>
-          </div>
-        )}
-        {isLocating && <div className="location-status" role="status"><span className="spinner-border spinner-border-sm"></span><span>Getting your exact location...</span>{accuracy != null && <small>Accuracy: ±{Math.round(accuracy)} m</small>}</div>}
-        {!isLocating && locationSource === 'gps' && accuracy != null && !locationError && <div className="location-status location-success" role="status"><i className="fa-solid fa-circle-check"></i><span>Location captured</span><small>Accuracy: ±{Math.round(accuracy)} m</small></div>}
-        
-        {/* Dropdown Results */}
-        {showDropdown && results.length > 0 && (
-          <ul className="location-results-dropdown shadow-sm">
-            {results.map((res) => (
-              <li 
-                key={`${res.latitude}-${res.longitude}-${res.label}`} 
-                className="location-result-item"
-                onClick={() => handleResultSelect(res)}
-              >
-                <i className="fa-solid fa-location-dot item-icon"></i>
-                <span>{res.label}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-        
-        {/* Empty State Message Inline */}
-        {emptyMessage && query.length >= 3 && !isSearching && (
-          <div className="location-empty-message">
-            <i className="fa-solid fa-circle-exclamation"></i> {emptyMessage}
-          </div>
-        )}
-      </div>
+      <LocationSearchControls
+        dropdownRef={dropdownRef}
+        query={query}
+        handleInputChange={handleInputChange}
+        results={results}
+        setShowDropdown={setShowDropdown}
+        showDropdown={showDropdown}
+        isSearching={isSearching}
+        isReverseGeocoding={isReverseGeocoding}
+        coordsLocked={coordsLocked}
+        isLocating={isLocating}
+        handleGetCurrentLocation={handleGetCurrentLocation}
+        locationError={locationError}
+        locationSource={locationSource}
+        accuracy={accuracy}
+        handleResultSelect={handleResultSelect}
+        emptyMessage={emptyMessage}
+      />
 
       <div className="map-picker-wrapper mt-3 rounded overflow-hidden border shadow-sm">
-        <MapContainer
-          center={mapCenter}
-          zoom={13}
-          style={{ height: '300px', width: '100%' }}
-          zoomControl={true}
-        >
+        <MapContainer center={mapCenter} zoom={13} style={{ height: '300px', width: '100%' }} zoomControl={true}>
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -464,15 +319,18 @@ const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat
             </Marker>
           ))}
 
-          {markerPos && (
-            <DraggableMarker position={markerPos} onDragEnd={handleMarkerDragEnd} />
-          )}
+          {markerPos && <DraggableMarker position={markerPos} onDragEnd={handleMarkerDragEnd} />}
         </MapContainer>
         <div className="map-picker-hint">
           <small className="text-muted"><i className="fa-solid fa-hand-pointer"></i> You can drag the pin or click anywhere on the map to set the exact location.</small>
         </div>
       </div>
-      {showLocationPrompt && <div className="location-permission-backdrop" role="presentation"><div className="location-permission-modal" role="dialog" aria-modal="true" aria-labelledby="location-permission-title"><i className="fa-solid fa-location-crosshairs permission-icon"></i><h3 id="location-permission-title">Turn on your location</h3><p>Please make sure Location/GPS is turned on on your device, then allow access when your browser asks. This lets us pinpoint exactly where the problem is.</p><div><button type="button" className="wizard-secondary" onClick={() => setShowLocationPrompt(false)}>Cancel</button><button type="button" className="wizard-primary" onClick={startLocationWatch}>Continue</button></div></div></div>}
+      {showLocationPrompt && (
+        <LocationPermissionModal
+          onCancel={() => setShowLocationPrompt(false)}
+          onContinue={startLocationWatch}
+        />
+      )}
     </div>
   );
 };
