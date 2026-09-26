@@ -12,15 +12,20 @@ const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_UR
 
 export const useSettingsAccount = (token, navigate) => {
   const avatarInput = useRef(null);
+  const officialIdInput = useRef(null);
   const [account, setAccount] = useState(emptyAccount);
   const [loadingAccount, setLoadingAccount] = useState(true);
   const [accountError, setAccountError] = useState('');
   const [editingAccount, setEditingAccount] = useState(false);
-  const [accountForm, setAccountForm] = useState({ fullName: '', email: '', phone: '', location: '' });
+  const [accountForm, setAccountForm] = useState({
+    fullName: '', email: '', phone: '', location: '', office: '', position: '', lga: '', staffId: '',
+  });
   const [savingAccount, setSavingAccount] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState('');
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [officialIdFile, setOfficialIdFile] = useState(null);
+  const [uploadingOfficialId, setUploadingOfficialId] = useState(false);
   const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [passwordVisibility, setPasswordVisibility] = useState({});
   const [passwordError, setPasswordError] = useState('');
@@ -41,7 +46,11 @@ export const useSettingsAccount = (token, navigate) => {
         if (!mounted) return;
         const nextAccount = normalizeSettingsAccount(data);
         setAccount(nextAccount);
-        setAccountForm({ fullName: nextAccount.fullName, email: nextAccount.email, phone: nextAccount.phone, location: nextAccount.location });
+        setAccountForm({
+          fullName: nextAccount.fullName, email: nextAccount.email, phone: nextAccount.phone,
+          location: nextAccount.location, office: nextAccount.office, position: nextAccount.position,
+          lga: nextAccount.lga, staffId: nextAccount.staffId,
+        });
         setAccountError('');
       })
       .catch((error) => {
@@ -65,13 +74,20 @@ export const useSettingsAccount = (token, navigate) => {
   const authConfig = { headers: { Authorization: `Bearer ${token}` } };
 
   const beginAccountEdit = () => {
-    setAccountForm({ fullName: account.fullName, email: account.email, phone: account.phone, location: account.location });
+    setAccountForm({
+      fullName: account.fullName, email: account.email, phone: account.phone,
+      location: account.location, office: account.office, position: account.position,
+      lga: account.lga, staffId: account.staffId,
+    });
     setEditingAccount(true);
   };
 
   const saveAccount = async (event) => {
     event.preventDefault();
     const changedFields = Object.fromEntries(Object.entries(accountForm).filter(([key, value]) => value !== account[key]));
+    if (changedFields.lga && !changedFields.location && !accountForm.location) {
+      changedFields.location = changedFields.lga;
+    }
     if (!Object.keys(changedFields).length) {
       setEditingAccount(false);
       return;
@@ -81,7 +97,11 @@ export const useSettingsAccount = (token, navigate) => {
       const { data } = await axios.patch(`${API_URL}/api/settings/account`, changedFields, authConfig);
       const updatedAccount = normalizeSettingsAccount(data);
       setAccount((current) => ({ ...current, ...updatedAccount }));
-      setAccountForm({ fullName: updatedAccount.fullName, email: updatedAccount.email, phone: updatedAccount.phone, location: updatedAccount.location });
+      setAccountForm({
+        fullName: updatedAccount.fullName, email: updatedAccount.email, phone: updatedAccount.phone,
+        location: updatedAccount.location, office: updatedAccount.office, position: updatedAccount.position,
+        lga: updatedAccount.lga, staffId: updatedAccount.staffId,
+      });
       setEditingAccount(false);
       if (changedFields.email) toast.info('Check your new email address for a verification link.');
       else toast.success('Account information updated.');
@@ -114,9 +134,7 @@ export const useSettingsAccount = (token, navigate) => {
     const formData = new FormData();
     formData.append('avatar', avatarFile);
     try {
-      const { data } = await axios.post(`${API_URL}/api/settings/account/avatar`, formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await axios.post(`${API_URL}/api/settings/account/avatar`, formData, authConfig);
       setAccount((current) => ({ ...current, avatarUrl: data.avatarUrl }));
       publishResidentAvatar(data.avatarUrl);
       setAvatarFile(null);
@@ -133,6 +151,44 @@ export const useSettingsAccount = (token, navigate) => {
     setAvatarFile(null);
     setAvatarPreview('');
   };
+
+  const handleOfficialIdSelect = (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    if (!['application/pdf', 'image/jpeg', 'image/png'].includes(file.type)) {
+      toast.error('Upload a PDF, JPG, or PNG document.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File must be 5MB or smaller.');
+      return;
+    }
+    setOfficialIdFile(file);
+  };
+
+  const uploadOfficialId = async () => {
+    if (!officialIdFile || uploadingOfficialId) return;
+    setUploadingOfficialId(true);
+    const formData = new FormData();
+    formData.append('officialIdFile', officialIdFile);
+    try {
+      const { data } = await axios.post(`${API_URL}/api/settings/account/official-id`, formData, authConfig);
+      setAccount((current) => ({
+        ...current,
+        idDocumentUrl: data.idDocumentUrl,
+        officialIdName: data.officialIdName || officialIdFile.name,
+      }));
+      setOfficialIdFile(null);
+      toast.success('Official ID document updated.');
+    } catch (error) {
+      toast.error(getErrorMessage(error, 'Unable to update official ID document.'));
+    } finally {
+      setUploadingOfficialId(false);
+    }
+  };
+
+  const cancelOfficialId = () => setOfficialIdFile(null);
 
   const changePassword = async (event) => {
     event.preventDefault();
@@ -211,20 +267,11 @@ export const useSettingsAccount = (token, navigate) => {
     setPasswordVisibility,
     passwordError,
     setPasswordError,
-    changingPassword,
-    savingNotification,
-    showDeleteModal,
-    setShowDeleteModal,
-    deletePassword,
-    setDeletePassword,
-    deletingAccount,
-    beginAccountEdit,
-    saveAccount,
-    handleAvatarSelect,
-    uploadAvatar,
-    cancelAvatar,
-    changePassword,
-    toggleNotification,
-    deleteAccount,
+    changingPassword, savingNotification, showDeleteModal, setShowDeleteModal,
+    deletePassword, setDeletePassword, deletingAccount, beginAccountEdit, saveAccount,
+    handleAvatarSelect, uploadAvatar, cancelAvatar,
+    officialIdInput, officialIdFile, uploadingOfficialId,
+    handleOfficialIdSelect, uploadOfficialId, cancelOfficialId,
+    changePassword, toggleNotification, deleteAccount,
   };
 };

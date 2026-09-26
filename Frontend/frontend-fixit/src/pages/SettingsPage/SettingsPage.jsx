@@ -56,13 +56,19 @@ const SettingsPage = () => {
     handleAvatarSelect,
     uploadAvatar,
     cancelAvatar,
+    officialIdInput,
+    officialIdFile,
+    uploadingOfficialId,
+    handleOfficialIdSelect,
+    uploadOfficialId,
+    cancelOfficialId,
     changePassword,
     toggleNotification,
     deleteAccount,
   } = useSettingsAccount(token, navigate);
 
-  const userName = account.fullName || 'Resident';
-  const userInitial = userName.trim().charAt(0).toUpperCase() || 'R';
+  const userName = account.fullName || (account.isOfficial ? 'Official' : 'Resident');
+  const userInitial = userName.trim().charAt(0).toUpperCase() || (account.isOfficial ? 'O' : 'R');
   const avatarSource = avatarPreview || (account.avatarUrl?.startsWith('/uploads/') ? `${API_URL}${account.avatarUrl}` : account.avatarUrl);
 
   const saveAppearance = (preference) => {
@@ -108,6 +114,13 @@ const SettingsPage = () => {
             uploadAvatar={uploadAvatar}
             uploadingAvatar={uploadingAvatar}
             cancelAvatar={cancelAvatar}
+            officialIdInput={officialIdInput}
+            onOfficialIdSelect={handleOfficialIdSelect}
+            officialIdFile={officialIdFile}
+            uploadingOfficialId={uploadingOfficialId}
+            uploadOfficialId={uploadOfficialId}
+            cancelOfficialId={cancelOfficialId}
+            apiUrl={API_URL}
           />
           <ChangePasswordCard
             passwordForm={passwordForm}

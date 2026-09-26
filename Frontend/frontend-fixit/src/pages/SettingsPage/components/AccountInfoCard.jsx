@@ -1,4 +1,5 @@
 import { Button, Form, Spinner } from 'react-bootstrap';
+import OfficialInfoSection from './OfficialInfoSection';
 
 const AccountInfoCard = ({
   account,
@@ -18,6 +19,13 @@ const AccountInfoCard = ({
   uploadAvatar,
   uploadingAvatar,
   cancelAvatar,
+  officialIdInput,
+  onOfficialIdSelect,
+  officialIdFile,
+  uploadingOfficialId,
+  uploadOfficialId,
+  cancelOfficialId,
+  apiUrl,
 }) => {
   return (
     <section className="settings-card settings-account-card">
@@ -152,6 +160,21 @@ const AccountInfoCard = ({
             </div>
           ))}
         </div>
+        {account.isOfficial && (
+          <OfficialInfoSection
+            account={account}
+            editingAccount={editingAccount}
+            accountForm={accountForm}
+            setAccountForm={setAccountForm}
+            officialIdInput={officialIdInput}
+            onOfficialIdSelect={onOfficialIdSelect}
+            officialIdFile={officialIdFile}
+            uploadingOfficialId={uploadingOfficialId}
+            uploadOfficialId={uploadOfficialId}
+            cancelOfficialId={cancelOfficialId}
+            apiUrl={apiUrl}
+          />
+        )}
       </Form>
     </section>
   );

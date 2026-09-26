@@ -1,0 +1,112 @@
+.settings-account-field .form-select {
+  max-width: 100%;
+  min-height: 28px;
+  padding: 4px 7px;
+  font-size: 13px;
+}
+
+.settings-official-section {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #edf1f6;
+}
+
+.settings-section-divider {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 0 3px;
+}
+
+.settings-section-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #1f3453;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.settings-section-title > i {
+  color: #2b6cb0;
+  font-size: 13px;
+}
+
+.official-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.official-status-badge.status-verified {
+  background: #e6f8ef;
+  color: #17814e;
+}
+
+.official-status-badge.status-pending {
+  background: #fff8eb;
+  color: #b45309;
+}
+
+.official-status-badge.status-rejected {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.settings-account-field-full {
+  grid-column: 1 / -1;
+}
+
+.official-id-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.official-id-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border: 1px solid #d5e1ee;
+  border-radius: 6px;
+  background: #f7fafc;
+  color: #2b6cb0;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.official-id-link:hover {
+  border-color: #2b6cb0;
+  background: #ebf4ff;
+  color: #1a4971;
+}
+
+.official-link-icon {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.official-id-upload-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.official-file-picker-btn {
+  font-size: 12px;
+  padding: 3px 8px;
+}
+
+.official-file-actions {
+  display: flex;
+  gap: 6px;
+}

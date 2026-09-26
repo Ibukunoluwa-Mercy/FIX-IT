@@ -4,31 +4,56 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const ResidentProfile = require('../models/ResidentProfile');
+const OfficialProfile = require('../models/OfficialProfile');
 const { uploadDirectory } = require('../middleware/avatarUpload');
 const { sendVerificationEmail, sendAccountDeletionEmail } = require('../services/emailService');
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const notificationKeys = ['issueUpdates', 'communityMessages', 'promotions'];
 
-const formatAccount = (user) => ({
-	fullName: user.name || '',
-	email: user.email || '',
-	phone: user.phone || '',
-	location: user.location || user.lastKnownLocation?.address || '',
-	avatarUrl: user.avatarUrl || '',
-	isVerified: Boolean(user.emailVerified),
-	notificationPrefs: {
-		issueUpdates: user.notificationPrefs?.issueUpdates ?? user.notificationPreferences?.issueUpdates ?? true,
-		communityMessages: user.notificationPrefs?.communityMessages ?? user.notificationPreferences?.communityMessages ?? true,
-		promotions: user.notificationPrefs?.promotions ?? user.notificationPreferences?.promotionsNews ?? false,
-	},
-});
+const formatAccount = (user, officialProfile = null) => {
+	const account = {
+		fullName: user.name || '',
+		email: user.email || '',
+		phone: user.phone || '',
+		location: user.location || user.lastKnownLocation?.address || '',
+		avatarUrl: user.avatarUrl || '',
+		isVerified: Boolean(user.emailVerified),
+		role: user.role || 'resident',
+		notificationPrefs: {
+			issueUpdates: user.notificationPrefs?.issueUpdates ?? user.notificationPreferences?.issueUpdates ?? true,
+			communityMessages: user.notificationPrefs?.communityMessages ?? user.notificationPreferences?.communityMessages ?? true,
+			promotions: user.notificationPrefs?.promotions ?? user.notificationPreferences?.promotionsNews ?? false,
+		},
+	};
+	if (officialProfile || user.role === 'admin') {
+		const docUrl = officialProfile?.idDocumentUrl || '';
+		account.isOfficial = true;
+		account.office = officialProfile?.department || '';
+		account.department = officialProfile?.department || '';
+		account.position = officialProfile?.position || '';
+		account.lga = officialProfile?.lga || user.location || '';
+		account.staffId = officialProfile?.staffId || '';
+		account.idDocumentUrl = docUrl;
+		account.officialIdName = docUrl ? path.basename(docUrl) : '';
+		account.verificationStatus = officialProfile?.verificationStatus || 'Pending';
+	}
+	return account;
+};
 
-const getAccount = (req, res) => res.json(formatAccount(req.user));
+const getAccount = async (req, res) => {
+	try {
+		const officialProfile = await OfficialProfile.findOne({ user: req.user._id }).lean();
+		return res.json(formatAccount(req.user, officialProfile));
+	} catch {
+		return res.json(formatAccount(req.user));
+	}
+};
 
 const updateAccount = (req, res) => {
 	const updates = {};
-	const { fullName, email, phone, location } = req.body || {};
+	const officialUpdates = {};
+	const { fullName, email, phone, location, office, department, position, lga, staffId } = req.body || {};
 	if (fullName !== undefined) {
 		if (typeof fullName !== 'string' || !fullName.trim() || fullName.trim().length > 120) {
 			return res.status(400).json({ code: 'INVALID_FULL_NAME', message: 'Full name must contain 1 to 120 characters' });
@@ -54,7 +79,27 @@ const updateAccount = (req, res) => {
 		if (typeof location !== 'string' || location.length > 200) return res.status(400).json({ code: 'INVALID_LOCATION', message: 'Location must be 200 characters or fewer' });
 		updates.location = location.trim();
 	}
-	if (!Object.keys(updates).length) return res.status(400).json({ code: 'NO_FIELDS', message: 'No account fields were provided' });
+	const deptVal = office !== undefined ? office : department;
+	if (deptVal !== undefined) {
+		if (typeof deptVal !== 'string' || deptVal.length > 120) return res.status(400).json({ code: 'INVALID_OFFICE', message: 'Office must be 120 characters or fewer' });
+		officialUpdates.department = deptVal.trim();
+	}
+	if (position !== undefined) {
+		if (typeof position !== 'string' || position.length > 120) return res.status(400).json({ code: 'INVALID_POSITION', message: 'Position must be 120 characters or fewer' });
+		officialUpdates.position = position.trim();
+	}
+	if (lga !== undefined) {
+		if (typeof lga !== 'string' || lga.length > 120) return res.status(400).json({ code: 'INVALID_LGA', message: 'Local Government Area must be 120 characters or fewer' });
+		officialUpdates.lga = lga.trim();
+		if (location === undefined && updates.location === undefined) updates.location = lga.trim();
+	}
+	if (staffId !== undefined) {
+		if (typeof staffId !== 'string' || staffId.length > 100) return res.status(400).json({ code: 'INVALID_STAFF_ID', message: 'Staff ID must be 100 characters or fewer' });
+		officialUpdates.staffId = staffId.trim();
+	}
+	if (!Object.keys(updates).length && !Object.keys(officialUpdates).length) {
+		return res.status(400).json({ code: 'NO_FIELDS', message: 'No account fields were provided' });
+	}
 
 	const emailChanged = Boolean(updates.email && updates.email !== req.user.email);
 	const verification = emailChanged ? {
@@ -74,22 +119,26 @@ const updateAccount = (req, res) => {
 			: null)
 		.then((duplicate) => {
 			if (duplicate) return res.status(409).json({ code: 'EMAIL_IN_USE', message: 'An account with this email already exists' });
-			return User.findByIdAndUpdate(req.user._id, { $set: updates }, { new: true, runValidators: true }).lean();
+			const saveProfile = Object.keys(officialUpdates).length && req.user?._id
+				? OfficialProfile.findOneAndUpdate({ user: req.user._id }, { $set: officialUpdates }, { new: true, upsert: true }).lean().catch(() => null)
+				: (req.user?.role === 'admin' ? OfficialProfile.findOne({ user: req.user?._id }).lean().catch(() => null) : Promise.resolve(null));
+			const saveUser = Object.keys(updates).length
+				? User.findByIdAndUpdate(req.user._id, { $set: updates }, { new: true, runValidators: true }).lean()
+				: User.findById(req.user._id).lean();
+			return Promise.all([saveUser, saveProfile]);
 		})
-		.then((user) => {
+		.then(([user, profile]) => {
 			if (res.headersSent) return undefined;
 			if (!user) return res.status(404).json({ code: 'ACCOUNT_NOT_FOUND', message: 'Account not found' });
-			if (!emailChanged) return res.json(formatAccount(user));
+			if (!emailChanged) return res.json(formatAccount(user, profile));
 
-			// Email edits immediately clear verification and replace the one-time token;
-			// the confirmation link proves the resident controls the new mailbox.
 			const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${verification.rawToken}`;
 			return sendVerificationEmail({ email: user.email, fullName: user.name, verificationUrl })
 				.catch((error) => {
 					console.error('Settings email verification message failed:', error.message);
 					return { sent: false };
 				})
-				.then(() => res.json(formatAccount(user)));
+				.then(() => res.json(formatAccount(user, profile)));
 		})
 		.catch((error) => {
 			if (error.code === 11000) return res.status(409).json({ code: 'EMAIL_IN_USE', message: 'An account with this email already exists' });
@@ -168,6 +217,18 @@ const uploadAvatar = (req, res) => {
 		}));
 };
 
+const uploadOfficialIdDocument = (req, res) => {
+	if (!req.file) return res.status(400).json({ message: 'Choose a PDF, JPG, or PNG document to upload' });
+	const idDocumentUrl = `/uploads/official-ids/${req.file.filename}`;
+	return OfficialProfile.findOneAndUpdate({ user: req.user._id }, { $set: { idDocumentUrl } }, { new: true, upsert: true })
+		.lean()
+		.then(() => res.json({ idDocumentUrl, officialIdName: req.file.originalname || path.basename(idDocumentUrl) }))
+		.catch((error) => fs.unlink(req.file.path).catch(() => {}).then(() => {
+			console.error('Settings official ID upload failed:', error);
+			return res.status(500).json({ message: 'Unable to update official ID document' });
+		}));
+};
+
 const deleteAccount = (req, res) => {
 	const { password } = req.body || {};
 	if (typeof password !== 'string' || !password) return res.status(400).json({ code: 'DELETE_PASSWORD_REQUIRED', message: 'Enter your password to confirm account deletion' });
@@ -207,7 +268,10 @@ const deleteAccount = (req, res) => {
 			user.password = crypto.randomBytes(48).toString('hex');
 
 			return user.save()
-				.then(() => ResidentProfile.deleteOne({ user: user._id }))
+				.then(() => Promise.all([
+					ResidentProfile.deleteOne({ user: user._id }).catch(() => null),
+					user.role === 'admin' ? OfficialProfile.deleteOne({ user: user._id }).catch(() => null) : Promise.resolve(),
+				]))
 				.then(() => avatarPath ? fs.unlink(avatarPath).catch(() => {}) : undefined)
 				.then(() => sendAccountDeletionEmail(farewell).catch((error) => {
 					console.error('Account deletion farewell email failed:', error.message);
@@ -221,4 +285,4 @@ const deleteAccount = (req, res) => {
 		});
 };
 
-module.exports = { getAccount, updateAccount, updatePassword, updateNotifications, uploadAvatar, deleteAccount, formatAccount };
+module.exports = { getAccount, updateAccount, updatePassword, updateNotifications, uploadAvatar, uploadOfficialIdDocument, deleteAccount, formatAccount };
