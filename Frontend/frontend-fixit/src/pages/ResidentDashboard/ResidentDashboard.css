@@ -2,5 +2,6 @@
 @import "./DashboardHeader.css";
 @import "./DashboardStatsCta.css";
 @import "./DashboardPanels.css";
+@import "./DashboardEmptyStates.css";
 @import "./DashboardMapModal.css";
 @import "./DashboardResponsive.css";
