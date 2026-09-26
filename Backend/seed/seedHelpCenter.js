@@ -1,0 +1,666 @@
+const mongoose = require('mongoose');
+const HelpTopic = require('../models/HelpTopic');
+const HelpTopicStep = require('../models/HelpTopicStep');
+const HelpFaq = require('../models/HelpFaq');
+
+/**
+ * Seed data for Help Center topics.
+ *
+ * Designed to accurately reflect the real application workflows:
+ * - "report-an-issue": mirrors ReportWizard.jsx (Details -> Location -> Photos -> Review & Submit)
+ * - "use-the-map": mirrors InteractiveMap.jsx and UserLocationMapPage.jsx (5km radius, categories, pins, tracking)
+ * - "track-your-report": mirrors MyReports.jsx (status tabs: all, pending, in_progress, resolved, rejected)
+ * - "account-profile": mirrors profile settings & saved locations
+ *
+ * For topics that have interactive numbered steps, hasSteps is set to true,
+ * and corresponding HelpTopicStep documents are created.
+ * For topics that are explanatory policies or troubleshooting articles, hasSteps is false,
+ * and body / content arrays are populated.
+ */
+const topicsData = [
+	// SECTION 1: QUICK HELP OPTIONS
+	{
+		slug: 'report-an-issue',
+		section: 'quick_help',
+		order: 1,
+		title: 'Report an Issue',
+		description: 'Learn how to submit a new community issue.',
+		icon: 'fa-solid fa-file-circle-plus',
+		iconBg: '#fee2e2',
+		iconColor: '#ef4444',
+		readTime: null,
+		hasSteps: true,
+		body: null,
+		steps: [
+			{
+				order: 1,
+				title: 'Click "+ New Report"',
+				description: 'From your resident dashboard header or sidebar, click "+ New Report" to launch the 4-step wizard.',
+			},
+			{
+				order: 2,
+				title: 'Enter Issue Details',
+				description: 'Choose your issue category (e.g. Potholes, Streetlights, Water Leaks), describe the problem, and pick a severity level.',
+			},
+			{
+				order: 3,
+				title: 'Specify Location',
+				description: 'Use automatic device GPS, enter a street address to geocode, or adjust the marker pin directly on the interactive map.',
+			},
+			{
+				order: 4,
+				title: 'Attach Photos',
+				description: 'Upload up to 5 clear photos (JPEG/PNG under 5MB each) so municipal resolvers can assess the damage visually.',
+			},
+			{
+				order: 5,
+				title: 'Review & Submit',
+				description: 'Check your report summary for accuracy, review nearby reports to avoid duplicates, and submit for resolution dispatch.',
+			},
+		],
+	},
+	{
+		slug: 'use-the-map',
+		section: 'quick_help',
+		order: 2,
+		title: 'Use the Map',
+		description: 'Find and explore issues near you.',
+		icon: 'fa-solid fa-location-dot',
+		iconBg: '#dbeafe',
+		iconColor: '#2563eb',
+		readTime: null,
+		hasSteps: true,
+		body: null,
+		steps: [
+			{
+				order: 1,
+				title: 'Open Nearby Issues or Community Map',
+				description: 'Click "Nearby Issues" in your sidebar or "Community Map" in the main navigation to open the map view.',
+			},
+			{
+				order: 2,
+				title: 'Center on Your Location',
+				description: 'Allow browser geolocation to automatically center on reports within a 5 km radius, or search by neighborhood/zone.',
+			},
+			{
+				order: 3,
+				title: 'Filter by Category & Status',
+				description: 'Use the quick filter chips (Road/Pothole, Water, Streetlight, Drainage) and status toggles to narrow down results.',
+			},
+			{
+				order: 4,
+				title: 'Click Markers for Details',
+				description: 'Click any map pin or nearby card to inspect photos, distance, reported date, and current resolver activity.',
+			},
+			{
+				order: 5,
+				title: 'Track and Upvote',
+				description: 'Click "Track" on an issue card to upvote it and receive notification updates as it progresses towards resolution.',
+			},
+		],
+	},
+	{
+		slug: 'track-your-report',
+		section: 'quick_help',
+		order: 3,
+		title: 'Track Your Report',
+		description: 'Check the status of your submitted issues.',
+		icon: 'fa-solid fa-circle-check',
+		iconBg: '#dcfce7',
+		iconColor: '#16a34a',
+		readTime: null,
+		hasSteps: true,
+		body: null,
+		steps: [
+			{
+				order: 1,
+				title: 'Navigate to "My Reports"',
+				description: 'Click "My Reports" on your dashboard sidebar to view your complete submission history.',
+			},
+			{
+				order: 2,
+				title: 'Filter by Status Tabs',
+				description: 'Switch between status tabs: All, Pending (submitted & awaiting triage), In Progress (crew assigned), Resolved (fixed), or Rejected.',
+			},
+			{
+				order: 3,
+				title: 'Search by Keyword',
+				description: 'Use the search input at the top of My Reports to quickly locate specific reports by category, address, or description.',
+			},
+			{
+				order: 4,
+				title: 'Inspect Detailed Timeline',
+				description: 'Click "View Details" on any report card to review the resolution progress, resolver notes, and before-and-after photos.',
+			},
+		],
+	},
+	{
+		slug: 'community-guidelines',
+		section: 'quick_help',
+		order: 4,
+		title: 'Community Guidelines',
+		description: 'Understand our rules and expectations.',
+		icon: 'fa-solid fa-users',
+		iconBg: '#f3e8ff',
+		iconColor: '#9333ea',
+		readTime: null,
+		hasSteps: false,
+		body: 'FixIt connects residents and municipal authorities to ensure faster, transparent civic improvements across our neighborhoods. To keep our platform constructive, respectful, and effective, please adhere to these core rules: report genuine civic issues, provide accurate locations, respect privacy in media, engage constructively, and upvote existing issues rather than filing duplicates.',
+		content: [
+			'FixIt connects residents and municipal authorities to ensure faster, transparent civic improvements across our neighborhoods.',
+			'To keep our platform constructive, respectful, and effective, please adhere to these core rules:',
+			'• Genuine Civic Issues: Only report legitimate public infrastructure damage, sanitation, water, electrical, and safety concerns.',
+			'• Accurate Information: Provide precise addresses or GPS pins and honest descriptions. Never file false or prank reports.',
+			'• Respectful Media: Ensure uploaded photos clearly show the problem without capturing private faces or confidential vehicle details without consent.',
+			'• Constructive Discourse: Harassment, abusive language, or spam in community comments and discussions will result in immediate account suspension.',
+			'• Duplicate Reporting: Check nearby issues on the map before reporting; upvoting an existing report accelerates its resolution more than filing a duplicate.',
+		],
+	},
+
+	// SECTION 2: BROWSE BY CATEGORY
+	{
+		slug: 'getting-started',
+		section: 'category',
+		order: 1,
+		title: 'Getting Started',
+		description: 'Learn the basics of using FixIt.',
+		icon: 'fa-solid fa-rocket',
+		iconBg: '#f3e8ff',
+		iconColor: '#9333ea',
+		readTime: null,
+		hasSteps: true,
+		body: null,
+		steps: [
+			{
+				order: 1,
+				title: 'Create Your Resident Account',
+				description: 'Sign up with your name, email, phone number, and residential zone.',
+			},
+			{
+				order: 2,
+				title: 'Explore the Resident Dashboard',
+				description: 'Review your personal impact score, monthly resolved count, and active neighborhood alerts.',
+			},
+			{
+				order: 3,
+				title: 'Check Your Community Map',
+				description: 'Explore live issues reported in your immediate 5 km radius.',
+			},
+			{
+				order: 4,
+				title: 'Submit Your First Report',
+				description: 'Click "+ New Report" anytime you encounter civic issues needing municipal attention.',
+			},
+		],
+	},
+	{
+		slug: 'reporting-issues',
+		section: 'category',
+		order: 2,
+		title: 'Reporting Issues',
+		description: 'How to report and add media.',
+		icon: 'fa-solid fa-file-lines',
+		iconBg: '#fee2e2',
+		iconColor: '#ef4444',
+		readTime: null,
+		hasSteps: true,
+		body: null,
+		steps: [
+			{
+				order: 1,
+				title: 'Choose the Right Category',
+				description: 'Select from Potholes & Road Damage, Streetlight Outages, Garbage & Litter, Water Leaks, or Others.',
+			},
+			{
+				order: 2,
+				title: 'Describe the Problem Clearly',
+				description: 'Provide specific landmarks, size/extent of the hazard, and relevant danger factors.',
+			},
+			{
+				order: 3,
+				title: 'Capture High Quality Photos',
+				description: 'Upload up to 5 clear photos under 5MB each. Good lighting and wide angles help resolvers locate the issue quickly.',
+			},
+			{
+				order: 4,
+				title: 'Confirm Location Accuracy',
+				description: 'Check the map marker to ensure the pin corresponds exactly with where the issue is situated on the street.',
+			},
+		],
+	},
+	{
+		slug: 'map-location',
+		section: 'category',
+		order: 3,
+		title: 'Map & Location',
+		description: 'Using the map and nearby issues.',
+		icon: 'fa-solid fa-location-dot',
+		iconBg: '#dcfce7',
+		iconColor: '#16a34a',
+		readTime: null,
+		hasSteps: true,
+		body: null,
+		steps: [
+			{
+				order: 1,
+				title: 'Enable Geolocation Access',
+				description: 'Allow browser location permissions to center automatically on your neighborhood coordinates.',
+			},
+			{
+				order: 2,
+				title: 'Use Search & Filters',
+				description: 'Filter map markers by category, severity (High, Medium, Low), and status (Verified, In Progress, Resolved).',
+			},
+			{
+				order: 3,
+				title: 'Toggle Satellite View',
+				description: 'Switch between standard street view and satellite imagery to verify ground landmarks.',
+			},
+			{
+				order: 4,
+				title: 'Track Nearby Issues',
+				description: 'Click "Track" on nearby cards to add them to your watchlist and support prioritization.',
+			},
+		],
+	},
+	{
+		slug: 'account-profile',
+		section: 'category',
+		order: 4,
+		title: 'Account & Profile',
+		description: 'Manage your account and settings.',
+		icon: 'fa-solid fa-user',
+		iconBg: '#dbeafe',
+		iconColor: '#2563eb',
+		readTime: null,
+		hasSteps: true,
+		body: null,
+		steps: [
+			{
+				order: 1,
+				title: 'Access Account Settings',
+				description: 'Click your avatar at the bottom of the sidebar or top right header and choose "Account settings".',
+			},
+			{
+				order: 2,
+				title: 'Update Personal Information',
+				description: 'Keep your full name, email address, and phone number up to date for SMS or email resolution alerts.',
+			},
+			{
+				order: 3,
+				title: 'Set Default Saved Location',
+				description: 'Configure your primary residential zone/ward so your dashboard always highlights your home area.',
+			},
+			{
+				order: 4,
+				title: 'Security & Sign Out',
+				description: 'Manage your password credentials or sign out securely on shared devices.',
+			},
+		],
+	},
+	{
+		slug: 'issue-status-updates',
+		section: 'category',
+		order: 5,
+		title: 'Issue Status & Updates',
+		description: 'Track progress and notifications.',
+		icon: 'fa-solid fa-clock',
+		iconBg: '#fef3c7',
+		iconColor: '#d97706',
+		readTime: null,
+		hasSteps: true,
+		body: null,
+		steps: [
+			{
+				order: 1,
+				title: 'Pending / New',
+				description: 'Your report has been successfully submitted and logged in the municipal queue awaiting initial triage.',
+			},
+			{
+				order: 2,
+				title: 'Verified',
+				description: 'The local zonal supervisor has reviewed the photos, location, and verified the authenticity of the issue.',
+			},
+			{
+				order: 3,
+				title: 'In Progress',
+				description: 'A municipal maintenance crew or contractor has been assigned with work actively underway on site.',
+			},
+			{
+				order: 4,
+				title: 'Resolved',
+				description: 'The repair work has been completed and verified with photographic proof attached to the report timeline.',
+			},
+			{
+				order: 5,
+				title: 'Rejected / Duplicate',
+				description: 'If a report is outside jurisdiction, invalid, or duplicate, a notification note explains the rationale.',
+			},
+		],
+	},
+	{
+		slug: 'safety-community',
+		section: 'category',
+		order: 6,
+		title: 'Safety & Community',
+		description: 'Guidelines and reporting safety hazards.',
+		icon: 'fa-solid fa-shield-halved',
+		iconBg: '#f3e8ff',
+		iconColor: '#9333ea',
+		readTime: null,
+		hasSteps: false,
+		body: 'Safety is our highest priority across all communities and municipal zones. For immediate life threats (fallen live wires, major gas leaks), contact emergency dispatch (112) immediately. When taking photos of road damage, stay safely on sidewalks. Always mark critical hazards as "High" severity.',
+		content: [
+			'Safety is our utmost priority across all participating communities and municipal zones.',
+			'Important Safety Protocols:',
+			'• Immediate Life Threats: If you encounter fallen live electrical cables, active gas leaks, or collapsing structures, immediately contact emergency services (112 / 199) first before submitting a report.',
+			'• Safe Photo Capture: Never endanger yourself or others while photographing road damage or dangerous intersections. Take photos from a safe sidewalk or roadside.',
+			'• High Severity Flagging: Always select "High" severity for hazards that pose direct danger to pedestrians or vehicles so municipal dispatch teams are alerted instantly.',
+			'• Community Collaboration: Comment respectfully on community discussions to share updates or detours with fellow residents.',
+		],
+	},
+	{
+		slug: 'troubleshooting',
+		section: 'category',
+		order: 7,
+		title: 'Troubleshooting',
+		description: 'Fix common issues and errors.',
+		icon: 'fa-solid fa-wrench',
+		iconBg: '#ffedd5',
+		iconColor: '#ea580c',
+		readTime: null,
+		hasSteps: false,
+		body: 'Common troubleshooting steps for FixIt: Allow location access in browser settings or search manual addresses. Keep images under 5MB each. If you encounter authentication alerts, sign out and sign back in to refresh your token.',
+		content: [
+			'Having technical difficulties? Here are quick solutions for common questions:',
+			'• GPS / Location Not Detected: Ensure location permissions are allowed in your browser settings (look for the lock/settings icon in your address bar). You can also type your address manually in the search field.',
+			'• Photos Not Uploading: Check that your images are under 5MB each and formatted as JPEG, PNG, or WebP. Verify that your device has an active internet connection.',
+			'• Session Expired / 401 Error: If you see an authentication alert, click your profile menu, sign out, and log back in to refresh your secure token.',
+			'• Map Not Rendering: Ensure WebGL is enabled in your browser and disable ad-blockers that might block tile servers (OpenStreetMap/Leaflet).',
+			'• Still Stuck?: Reach out directly to our support desk via email at ibukunoludapo2022@gmail.com or call 09134640553.',
+		],
+	},
+	{
+		slug: 'other',
+		section: 'category',
+		order: 8,
+		title: 'Other',
+		description: 'More help and resources.',
+		icon: 'fa-solid fa-ellipsis',
+		iconBg: '#f1f5f9',
+		iconColor: '#64748b',
+		readTime: null,
+		hasSteps: false,
+		body: 'Additional FixIt resources: Municipal resolvers can apply for coordinator credentials. Users can request data exports or account deletion. For suggestions, contact ibukunoludapo2022@gmail.com.',
+		content: [
+			'Looking for additional resources or municipal partnership information?',
+			'• Municipal & Resolver Inquiries: If you are a municipal staff member or community ward leader seeking resolver portal access, contact our administrative desk.',
+			'• Data Privacy & GDPR: You can request an export of your personal reports or account data deletion at any time.',
+			'• Feature Requests & Feedback: We are continuously improving FixIt. If you have suggestions for new features, send them to our support email at ibukunoludapo2022@gmail.com.',
+			'• Emergency Contacts: For urgent police, fire, or medical emergencies, please dial your official local emergency numbers directly.',
+		],
+	},
+
+	// SECTION 3: QUICK GUIDES
+	{
+		slug: 'how-to-report-an-issue',
+		section: 'guide',
+		order: 1,
+		title: 'How to Report an Issue',
+		description: 'Step-by-step walkthrough to report community problems with photos and location.',
+		readTime: '2 min read',
+		icon: 'fa-solid fa-file-lines',
+		iconBg: '#f1f5f9',
+		iconColor: '#64748b',
+		hasSteps: true,
+		body: null,
+		steps: [
+			{
+				order: 1,
+				title: 'Open the Report Wizard',
+				description: 'Click "+ New Report" in the dashboard header or on the quick action button.',
+			},
+			{
+				order: 2,
+				title: 'Select Issue Category & Severity',
+				description: 'Choose from 5 primary categories and rate the severity (Low, Medium, High).',
+			},
+			{
+				order: 3,
+				title: 'Pinpoint Location on Map',
+				description: 'Use device GPS, type the street address, or reposition the map pin directly over the problem.',
+			},
+			{
+				order: 4,
+				title: 'Upload Clear Photos',
+				description: 'Add up to 5 photos showing the full context and close-up damage.',
+			},
+			{
+				order: 5,
+				title: 'Submit & Track',
+				description: 'Review summary and click Submit. Your issue will immediately receive a tracking ticket in My Reports.',
+			},
+		],
+	},
+	{
+		slug: 'using-the-community-map',
+		section: 'guide',
+		order: 2,
+		title: 'Using the Community Map',
+		description: 'Learn how to discover, filter, and track nearby neighborhood issues.',
+		readTime: '3 min read',
+		icon: 'fa-solid fa-file-lines',
+		iconBg: '#f1f5f9',
+		iconColor: '#64748b',
+		hasSteps: true,
+		body: null,
+		steps: [
+			{
+				order: 1,
+				title: 'Explore Your Neighborhood',
+				description: 'Navigate to "Nearby Issues" to view reports within 5 km of your location.',
+			},
+			{
+				order: 2,
+				title: 'Filter by Problem Type',
+				description: 'Use category pills (Roads, Water, Streetlights, Drainage) to see what impacts your daily route.',
+			},
+			{
+				order: 3,
+				title: 'Inspect Markers and Photos',
+				description: 'Click pins on the map to view submitted images, timestamps, and resolver status.',
+			},
+			{
+				order: 4,
+				title: 'Upvote & Track',
+				description: 'Track issues to stay informed with real-time push and email notifications as repairs take place.',
+			},
+		],
+	},
+	{
+		slug: 'understanding-issue-status',
+		section: 'guide',
+		order: 3,
+		title: 'Understanding Issue Status',
+		description: 'A breakdown of each lifecycle stage from New to Resolved.',
+		readTime: '2 min read',
+		icon: 'fa-solid fa-file-lines',
+		iconBg: '#f1f5f9',
+		iconColor: '#64748b',
+		hasSteps: true,
+		body: null,
+		steps: [
+			{
+				order: 1,
+				title: 'Pending Review',
+				description: 'Issue has been received and queued for review by the municipal zonal coordinator.',
+			},
+			{
+				order: 2,
+				title: 'Verified',
+				description: 'Site details have been validated and assigned to the relevant public works department.',
+			},
+			{
+				order: 3,
+				title: 'In Progress',
+				description: 'Crews are deployed and active repair work or maintenance is ongoing.',
+			},
+			{
+				order: 4,
+				title: 'Resolved',
+				description: 'The problem is officially fixed, confirmed by photographic before-and-after evidence.',
+			},
+		],
+	},
+	{
+		slug: 'setting-up-your-profile',
+		section: 'guide',
+		order: 4,
+		title: 'Setting Up Your Profile',
+		description: 'Configure your residential zone and notification preferences.',
+		readTime: '2 min read',
+		icon: 'fa-solid fa-file-lines',
+		iconBg: '#f1f5f9',
+		iconColor: '#64748b',
+		hasSteps: true,
+		body: null,
+		steps: [
+			{
+				order: 1,
+				title: 'Open Settings',
+				description: 'Click your profile avatar on the sidebar to access Account Settings.',
+			},
+			{
+				order: 2,
+				title: 'Configure Your Residential Zone',
+				description: 'Set your neighborhood zone/ward to receive localized civic alerts.',
+			},
+			{
+				order: 3,
+				title: 'Save Default Coordinates',
+				description: 'Save your primary home address for instant 1-click nearby map positioning.',
+			},
+			{
+				order: 4,
+				title: 'Notification Preferences',
+				description: 'Customize SMS or email notifications for updates on your reported and tracked issues.',
+			},
+		],
+	},
+];
+
+const faqsData = [
+	{
+		order: 1,
+		question: 'How do I report a problem on FixIt?',
+		answer: 'Click the "+ New Report" button located in the dashboard header or sidebar. The wizard will walk you through 4 simple steps: choosing an issue category, entering a description, specifying the location via GPS or address search, uploading up to 5 photos, and reviewing before submitting.',
+	},
+	{
+		order: 2,
+		question: 'Can I add photos or videos to my report?',
+		answer: 'Yes! In Step 3 of the reporting wizard, you can upload up to 5 high-resolution photos (up to 5MB each, JPEG or PNG). High-clarity photos significantly accelerate municipal verification and dispatch. Video upload support is currently in development and will be available soon.',
+	},
+	{
+		order: 3,
+		question: 'How do I check the status of my reported issue?',
+		answer: 'Navigate to "My Reports" from your dashboard sidebar. You will see a breakdown of all your reports organized by status tabs: All, Pending, In Progress, Resolved, and Rejected. Click "View Details" on any report to see the live timeline, assigned resolver team, and resolution notes.',
+	},
+	{
+		order: 4,
+		question: 'What do the different severity levels mean?',
+		answer: 'Low: Minor non-urgent issues that do not disrupt traffic or pose immediate danger (e.g. minor paint fading, small litter). Medium: Moderate problems that require routine maintenance (e.g. potholes, non-functional streetlights). High: Urgent hazards posing immediate danger to life or property (e.g. fallen power lines, major main water bursts, severe road collapses).',
+	},
+	{
+		order: 5,
+		question: 'How do I change my location or update my profile?',
+		answer: 'Click on your avatar at the bottom of the sidebar or top header, then select "Account settings". Here you can update your contact information, residential zone/ward, and save your default community location to customize your Nearby Issues feed.',
+	},
+	{
+		order: 6,
+		question: 'Who resolves the issues reported on FixIt?',
+		answer: 'Reports are automatically routed to verified municipal departments, public utility agencies, and local zonal resolvers assigned to your district.',
+	},
+	{
+		order: 7,
+		question: 'Can I upvote or track issues reported by other residents?',
+		answer: 'Yes! Open "Nearby Issues" or "Community Map" to view reports around you and click the "Track" button to upvote and increase its community priority score.',
+	},
+	{
+		order: 8,
+		question: 'Is my personal information kept private when I report?',
+		answer: 'Yes. Your contact phone number and exact personal account details are never publicly visible on community boards. Only your report description, location, and photos are displayed.',
+	},
+];
+
+/**
+ * Seed function executing via .then() / .catch() promise chains.
+ *
+ * First deletes existing HelpTopic, HelpTopicStep, and HelpFaq documents to ensure
+ * idempotency, then inserts all topics, creates step records for topics with hasSteps: true,
+ * and populates the FAQ documents.
+ */
+const seedHelpCenter = () => {
+	console.log('Seeding Help Center content...');
+
+	return HelpTopicStep.deleteMany({})
+		.then(() => HelpTopic.deleteMany({}))
+		.then(() => HelpFaq.deleteMany({}))
+		.then(() => {
+			// Insert all topics without steps first
+			const topicsToInsert = topicsData.map((t) => ({
+				slug: t.slug,
+				section: t.section,
+				order: t.order,
+				title: t.title,
+				description: t.description,
+				icon: t.icon,
+				iconBg: t.iconBg,
+				iconColor: t.iconColor,
+				readTime: t.readTime,
+				hasSteps: t.hasSteps,
+				body: t.body,
+				content: t.content || [],
+			}));
+
+			return HelpTopic.insertMany(topicsToInsert);
+		})
+		.then((insertedTopics) => {
+			// Build step records linked by topicId and topicSlug
+			const topicMap = new Map();
+			insertedTopics.forEach((t) => topicMap.set(t.slug, t._id));
+
+			const stepsToInsert = [];
+			topicsData.forEach((t) => {
+				if (t.hasSteps && Array.isArray(t.steps)) {
+					const topicId = topicMap.get(t.slug);
+					if (topicId) {
+						t.steps.forEach((s) => {
+							stepsToInsert.push({
+								topicId,
+								topicSlug: t.slug,
+								order: s.order,
+								title: s.title,
+								description: s.description,
+							});
+						});
+					}
+				}
+			});
+
+			return HelpTopicStep.insertMany(stepsToInsert);
+		})
+		.then(() => {
+			// Insert FAQs
+			return HelpFaq.insertMany(faqsData);
+		})
+		.then(() => {
+			console.log('Help Center content seeded successfully.');
+			return { success: true };
+		})
+		.catch((err) => {
+			console.error('Error seeding Help Center content:', err);
+			throw err;
+		});
+};
+
+module.exports = { seedHelpCenter, topicsData, faqsData };

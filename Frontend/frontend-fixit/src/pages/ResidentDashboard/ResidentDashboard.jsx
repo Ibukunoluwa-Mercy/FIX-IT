@@ -110,7 +110,14 @@ const ResidentDashboard = () => {
     localStorage.removeItem('fixitUser');
     navigate('/login');
   };
-  const goToNav = (label) => { setActiveNav(label); if (label === 'My Reports') navigate('/reports'); if (label === 'Nearby Issues') navigate('/map'); };
+
+  const goToNav = (label) => { 
+    setActiveNav(label); 
+    if (label === 'Dashboard') navigate('/dashboard');
+    if (label === 'My Reports') navigate('/reports'); 
+    if (label === 'Nearby Issues') navigate('/map'); 
+    if (label === 'Help Center') navigate('/help-center');
+  };
 
   return (
     <div className={`resident-dashboard ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>

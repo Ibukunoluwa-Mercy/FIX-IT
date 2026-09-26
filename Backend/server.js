@@ -16,6 +16,11 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const geocodeRoutes = require('./routes/geocodeRoutes');
 const userRoutes = require('./routes/userRoutes');
 const issuesRoutes = require('./routes/issuesRoutes');
+const settingsRoutes = require('./routes/settingsRoutes');
+const helpRoutes = require('./routes/helpRoutes');
+const supportRoutes = require('./routes/supportRoutes');
+const HelpTopic = require('./models/HelpTopic');
+const { seedHelpCenter } = require('./seed/seedHelpCenter');
 
 const app = express();
 const port = process.env.PORT || 5100;
@@ -28,6 +33,10 @@ const allowedOrigins = [...new Set([
 	...configuredOrigins,
 	'http://localhost:5173',
 	'http://127.0.0.1:5173',
+	'http://localhost:5174',
+	'http://127.0.0.1:5174',
+	'http://localhost:5175',
+	'http://127.0.0.1:5175',
 ])];
 
 fs.mkdirSync(uploadDirectory, { recursive: true });
@@ -55,13 +64,30 @@ app.use('/api/geocode', geocodeRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/issues', issuesRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/help', helpRoutes);
+app.use('/api/support', supportRoutes);
 
 const startServer = async () => {
 	const server = app.listen(port, () => console.log(`Server running on port ${port}`));
 	// Start accepting requests before database retries finish so local clients get
 	// a useful API response instead of a browser-level network error.
 	const connected = await connectDB();
-	if (!connected) console.error('Database unavailable. API started, but database-backed requests will return an error until MongoDB reconnects.');
+	if (!connected) {
+		console.error('Database unavailable. API started, but database-backed requests will return an error until MongoDB reconnects.');
+	} else {
+		// Verify and seed help content if empty
+		HelpTopic.countDocuments()
+			.then((count) => {
+				if (count === 0) {
+					console.log('No help topics found. Initializing seed data...');
+					return seedHelpCenter();
+				}
+			})
+			.catch((err) => {
+				console.error('Help topic initialization check deferred:', err.message);
+			});
+	}
 	const shutdown = async () => {
 		server.close();
 		if (mongoose.connection.readyState !== 0) await mongoose.connection.close();

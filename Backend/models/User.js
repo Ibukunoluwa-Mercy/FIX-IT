@@ -22,9 +22,15 @@ const userSchema = new mongoose.Schema(
 		password: { type: String, required: true, minlength: 8, select: false },
 		role: { type: String, enum: ['resident', 'admin', 'Community Member', 'Issue Resolver', 'Administrator'], default: 'resident', required: true },
 		location: { type: String, trim: true, default: '' },
+		notificationPreferences: {
+			issueUpdates: { type: Boolean, default: true },
+			communityMessages: { type: Boolean, default: true },
+			promotionsNews: { type: Boolean, default: false },
+		},
 		lastKnownLocation: {
 			latitude: { type: Number, min: -90, max: 90 },
 			longitude: { type: Number, min: -180, max: 180 },
+			address: { type: String, trim: true, default: '' },
 			accuracy: { type: Number, min: 0 },
 			capturedAt: { type: Date },
 		},

@@ -12,13 +12,14 @@ import ResetPassword from './pages/ResetPassword/ResetPassword'
 import ResidentDashboard from './pages/ResidentDashboard/ResidentDashboard'
 import MyReports from './pages/MyReports/MyReports'
 import UserLocationMapPage from './pages/UserLocationMapPage/UserLocationMapPage'
+import HelpCenter from './pages/HelpCenter/HelpCenter'
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Auth-only routes that should render without the Navbar/Footer shell
 const AUTH_ROUTES = ['/register', '/login', '/forgot-password', '/reset-password'];
-const DASHBOARD_ROUTES = ['/dashboard', '/reports', '/my-reports'];
+const DASHBOARD_ROUTES = ['/dashboard', '/reports', '/my-reports', '/help-center'];
 const LOCATION_ROUTES = ['/map'];
 
 function AppShell() {
@@ -44,6 +45,7 @@ function AppShell() {
         <Route path="/dashboard" element={<ResidentDashboard />} />
         <Route path="/my-reports" element={<MyReports />} />
         <Route path="/reports" element={<MyReports />} />
+        <Route path="/help-center" element={<HelpCenter />} />
       </Routes>
     );
   }

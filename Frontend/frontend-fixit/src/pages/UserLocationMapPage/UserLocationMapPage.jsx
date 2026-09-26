@@ -26,17 +26,40 @@ const formatDistance = (meters) => meters < 1000 ? `${Math.round(meters)} m away
 const formatDate = (value) => value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(value)) : 'Recently reported';
 const normalizeStatus = (status) => status === 'New' ? 'Pending' : status || 'Pending';
 
-const ResidentSidebar = ({ navigate }) => (
-  <aside className="nearby-sidebar">
-    <div className="nearby-brand-row"><Link to="/dashboard" className="nearby-brand"><img src={logoWhite} alt="FixIt" /><span>Fix<span>It</span></span></Link></div>
+const ResidentSidebar = ({ navigate, isCollapsed, onToggle, userName, showProfileMenu, onToggleProfileMenu, onSignOut }) => (
+  <aside className={`nearby-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+    <div className="nearby-brand-row">
+      <Link to="/dashboard" className="nearby-brand"><img src={logoWhite} alt="FixIt" /><span>Fix<span>It</span></span></Link>
+      <button className="nearby-sidebar-toggle" type="button" onClick={onToggle} aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+        <i className={`fa-solid ${isCollapsed ? 'fa-bars' : 'fa-xmark'}`} />
+      </button>
+    </div>
     <nav aria-label="Resident dashboard navigation" className="nearby-nav">
       {[['Dashboard', 'fa-grip', '/dashboard'], ['My Reports', 'fa-file-lines', '/reports'], ['Nearby Issues', 'fa-location-dot', '/map'], ['Notifications', 'fa-bell'], ['Messages', 'fa-message'], ['Saved Locations', 'fa-bookmark']].map(([label, icon, path]) => (
         <button key={label} className={`nearby-nav-link ${label === 'Nearby Issues' ? 'active' : ''}`} onClick={() => path && navigate(path)}><i className={`fa-solid ${icon}`} /><span>{label}</span></button>
       ))}
       <div className="nearby-nav-divider" />
-      {['Help Center', 'Settings'].map((label) => <button key={label} className="nearby-nav-link"><i className={`fa-solid ${label === 'Settings' ? 'fa-gear' : 'fa-circle-question'}`} /><span>{label}</span></button>)}
+      {[['Help Center', 'fa-circle-question', '/help-center'], ['Settings', 'fa-gear', null]].map(([label, icon, path]) => (
+        <button key={label} className="nearby-nav-link" onClick={() => path && navigate(path)}><i className={`fa-solid ${icon}`} /><span>{label}</span></button>
+      ))}
     </nav>
-    <div className="nearby-sidebar-user"><span className="nearby-avatar">R</span><span><strong>Resident</strong><small>Community member</small></span><i className="fa-solid fa-ellipsis" /></div>
+    <div className="nearby-profile-wrap">
+      {showProfileMenu && (
+        <div className="nearby-profile-menu" role="menu">
+          <button type="button" role="menuitem" onClick={() => { navigate('/dashboard'); onToggleProfileMenu(); }}>
+            <i className="fa-solid fa-gear" /> Account settings
+          </button>
+          <button type="button" role="menuitem" onClick={onSignOut}>
+            <i className="fa-solid fa-arrow-right-from-bracket" /> Sign out
+          </button>
+        </div>
+      )}
+      <button className="nearby-sidebar-user" type="button" onClick={onToggleProfileMenu} title={userName} aria-haspopup="menu" aria-expanded={showProfileMenu}>
+        <span className="nearby-avatar">{userName.charAt(0).toUpperCase()}</span>
+        <span className="nearby-sidebar-user-copy"><strong>{userName}</strong><small>Resident</small></span>
+        <i className="fa-solid fa-chevron-down" />
+      </button>
+    </div>
   </aside>
 );
 
@@ -53,7 +76,19 @@ const NearbyIssueCard = ({ issue }) => (
 
 const UserLocationMapPage = () => {
   const navigate = useNavigate();
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const user = useMemo(() => {
+    try { return JSON.parse(localStorage.getItem('fixitUser') || '{}'); } catch { return {}; }
+  }, []);
+  const userName = user.name || user.fullName || 'Resident';
   const token = localStorage.getItem('fixitToken') || localStorage.getItem('token') || '';
+  const signOut = () => {
+    localStorage.removeItem('fixitToken');
+    localStorage.removeItem('token');
+    localStorage.removeItem('fixitUser');
+    navigate('/login');
+  };
   const [location, setLocation] = useState(null);
   const [locationLoading, setLocationLoading] = useState(true);
   const [locationMessage, setLocationMessage] = useState('');
@@ -72,7 +107,7 @@ const UserLocationMapPage = () => {
       const response = await axios.get(`${API_URL}/api/users/me/location`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
       const saved = response.data?.location;
       if (saved?.latitude != null && saved?.longitude != null) {
-        setLocation({ latitude: Number(saved.latitude), longitude: Number(saved.longitude), accuracy: saved.accuracy || 100 });
+        setLocation({ latitude: Number(saved.latitude), longitude: Number(saved.longitude), accuracy: saved.accuracy || 100, source: 'profile' });
         setLocationMessage('Using your saved location.');
         return true;
       }
@@ -88,7 +123,7 @@ const UserLocationMapPage = () => {
       return;
     }
     navigator.geolocation.getCurrentPosition((position) => {
-      setLocation({ latitude: position.coords.latitude, longitude: position.coords.longitude, accuracy: position.coords.accuracy });
+      setLocation({ latitude: position.coords.latitude, longitude: position.coords.longitude, accuracy: position.coords.accuracy, source: 'geolocation' });
       setLocationMessage('Using your current location.');
       setLocationLoading(false);
     }, async () => {
@@ -103,12 +138,30 @@ const UserLocationMapPage = () => {
     if (!location) return undefined;
     let active = true;
     setIssuesLoading(true); setIssuesError('');
-    axios.get(`${API_URL}/api/reports/nearby`, { params: { lat: location.latitude, lng: location.longitude, radius: RADIUS_METERS } }).then((response) => {
+    const params = { radiusKm: RADIUS_METERS / 1000 };
+    if (location.source !== 'profile') {
+      params.lat = location.latitude;
+      params.lng = location.longitude;
+    }
+    axios.get(`${API_URL}/api/issues/nearby`, {
+      params,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }).then((response) => {
       if (!active) return;
-      setIssues((response.data || []).map((issue) => ({ ...issue, id: issue.id?.toString(), status: normalizeStatus(issue.status), severity: issue.severity || 'Medium', distance: distanceInMeters(location, { latitude: issue.lat, longitude: issue.lng }) })));
+      setIssues((response.data?.issues || []).map((issue) => ({
+        ...issue,
+        id: issue.id?.toString(),
+        status: normalizeStatus(issue.status),
+        severity: issue.severity || 'Medium',
+        lat: issue.location.lat,
+        lng: issue.location.lng,
+        areaName: issue.location.areaName,
+        distance: Number(issue.distanceKm || 0) * 1000,
+        thumbnailUrl: issue.imageUrl,
+      })));
     }).catch(() => { if (active) setIssuesError('Unable to load nearby issues. Please try again.'); }).finally(() => { if (active) setIssuesLoading(false); });
     return () => { active = false; };
-  }, [location]);
+  }, [location, token]);
 
   const filteredIssues = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -129,7 +182,7 @@ const UserLocationMapPage = () => {
   const mapIssues = filteredIssues.map((issue) => ({ ...issue, lat: Number(issue.lat), lng: Number(issue.lng) }));
   const center = location ? [location.latitude, location.longitude] : DEFAULT_CENTER;
 
-  return <div className="nearby-page"><ResidentSidebar navigate={navigate} /><main className="nearby-main"><header className="nearby-header"><div className="nearby-mobile-brand"><img src={logoWhite} alt="FixIt" /><strong>Fix<span>It</span></strong></div><div className="nearby-header-actions"><button className="nearby-header-icon" aria-label="Notifications"><i className="fa-regular fa-bell" /></button><span className="nearby-header-avatar">R</span></div></header><div className="nearby-content">
+  return <div className={`nearby-page ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}><ResidentSidebar navigate={navigate} isCollapsed={isSidebarCollapsed} onToggle={() => setIsSidebarCollapsed((value) => !value)} userName={userName} showProfileMenu={showProfileMenu} onToggleProfileMenu={() => setShowProfileMenu((value) => !value)} onSignOut={signOut} /><main className="nearby-main"><header className="nearby-header"><div className="nearby-mobile-brand"><img src={logoWhite} alt="FixIt" /><strong>Fix<span>It</span></strong></div><div className="nearby-header-actions"><button className="nearby-header-icon" aria-label="Notifications"><i className="fa-regular fa-bell" /></button><span className="nearby-header-avatar">{userName.charAt(0).toUpperCase()}</span></div></header><div className="nearby-content">
     <section className="nearby-page-intro"><div><p className="nearby-eyebrow">RESIDENT DASHBOARD</p><h1>Nearby Issues</h1><p>Explore issues around and update your nearest Zone/Ward. Click on a marker to view details and track progress.</p></div><div className="nearby-search"><i className="fa-solid fa-magnifying-glass" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search nearby issues..." aria-label="Search nearby issues" /></div></section>
     <div className="nearby-chips">{categoryChips.map(([label, value]) => <button key={label} className={activeChip === value ? 'active' : ''} onClick={() => setActiveChip(value)}>{label}</button>)}</div>
     {locationMessage && <div className="nearby-location-notice"><i className="fa-solid fa-location-dot" /><span>{locationMessage}</span><button onClick={resolveLocation}>Try again</button></div>}

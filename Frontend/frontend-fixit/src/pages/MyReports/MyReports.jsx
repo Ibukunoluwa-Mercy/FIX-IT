@@ -125,6 +125,7 @@ const MyReports = () => {
                     if (label === 'Dashboard') navigate('/dashboard');
                     if (label === 'My Reports') navigate('/reports');
                     if (label === 'Nearby Issues') navigate('/map');
+                    if (label === 'Help Center') navigate('/help-center');
                   }} 
                   title={label}
                 >

@@ -47,7 +47,7 @@ const Footer = () => {
           <Col lg={2} md={6} className="footer-col">
             <h5 className="footer-heading">Support</h5>
             <ul className="footer-links-list">
-              <li><a href="#">Help Center</a></li>
+              <li><a href="/help-center">Help Center</a></li>
               <li><a href="#">Contact Support</a></li>
               <li><a href="#">Privacy Policy</a></li>
               <li><a href="#">Terms of Service</a></li>

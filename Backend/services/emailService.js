@@ -78,4 +78,38 @@ const sendPasswordResetEmail = async ({ email, fullName, resetUrl }) => {
 	return { sent: true, skipped: false };
 };
 
-module.exports = { sendVerificationEmail, sendWelcomeEmail, sendLoginEmail, sendPasswordResetEmail };
+const sendSupportTicketEmail = async ({ name, email, subject, message, ticketId }) => {
+	const transporter = createTransporter();
+	const supportTargetEmail = process.env.SUPPORT_EMAIL || 'ibukunoludapo2022@gmail.com';
+	if (!transporter) return { sent: false, skipped: true };
+
+	const safeName = escapeHtml(name);
+	const safeSubject = escapeHtml(subject || 'New Support Inquiry');
+	const safeMessage = escapeHtml(message).replace(/\n/g, '<br/>');
+
+	await transporter.sendMail({
+		from: process.env.MAIL_FROM || process.env.SMTP_USER,
+		to: supportTargetEmail,
+		replyTo: email,
+		subject: `[Support Ticket #${ticketId || 'NEW'}] ${safeSubject}`,
+		text: `New support message from ${name} (${email}):\n\nSubject: ${subject}\n\nMessage:\n${message}`,
+		html: `
+			<h3>New Support Request Received</h3>
+			<p><strong>From:</strong> ${safeName} (&lt;${escapeHtml(email)}&gt;)</p>
+			<p><strong>Subject:</strong> ${safeSubject}</p>
+			<p><strong>Ticket ID:</strong> ${ticketId || 'N/A'}</p>
+			<hr />
+			<p><strong>Message:</strong></p>
+			<p>${safeMessage}</p>
+		`,
+	});
+	return { sent: true, skipped: false };
+};
+
+module.exports = {
+	sendVerificationEmail,
+	sendWelcomeEmail,
+	sendLoginEmail,
+	sendPasswordResetEmail,
+	sendSupportTicketEmail,
+};
