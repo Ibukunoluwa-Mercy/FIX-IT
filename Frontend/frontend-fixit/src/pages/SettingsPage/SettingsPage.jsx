@@ -12,47 +12,13 @@ import '../ResidentDashboard/ResidentDashboard.css';
 import './SettingsPage.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
-const navGroups = [
-  [
-    { label: 'Dashboard', iconClass: 'fa-solid fa-grip', path: '/dashboard' },
-    { label: 'My Reports', iconClass: 'fa-solid fa-file-lines', path: '/reports' },
-    { label: 'Nearby Issues', iconClass: 'fa-solid fa-location-dot', path: '/map' },
-    { label: 'Notifications', iconClass: 'fa-solid fa-bell' },
-    { label: 'Messages', iconClass: 'fa-solid fa-message' },
-    { label: 'Saved Locations', iconClass: 'fa-solid fa-bookmark' },
-  ],
-  [
-    { label: 'Help Center', iconClass: 'fa-solid fa-circle-question', path: '/help-center' },
-    { label: 'Settings', iconClass: 'fa-solid fa-gear', path: '/settings' },
-  ],
-];
-const settingsSections = [
-  ['Account', 'fa-regular fa-user'],
-  ['Notifications', 'fa-regular fa-bell'],
-  ['Privacy & Security', 'fa-solid fa-shield-halved'],
-  ['Appearance', 'fa-solid fa-palette'],
-  ['Location', 'fa-solid fa-location-dot'],
-  ['Help & Support', 'fa-regular fa-circle-question'],
-];
-const emptyAccount = {
-  fullName: '', email: '', phone: '', location: '', avatarUrl: '', emailVerified: false,
-  notifications: { issueUpdates: true, communityMessages: true, promotionsNews: false },
-};
-const normalizeSettingsAccount = (data) => ({
-  ...emptyAccount,
-  ...data,
-  emailVerified: data.isVerified ?? data.emailVerified ?? false,
-  notifications: {
-    ...emptyAccount.notifications,
-    ...(data.notifications || {}),
-    ...(data.notificationPrefs ? {
-      issueUpdates: data.notificationPrefs.issueUpdates,
-      communityMessages: data.notificationPrefs.communityMessages,
-      promotionsNews: data.notificationPrefs.promotions ?? data.notificationPrefs.promotionsNews,
-    } : {}),
-  },
-});
-const getErrorMessage = (error, fallback) => error.response?.data?.message || error.response?.data?.error || fallback;
+import {
+  navGroups,
+  settingsSections,
+  emptyAccount,
+  normalizeSettingsAccount,
+  getErrorMessage,
+} from './settingsConstants';
 
 const SettingsPage = () => {
   const navigate = useNavigate();
