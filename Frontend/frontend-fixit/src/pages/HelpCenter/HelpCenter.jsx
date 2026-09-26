@@ -108,7 +108,6 @@ const HelpCenter = () => {
         navGroups={navGroups}
         onNavClick={handleNavClick}
         userName={userName}
-        firstName={firstName}
         showProfileMenu={showProfileMenu}
         onToggleProfileMenu={() => setShowProfileMenu((prev) => !prev)}
         onSignOut={handleSignOut}

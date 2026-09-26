@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import ResidentAvatar from '../../components/ResidentAvatar';
 import logoWhite from '../../assets/fixit-white-logo.png';
 import './MyReports.css';
 
@@ -37,7 +38,6 @@ const MyReports = () => {
     try { return JSON.parse(localStorage.getItem('fixitUser') || '{}'); } catch { return {}; }
   }, []);
   const userName = user.name || user.fullName || 'Resident';
-  const firstName = userName.split(' ')[0];
 
   const [reports, setReports] = useState([]);
   const [counts, setCounts] = useState({ all: 0, pending: 0, in_progress: 0, resolved: 0, rejected: 0 });
@@ -150,7 +150,7 @@ const MyReports = () => {
             </div>
           )}
           <button className="resident-profile" onClick={() => setShowProfileMenu((value) => !value)}>
-            <span className="avatar avatar-photo">{firstName.charAt(0)}</span>
+            <ResidentAvatar className="avatar avatar-photo" name={userName} />
             <span className="profile-copy"><strong>{userName}</strong><small>Resident</small></span>
             <i className="fa-solid fa-chevron-down" style={{ fontSize: 12 }}></i>
           </button>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import ResidentAvatar from '../../../components/ResidentAvatar';
 import logoWhite from '../../../assets/fixit-white-logo.png';
 
 const HelpCenterSidebar = ({
@@ -8,7 +9,6 @@ const HelpCenterSidebar = ({
   navGroups,
   onNavClick,
   userName,
-  firstName,
   showProfileMenu,
   onToggleProfileMenu,
   onSignOut,
@@ -76,7 +76,7 @@ const HelpCenterSidebar = ({
           aria-haspopup="true"
           aria-expanded={showProfileMenu}
         >
-          <span className="help-avatar-circle">{firstName.charAt(0).toUpperCase()}</span>
+          <ResidentAvatar className="help-avatar-circle" name={userName} />
           <span className="help-profile-copy">
             <strong>{userName}</strong>
             <small>Resident</small>

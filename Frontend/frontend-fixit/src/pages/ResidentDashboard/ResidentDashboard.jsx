@@ -6,6 +6,7 @@ import DashboardLocationPreview from './components/DashboardLocationPreview';
 import DashboardStatsGrid from './components/DashboardStatsGrid';
 import DashboardRecentReports from './components/DashboardRecentReports';
 import DashboardRecentUpdates from './components/DashboardRecentUpdates';
+import ResidentAvatar from '../../components/ResidentAvatar';
 import logoWhite from '../../assets/fixit-white-logo.png';
 import './ResidentDashboard.css';
 
@@ -47,7 +48,6 @@ const ResidentDashboard = () => {
   const token = localStorage.getItem('fixitToken');
   const userInfo = dashboard.userInfo.name ? dashboard.userInfo : user;
   const userName = userInfo.name || userInfo.fullName || 'Resident';
-  const firstName = userName.split(' ')[0];
   const greeting = localStorage.getItem('fixitDashboardGreeting') === 'welcome' ? 'Welcome' : 'Welcome back';
 
   const loadDashboard = useCallback(async () => {
@@ -124,7 +124,7 @@ const ResidentDashboard = () => {
             </div>
           )}
           <button className="resident-profile" onClick={() => setShowProfileMenu((value) => !value)}>
-            <span className="avatar avatar-photo">{firstName.charAt(0)}</span>
+            <ResidentAvatar className="avatar avatar-photo" name={userName} />
             <span className="profile-copy"><strong>{userName}</strong><small>Resident</small></span>
             <i className="fa-solid fa-chevron-down" style={{ fontSize: 12 }}></i>
           </button>
@@ -162,7 +162,7 @@ const ResidentDashboard = () => {
               )}
             </div>
             <button className="icon-button header-icon profile-icon" onClick={() => setShowProfileMenu((value) => !value)} aria-label="Open profile">
-              <i className="fa-solid fa-circle-user" style={{ fontSize: 20 }}></i>
+              <ResidentAvatar className="avatar avatar-photo" name={userName} />
             </button>
           </div>
         </header>

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import InteractiveMap from '../../components/map/InteractiveMap';
+import ResidentAvatar from '../../components/ResidentAvatar';
 import logoWhite from '../../assets/fixit-white-logo.png';
 import './UserLocationMapPage.css';
 
@@ -47,7 +48,7 @@ const ResidentSidebar = ({ navigate, isCollapsed, onToggle, userName, showProfil
         </div>
       )}
       <button className="nearby-sidebar-user" type="button" onClick={onToggleProfileMenu} title={userName} aria-haspopup="menu" aria-expanded={showProfileMenu}>
-        <span className="nearby-avatar">{userName.charAt(0).toUpperCase()}</span>
+        <ResidentAvatar className="nearby-avatar" name={userName} />
         <span className="nearby-sidebar-user-copy"><strong>{userName}</strong><small>Resident</small></span>
         <i className="fa-solid fa-chevron-down" />
       </button>
@@ -174,7 +175,7 @@ const UserLocationMapPage = () => {
   const mapIssues = filteredIssues.map((issue) => ({ ...issue, lat: Number(issue.lat), lng: Number(issue.lng) }));
   const center = location ? [location.latitude, location.longitude] : DEFAULT_CENTER;
 
-  return <div className={`nearby-page ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}><ResidentSidebar navigate={navigate} isCollapsed={isSidebarCollapsed} onToggle={() => setIsSidebarCollapsed((value) => !value)} userName={userName} showProfileMenu={showProfileMenu} onToggleProfileMenu={() => setShowProfileMenu((value) => !value)} onSignOut={signOut} /><main className="nearby-main"><header className="nearby-header"><div className="nearby-mobile-brand"><img src={logoWhite} alt="FixIt" /><strong>Fix<span>It</span></strong></div><div className="nearby-header-actions"><button className="nearby-header-icon" aria-label="Notifications"><i className="fa-regular fa-bell" /></button><span className="nearby-header-avatar">{userName.charAt(0).toUpperCase()}</span></div></header><div className="nearby-content">
+  return <div className={`nearby-page ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}><ResidentSidebar navigate={navigate} isCollapsed={isSidebarCollapsed} onToggle={() => setIsSidebarCollapsed((value) => !value)} userName={userName} showProfileMenu={showProfileMenu} onToggleProfileMenu={() => setShowProfileMenu((value) => !value)} onSignOut={signOut} /><main className="nearby-main"><header className="nearby-header"><div className="nearby-mobile-brand"><img src={logoWhite} alt="FixIt" /><strong>Fix<span>It</span></strong></div><div className="nearby-header-actions"><button className="nearby-header-icon" aria-label="Notifications"><i className="fa-regular fa-bell" /></button><ResidentAvatar className="nearby-header-avatar" name={userName} /></div></header><div className="nearby-content">
     <section className="nearby-page-intro"><div><p className="nearby-eyebrow">RESIDENT DASHBOARD</p><h1>Nearby Issues</h1><p>Explore issues around and update your nearest Zone/Ward. Click on a marker to view details and track progress.</p></div><div className="nearby-search"><i className="fa-solid fa-magnifying-glass" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search nearby issues..." aria-label="Search nearby issues" /></div></section>
     <div className="nearby-chips">{categoryChips.map(([label, value]) => <button key={label} className={activeChip === value ? 'active' : ''} onClick={() => setActiveChip(value)}>{label}</button>)}</div>
     {locationMessage && <div className="nearby-location-notice"><i className="fa-solid fa-location-dot" /><span>{locationMessage}</span><button onClick={resolveLocation}>Try again</button></div>}

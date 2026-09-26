@@ -6,25 +6,7 @@ import LocationSearchControls from './LocationSearchControls';
 import LocationPermissionModal from './LocationPermissionModal';
 import './LocationPickerMap.css';
 
-const NEARBY_RADIUS = 150;
-const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('fixitToken') || localStorage.getItem('token') || '';
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
-
-const reverseGeocode = async (lat, lng) => {
-  try {
-    const res = await fetch(`${API_URL}/api/geocode/reverse?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}`, { headers: getAuthHeaders() });
-    if (!res.ok) throw new Error('Geocode failed');
-    const data = await res.json();
-    return data.address;
-  } catch (err) {
-    console.error('Reverse geocode error:', err);
-    return null;
-  }
-};
+import { NEARBY_RADIUS, API_URL, reverseGeocode } from './mapUtils';
 
 const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat, initialLng, initialAddress, initialAccuracy, initialSource }) => {
   const [query, setQuery] = useState(initialAddress || '');

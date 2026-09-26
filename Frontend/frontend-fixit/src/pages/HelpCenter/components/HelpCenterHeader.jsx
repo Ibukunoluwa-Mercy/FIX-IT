@@ -1,5 +1,6 @@
 import React from 'react';
 import logoWhite from '../../../assets/fixit-white-logo.png';
+import ResidentAvatar from '../../../components/ResidentAvatar';
 
 const HelpCenterHeader = ({
   onToggleSidebar,
@@ -55,13 +56,8 @@ const HelpCenterHeader = ({
         </div>
 
         {/* Avatar Button */}
-        <button
-          className="help-header-avatar"
-          type="button"
-          onClick={onToggleProfileMenu}
-          aria-label="Open profile settings"
-        >
-          {firstName.charAt(0).toUpperCase()}
+        <button type="button" onClick={onToggleProfileMenu} aria-label="Open profile settings" className="help-header-avatar-button">
+          <ResidentAvatar className="help-header-avatar" name={firstName} />
         </button>
       </div>
     </header>
