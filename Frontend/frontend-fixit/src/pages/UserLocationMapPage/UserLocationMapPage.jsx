@@ -14,14 +14,6 @@ const statusOptions = ['Verified', 'In Progress', 'Resolved', 'Pending'];
 const severityOptions = ['High', 'Medium', 'Low'];
 const initialFilters = { from: '', to: '', statuses: [], severities: [], categories: [], sort: 'Most Recent' };
 
-const distanceInMeters = (first, second) => {
-  if (!first || !second) return Infinity;
-  const earthRadius = 6371000;
-  const latDelta = (second.latitude - first.latitude) * Math.PI / 180;
-  const lngDelta = (second.longitude - first.longitude) * Math.PI / 180;
-  const a = Math.sin(latDelta / 2) ** 2 + Math.cos(first.latitude * Math.PI / 180) * Math.cos(second.latitude * Math.PI / 180) * Math.sin(lngDelta / 2) ** 2;
-  return earthRadius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-};
 const formatDistance = (meters) => meters < 1000 ? `${Math.round(meters)} m away` : `${(meters / 1000).toFixed(1)} km away`;
 const formatDate = (value) => value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(value)) : 'Recently reported';
 const normalizeStatus = (status) => status === 'New' ? 'Pending' : status || 'Pending';
@@ -39,14 +31,14 @@ const ResidentSidebar = ({ navigate, isCollapsed, onToggle, userName, showProfil
         <button key={label} className={`nearby-nav-link ${label === 'Nearby Issues' ? 'active' : ''}`} onClick={() => path && navigate(path)}><i className={`fa-solid ${icon}`} /><span>{label}</span></button>
       ))}
       <div className="nearby-nav-divider" />
-      {[['Help Center', 'fa-circle-question', '/help-center'], ['Settings', 'fa-gear', null]].map(([label, icon, path]) => (
+      {[['Help Center', 'fa-circle-question', '/help-center'], ['Settings', 'fa-gear', '/settings']].map(([label, icon, path]) => (
         <button key={label} className="nearby-nav-link" onClick={() => path && navigate(path)}><i className={`fa-solid ${icon}`} /><span>{label}</span></button>
       ))}
     </nav>
     <div className="nearby-profile-wrap">
       {showProfileMenu && (
         <div className="nearby-profile-menu" role="menu">
-          <button type="button" role="menuitem" onClick={() => { navigate('/dashboard'); onToggleProfileMenu(); }}>
+          <button type="button" role="menuitem" onClick={() => { navigate('/settings'); onToggleProfileMenu(); }}>
             <i className="fa-solid fa-gear" /> Account settings
           </button>
           <button type="button" role="menuitem" onClick={onSignOut}>

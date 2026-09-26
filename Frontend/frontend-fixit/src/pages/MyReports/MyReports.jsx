@@ -125,6 +125,7 @@ const MyReports = () => {
                     if (label === 'Dashboard') navigate('/dashboard');
                     if (label === 'My Reports') navigate('/reports');
                     if (label === 'Nearby Issues') navigate('/map');
+                                        if (label === 'Settings') navigate('/settings');
                     if (label === 'Help Center') navigate('/help-center');
                   }} 
                   title={label}
@@ -140,7 +141,7 @@ const MyReports = () => {
         <div className="resident-profile-wrap">
           {showProfileMenu && (
             <div className="profile-menu">
-              <button onClick={() => navigate('/dashboard')}>
+              <button onClick={() => navigate('/settings')}>
                 <i className="fa-solid fa-gear" style={{ fontSize: 14 }}></i> Account settings
               </button>
               <button onClick={logout}>

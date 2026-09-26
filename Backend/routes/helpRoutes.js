@@ -3,6 +3,7 @@ const {
 	getTopics,
 	getTopicBySlug,
 	getFaqs,
+	getAllFaqs,
 	searchHelp,
 } = require('../controllers/helpController');
 const { seedHelpCenter } = require('../seed/seedHelpCenter');
@@ -22,10 +23,7 @@ router.get('/topics', getTopics);
 router.get('/topics/:slug', getTopicBySlug);
 
 // 3. GET /api/help/faqs/all - Returns all FAQs without limit
-router.get('/faqs/all', (req, res, next) => {
-	req.query.all = 'true';
-	next();
-}, getFaqs);
+router.get('/faqs/all', getAllFaqs);
 
 // 4. GET /api/help/faqs - Returns default 5-item FAQ slice or limited via ?limit=
 router.get('/faqs', getFaqs);

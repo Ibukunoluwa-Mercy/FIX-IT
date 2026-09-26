@@ -16,7 +16,8 @@ const storage = multer.diskStorage({
 const fileFilter = (req, file, callback) => {
 	const extension = path.extname(file.originalname).toLowerCase();
 	const validType = (file.mimetype === 'image/jpeg' && ['.jpg', '.jpeg'].includes(extension))
-		|| (file.mimetype === 'image/png' && extension === '.png');
+		|| (file.mimetype === 'image/png' && extension === '.png')
+		|| (file.mimetype === 'image/webp' && extension === '.webp');
 	if (validType) return callback(null, true);
 	return callback(new multer.MulterError('LIMIT_UNEXPECTED_FILE', 'avatar'));
 };

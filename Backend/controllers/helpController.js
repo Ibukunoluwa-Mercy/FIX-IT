@@ -311,5 +311,6 @@ module.exports = {
 	getTopics,
 	getTopicBySlug,
 	getFaqs,
+	getAllFaqs,
 	searchHelp,
 };

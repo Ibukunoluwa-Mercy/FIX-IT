@@ -117,6 +117,7 @@ const ResidentDashboard = () => {
     if (label === 'My Reports') navigate('/reports'); 
     if (label === 'Nearby Issues') navigate('/map'); 
     if (label === 'Help Center') navigate('/help-center');
+    if (label === 'Settings') navigate('/settings');
   };
 
   return (
@@ -151,7 +152,7 @@ const ResidentDashboard = () => {
         <div className="resident-profile-wrap">
           {showProfileMenu && (
             <div className="profile-menu">
-              <button onClick={() => setActiveNav('Settings')}>
+              <button onClick={() => { setShowProfileMenu(false); navigate('/settings'); }}>
                 <i className="fa-solid fa-gear" style={{ fontSize: 14 }}></i> Account settings
               </button>
               <button onClick={logout}>

@@ -27,6 +27,11 @@ const userSchema = new mongoose.Schema(
 			communityMessages: { type: Boolean, default: true },
 			promotionsNews: { type: Boolean, default: false },
 		},
+		notificationPrefs: {
+			issueUpdates: { type: Boolean, default: true },
+			communityMessages: { type: Boolean, default: true },
+			promotions: { type: Boolean, default: false },
+		},
 		lastKnownLocation: {
 			latitude: { type: Number, min: -90, max: 90 },
 			longitude: { type: Number, min: -180, max: 180 },
@@ -36,6 +41,7 @@ const userSchema = new mongoose.Schema(
 		},
 		isActive: { type: Boolean, default: true },
 		emailVerified: { type: Boolean, default: false },
+		deletedAt: { type: Date, default: null },
 		emailVerificationTokenHash: { type: String, select: false },
 		emailVerificationExpires: { type: Date, select: false },
 		resetPasswordToken: { type: String, select: false },

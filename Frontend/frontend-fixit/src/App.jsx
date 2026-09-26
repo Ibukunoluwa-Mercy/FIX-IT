@@ -13,20 +13,22 @@ import ResidentDashboard from './pages/ResidentDashboard/ResidentDashboard'
 import MyReports from './pages/MyReports/MyReports'
 import UserLocationMapPage from './pages/UserLocationMapPage/UserLocationMapPage'
 import HelpCenter from './pages/HelpCenter/HelpCenter'
+import SettingsPage from './pages/SettingsPage/SettingsPage'
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Auth-only routes that should render without the Navbar/Footer shell
 const AUTH_ROUTES = ['/register', '/login', '/forgot-password', '/reset-password'];
-const DASHBOARD_ROUTES = ['/dashboard', '/reports', '/my-reports', '/help-center'];
+const DASHBOARD_ROUTES = ['/dashboard', '/reports', '/my-reports', '/help-center', '/settings'];
 const LOCATION_ROUTES = ['/map'];
 
 function AppShell() {
   const location = useLocation();
-  const isAuthPage = AUTH_ROUTES.includes(location.pathname);
-  const isDashboard = DASHBOARD_ROUTES.includes(location.pathname);
-  const isLocationPage = LOCATION_ROUTES.includes(location.pathname);
+  const pathname = location.pathname.replace(/\/+$/, '') || '/';
+  const isAuthPage = AUTH_ROUTES.includes(pathname);
+  const isDashboard = DASHBOARD_ROUTES.includes(pathname);
+  const isLocationPage = LOCATION_ROUTES.includes(pathname);
 
   if (isAuthPage) {
     return (
@@ -46,6 +48,7 @@ function AppShell() {
         <Route path="/my-reports" element={<MyReports />} />
         <Route path="/reports" element={<MyReports />} />
         <Route path="/help-center" element={<HelpCenter />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Routes>
     );
   }

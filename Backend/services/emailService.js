@@ -78,6 +78,21 @@ const sendPasswordResetEmail = async ({ email, fullName, resetUrl }) => {
 	return { sent: true, skipped: false };
 };
 
+const sendAccountDeletionEmail = async ({ email, fullName }) => {
+	const transporter = createTransporter();
+	if (!transporter) return { sent: false, skipped: true };
+	const safeName = escapeHtml(fullName);
+
+	await transporter.sendMail({
+		from: process.env.MAIL_FROM || process.env.SMTP_USER,
+		to: email,
+		subject: 'Your Fixit account has been deleted',
+		text: `Hi ${fullName}, your Fixit account has been deleted. Your community reports remain available without your profile information.`,
+		html: `<p>Hi ${safeName},</p><p>Your Fixit account has been deleted. Your community reports remain available without your profile information.</p><p>If you did not request this, contact Fixit support.</p>`,
+	});
+	return { sent: true, skipped: false };
+};
+
 const sendSupportTicketEmail = async ({ name, email, subject, message, ticketId }) => {
 	const transporter = createTransporter();
 	const supportTargetEmail = process.env.SUPPORT_EMAIL || 'ibukunoludapo2022@gmail.com';
@@ -111,5 +126,6 @@ module.exports = {
 	sendWelcomeEmail,
 	sendLoginEmail,
 	sendPasswordResetEmail,
+	sendAccountDeletionEmail,
 	sendSupportTicketEmail,
 };

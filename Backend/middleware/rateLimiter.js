@@ -24,7 +24,9 @@ const createRateLimiter = (options = {}) => {
 	}, 5 * 60 * 1000).unref();
 
 	return (req, res, next) => {
-		const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+		const ip = typeof options.keyGenerator === 'function'
+			? options.keyGenerator(req)
+			: req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
 		const now = Date.now();
 
 		let clientRecord = hits.get(ip);

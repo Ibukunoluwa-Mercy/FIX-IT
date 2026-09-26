@@ -1,18 +1,34 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Modal, Accordion } from 'react-bootstrap';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import logoWhite from '../../assets/fixit-white-logo.png';
-import helpCenterImg from '../../assets/help-center.png';
 import ReportWizard from '../ReportWizardPage/ReportWizard';
+
+// Modular Data & Subcomponents
 import {
-  quickHelpOptions,
-  categoriesList,
-  quickGuides,
-  faqsList,
-  contactInfo
+  quickHelpOptions as fallbackQuickHelp,
+  categoriesList as fallbackCategories,
+  quickGuides as fallbackGuides,
+  faqsList as fallbackFaqs,
+  contactInfo,
 } from './helpCenterData';
+
+import HelpCenterSidebar from './components/HelpCenterSidebar';
+import HelpCenterHeader from './components/HelpCenterHeader';
+import HelpBanner from './components/HelpBanner';
+import HelpSearchBar from './components/HelpSearchBar';
+import HelpSecondaryBanner from './components/HelpSecondaryBanner';
+import HelpQuickOptions from './components/HelpQuickOptions';
+import HelpCategories from './components/HelpCategories';
+import HelpQuickGuides from './components/HelpQuickGuides';
+import HelpFaqsAccordion from './components/HelpFaqsAccordion';
+import HelpFooterSupport from './components/HelpFooterSupport';
+import HelpStepModal from './components/HelpStepModal';
+import ContactSupportModal from './components/ContactSupportModal';
+
 import './HelpCenter.css';
+
+const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
 
 const navGroups = [
   [
@@ -32,29 +48,31 @@ const navGroups = [
 const HelpCenter = () => {
   const navigate = useNavigate();
 
-  // Dashboard layout states
+  // Layout & UI states
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showReportWizard, setShowReportWizard] = useState(false);
 
-  // Search state
+  // Content states from Backend API (with graceful fallback)
+  const [topics, setTopics] = useState([]);
+  const [faqs, setFaqs] = useState(fallbackFaqs);
+  const [showAllFaqs, setShowAllFaqs] = useState(false);
+
+  // Search states
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
 
-  // Step modal state
+  // Modal walkthrough & contact states
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [showStepModal, setShowStepModal] = useState(false);
+  const [loadingTopicDetail, setLoadingTopicDetail] = useState(false);
 
-  // Contact support modal state
   const [showContactModal, setShowContactModal] = useState(false);
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
   const [sendingMessage, setSendingMessage] = useState(false);
 
-  // FAQ state: show 5 or all
-  const [showAllFaqs, setShowAllFaqs] = useState(false);
-
-  // Current user info
+  // Current resident info
   const user = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem('fixitUser') || '{}');
@@ -65,7 +83,43 @@ const HelpCenter = () => {
   const userName = user.name || user.fullName || 'Resident';
   const firstName = userName.split(' ')[0];
 
-  // Debounce search query by 300ms
+  // Fetch topics and FAQs on component mount
+  useEffect(() => {
+    let active = true;
+
+    axios.get(`${API_URL}/api/help/topics`)
+      .then((res) => {
+        if (active && Array.isArray(res.data) && res.data.length > 0) {
+          setTopics(res.data);
+        }
+      })
+      .catch(() => {});
+
+    axios.get(`${API_URL}/api/help/faqs`)
+      .then((res) => {
+        if (active && Array.isArray(res.data) && res.data.length > 0) {
+          setFaqs(res.data);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Fetch all FAQs when toggle clicked
+  useEffect(() => {
+    if (showAllFaqs) {
+      axios.get(`${API_URL}/api/help/faqs/all`)
+        .then((res) => {
+          if (Array.isArray(res.data)) setFaqs(res.data);
+        })
+        .catch(() => {});
+    }
+  }, [showAllFaqs]);
+
+  // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(searchQuery.trim().toLowerCase());
@@ -73,15 +127,64 @@ const HelpCenter = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Sign out handler
-  const handleSignOut = () => {
-    localStorage.removeItem('fixitToken');
-    localStorage.removeItem('token');
-    localStorage.removeItem('fixitUser');
-    navigate('/login');
-  };
+  // Topic sections derived from API or fallback
+  const allQuickHelp = useMemo(() => {
+    const fromApi = topics.filter((t) => t.section === 'quick_help');
+    return fromApi.length > 0 ? fromApi : fallbackQuickHelp;
+  }, [topics]);
 
-  // Nav click handler
+  const allCategories = useMemo(() => {
+    const fromApi = topics.filter((t) => t.section === 'category');
+    return fromApi.length > 0 ? fromApi : fallbackCategories;
+  }, [topics]);
+
+  const allGuides = useMemo(() => {
+    const fromApi = topics.filter((t) => t.section === 'guide');
+    return fromApi.length > 0 ? fromApi : fallbackGuides;
+  }, [topics]);
+
+  // Filtered lists based on search
+  const filteredQuickHelp = useMemo(() => {
+    if (!debouncedQuery) return allQuickHelp;
+    return allQuickHelp.filter((item) =>
+      item.title.toLowerCase().includes(debouncedQuery) ||
+      (item.description && item.description.toLowerCase().includes(debouncedQuery)) ||
+      (item.steps && item.steps.some((s) => s.title?.toLowerCase().includes(debouncedQuery) || s.description?.toLowerCase().includes(debouncedQuery)))
+    );
+  }, [allQuickHelp, debouncedQuery]);
+
+  const filteredCategories = useMemo(() => {
+    if (!debouncedQuery) return allCategories;
+    return allCategories.filter((item) =>
+      item.title.toLowerCase().includes(debouncedQuery) ||
+      (item.description && item.description.toLowerCase().includes(debouncedQuery)) ||
+      (item.steps && item.steps.some((s) => s.title?.toLowerCase().includes(debouncedQuery) || s.description?.toLowerCase().includes(debouncedQuery))) ||
+      (item.content && item.content.some((c) => c.toLowerCase().includes(debouncedQuery))) ||
+      (item.body && item.body.toLowerCase().includes(debouncedQuery))
+    );
+  }, [allCategories, debouncedQuery]);
+
+  const filteredGuides = useMemo(() => {
+    if (!debouncedQuery) return allGuides;
+    return allGuides.filter((item) =>
+      item.title.toLowerCase().includes(debouncedQuery) ||
+      (item.readTime && item.readTime.toLowerCase().includes(debouncedQuery)) ||
+      (item.steps && item.steps.some((s) => s.title?.toLowerCase().includes(debouncedQuery) || s.description?.toLowerCase().includes(debouncedQuery)))
+    );
+  }, [allGuides, debouncedQuery]);
+
+  const displayedFaqs = useMemo(() => {
+    let list = faqs && faqs.length > 0 ? faqs : fallbackFaqs;
+    if (debouncedQuery) {
+      list = list.filter((faq) =>
+        faq.question.toLowerCase().includes(debouncedQuery) ||
+        faq.answer.toLowerCase().includes(debouncedQuery)
+      );
+    }
+    return showAllFaqs || debouncedQuery ? list : list.slice(0, 5);
+  }, [faqs, debouncedQuery, showAllFaqs]);
+
+  // Navigation click
   const handleNavClick = (item) => {
     if (item.path) {
       navigate(item.path);
@@ -94,19 +197,31 @@ const HelpCenter = () => {
     }
   };
 
-  // Open step modal
+  // Sign out
+  const handleSignOut = () => {
+    localStorage.removeItem('fixitToken');
+    localStorage.removeItem('token');
+    localStorage.removeItem('fixitUser');
+    navigate('/login');
+  };
+
+  // Open step modal with live API lookup
   const handleOpenTopic = (topic) => {
     setSelectedTopic(topic);
     setShowStepModal(true);
+
+    if (topic.slug) {
+      setLoadingTopicDetail(true);
+      axios.get(`${API_URL}/api/help/topics/${topic.slug}`)
+        .then((res) => {
+          if (res.data) setSelectedTopic(res.data);
+        })
+        .catch(() => {})
+        .finally(() => setLoadingTopicDetail(false));
+    }
   };
 
-  // Close step modal
-  const handleCloseStepModal = () => {
-    setShowStepModal(false);
-    setSelectedTopic(null);
-  };
-
-  // Handle Contact Form Submit
+  // Contact support submission
   const handleContactSubmit = (e) => {
     e.preventDefault();
     if (!contactForm.message.trim()) {
@@ -114,647 +229,133 @@ const HelpCenter = () => {
       return;
     }
     setSendingMessage(true);
-    setTimeout(() => {
-      setSendingMessage(false);
-      setShowContactModal(false);
-      setContactForm({ name: '', email: '', message: '' });
-      toast.success('Thank you! Our support team has received your message and will respond shortly.');
-    }, 700);
+
+    const payload = {
+      name: contactForm.name.trim() || userName,
+      email: contactForm.email.trim() || user.email || 'resident@fixit.app',
+      subject: 'Help Center Inquiry',
+      message: contactForm.message.trim(),
+      userId: user._id || user.id || null,
+    };
+
+    axios.post(`${API_URL}/api/support/contact`, payload)
+      .then((res) => {
+        setSendingMessage(false);
+        setShowContactModal(false);
+        setContactForm({ name: '', email: '', message: '' });
+        toast.success(res.data?.message || 'Thank you! Our support team has received your message and will respond shortly.');
+      })
+      .catch((err) => {
+        setSendingMessage(false);
+        toast.error(err.response?.data?.error || 'Unable to submit your support message. Please try again.');
+      });
   };
-
-  // Filter items based on debounced search
-  const filteredQuickHelp = useMemo(() => {
-    if (!debouncedQuery) return quickHelpOptions;
-    return quickHelpOptions.filter((item) =>
-      item.title.toLowerCase().includes(debouncedQuery) ||
-      item.description.toLowerCase().includes(debouncedQuery) ||
-      (item.steps && item.steps.some((s) => s.title.toLowerCase().includes(debouncedQuery) || s.description.toLowerCase().includes(debouncedQuery)))
-    );
-  }, [debouncedQuery]);
-
-  const filteredCategories = useMemo(() => {
-    if (!debouncedQuery) return categoriesList;
-    return categoriesList.filter((item) =>
-      item.title.toLowerCase().includes(debouncedQuery) ||
-      item.description.toLowerCase().includes(debouncedQuery) ||
-      (item.steps && item.steps.some((s) => s.title.toLowerCase().includes(debouncedQuery) || s.description.toLowerCase().includes(debouncedQuery))) ||
-      (item.content && item.content.some((c) => c.toLowerCase().includes(debouncedQuery)))
-    );
-  }, [debouncedQuery]);
-
-  const filteredGuides = useMemo(() => {
-    if (!debouncedQuery) return quickGuides;
-    return quickGuides.filter((item) =>
-      item.title.toLowerCase().includes(debouncedQuery) ||
-      (item.steps && item.steps.some((s) => s.title.toLowerCase().includes(debouncedQuery) || s.description.toLowerCase().includes(debouncedQuery)))
-    );
-  }, [debouncedQuery]);
-
-  const displayedFaqs = useMemo(() => {
-    let list = faqsList;
-    if (debouncedQuery) {
-      list = list.filter((faq) =>
-        faq.question.toLowerCase().includes(debouncedQuery) ||
-        faq.answer.toLowerCase().includes(debouncedQuery)
-      );
-    }
-    return showAllFaqs || debouncedQuery ? list : list.slice(0, 5);
-  }, [debouncedQuery, showAllFaqs]);
-
-  const hasSearchFilter = Boolean(debouncedQuery);
 
   return (
     <div className={`help-center-page ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
-      {/* Sidebar */}
-      <aside className="help-sidebar" aria-label="Dashboard navigation">
-        <div className="help-brand-row">
-          <Link to="/dashboard" className="help-brand" aria-label="FixIt dashboard">
-            <img src={logoWhite} alt="FixIt" className="help-brand-img" />
-            <span>
-              Fix<span style={{ color: '#f59e0b' }}>It</span>
-            </span>
-          </Link>
-          <button
-            className="help-sidebar-toggle"
-            type="button"
-            onClick={() => setIsSidebarCollapsed((prev) => !prev)}
-            aria-label="Toggle sidebar"
-          >
-            <i className={`fa-solid ${isSidebarCollapsed ? 'fa-bars' : 'fa-xmark'}`}></i>
-          </button>
-        </div>
+      {/* 1. Sidebar Navigation */}
+      <HelpCenterSidebar
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
+        navGroups={navGroups}
+        onNavClick={handleNavClick}
+        userName={userName}
+        firstName={firstName}
+        showProfileMenu={showProfileMenu}
+        onToggleProfileMenu={() => setShowProfileMenu((prev) => !prev)}
+        onSignOut={handleSignOut}
+        onSettingsClick={() => {
+          setShowProfileMenu(false);
+          navigate('/dashboard');
+        }}
+      />
 
-        <nav className="help-nav" aria-label="Sidebar main navigation">
-          {navGroups.map((group, groupIndex) => (
-            <div className={`help-nav-group ${groupIndex ? 'help-nav-group-secondary' : ''}`} key={groupIndex}>
-              {group.map((item) => (
-                <button
-                  key={item.label}
-                  className={`help-nav-link ${item.active ? 'active' : ''}`}
-                  onClick={() => handleNavClick(item)}
-                  title={item.label}
-                >
-                  <i className={item.iconClass} style={{ fontSize: 16 }}></i>
-                  <span>{item.label}</span>
-                  {Boolean(item.badge && item.badge > 0) && (
-                    <span className="help-nav-badge">{item.badge}</span>
-                  )}
-                </button>
-              ))}
-            </div>
-          ))}
-        </nav>
-
-        {/* Profile Card / Dropdown */}
-        <div className="help-profile-wrap">
-          {showProfileMenu && (
-            <div className="help-profile-menu" role="menu">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowProfileMenu(false);
-                  navigate('/dashboard');
-                }}
-              >
-                <i className="fa-solid fa-gear"></i> Account settings
-              </button>
-              <button type="button" onClick={handleSignOut}>
-                <i className="fa-solid fa-arrow-right-from-bracket"></i> Sign out
-              </button>
-            </div>
-          )}
-          <button
-            className="help-profile-btn"
-            type="button"
-            onClick={() => setShowProfileMenu((prev) => !prev)}
-            aria-haspopup="true"
-            aria-expanded={showProfileMenu}
-          >
-            <span className="help-avatar-circle">{firstName.charAt(0).toUpperCase()}</span>
-            <span className="help-profile-copy">
-              <strong>{userName}</strong>
-              <small>Resident</small>
-            </span>
-            <i className="fa-solid fa-chevron-down" style={{ fontSize: 12, marginLeft: 'auto' }}></i>
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Container */}
+      {/* 2. Main Page Layout */}
       <main className="help-main">
-        {/* Top Header */}
-        <header className="help-header">
-          <div className="help-mobile-brand">
-            <button
-              className="help-sidebar-toggle d-md-none"
-              type="button"
-              onClick={() => setIsSidebarCollapsed((prev) => !prev)}
-              aria-label="Open navigation menu"
-            >
-              <i className="fa-solid fa-bars"></i>
-            </button>
-            <img src={logoWhite} alt="FixIt" style={{ height: '24px' }} />
-            <span style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a' }}>
-              Fi<span style={{ color: '#f59e0b' }}>xIt</span>
-            </span>
-          </div>
+        <HelpCenterHeader
+          onToggleSidebar={() => setIsSidebarCollapsed((prev) => !prev)}
+          onOpenReportWizard={() => setShowReportWizard(true)}
+          showNotifications={showNotifications}
+          onToggleNotifications={() => setShowNotifications((prev) => !prev)}
+          onToggleProfileMenu={() => setShowProfileMenu((prev) => !prev)}
+          firstName={firstName}
+        />
 
-          <div className="help-header-actions">
-            <button
-              className="help-btn-new-report"
-              type="button"
-              onClick={() => setShowReportWizard(true)}
-            >
-              <i className="fa-solid fa-plus"></i> New Report
-            </button>
-
-            {/* Notification Popover */}
-            <div style={{ position: 'relative' }}>
-              <button
-                className="help-header-icon-btn"
-                type="button"
-                onClick={() => setShowNotifications((prev) => !prev)}
-                aria-label="Notifications"
-              >
-                <i className="fa-regular fa-bell" style={{ fontSize: 18 }}></i>
-                <span className="help-notification-dot"></span>
-              </button>
-              {showNotifications && (
-                <div className="help-notification-popover" role="dialog">
-                  <strong>Notifications</strong>
-                  <p>No new notifications at this time.</p>
-                </div>
-              )}
-            </div>
-
-            {/* Avatar Button */}
-            <button
-              className="help-header-avatar"
-              type="button"
-              onClick={() => setShowProfileMenu((prev) => !prev)}
-              aria-label="Open profile settings"
-            >
-              {firstName.charAt(0).toUpperCase()}
-            </button>
-          </div>
-        </header>
-
-        {/* Content Body */}
         <div className="help-content-container">
-          {/* 1. Header Banner */}
-          <section className="help-banner-card" aria-label="Help Center banner">
-            <div className="help-banner-inner">
-              <div className="help-banner-left">
-                <div className="help-banner-icon-badge" aria-hidden="true">
-                  <i className="fa-solid fa-headset"></i>
-                </div>
-                <div className="help-banner-text">
-                  <h1>Help Center</h1>
-                  <p>Find answers to common questions, get support, and learn how to make a bigger impact in your community.</p>
-                </div>
-              </div>
-              <div className="help-banner-illustration-wrap" aria-hidden="true">
-                <img
-                  src={helpCenterImg}
-                  alt="Customer Support Representative"
-                  className="help-banner-illustration"
-                />
-              </div>
-            </div>
-          </section>
+          {/* Top Banner */}
+          <HelpBanner />
 
-          {/* 2. Search Bar */}
-          <div className="help-search-wrapper">
-            <div className="help-search-bar">
-              <i className="fa-solid fa-magnifying-glass help-search-icon" aria-hidden="true"></i>
-              <input
-                type="text"
-                className="help-search-input"
-                placeholder="Search for help articles, FAQs, or topics..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                aria-label="Search help center"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  className="help-search-clear-btn"
-                  onClick={() => setSearchQuery('')}
-                  aria-label="Clear search query"
-                >
-                  <i className="fa-solid fa-xmark"></i>
-                </button>
-              )}
-              <button
-                type="button"
-                className="help-search-btn"
-                onClick={() => setDebouncedQuery(searchQuery.trim().toLowerCase())}
-              >
-                Search
-              </button>
-            </div>
+          {/* Search Bar */}
+          <HelpSearchBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            onClearSearch={() => setSearchQuery('')}
+            onSearchSubmit={() => setDebouncedQuery(searchQuery.trim().toLowerCase())}
+            hasSearchFilter={Boolean(debouncedQuery)}
+          />
 
-            {hasSearchFilter && (
-              <div className="help-search-status">
-                <span>
-                  Showing search results for &ldquo;<strong>{searchQuery}</strong>&rdquo;
-                </span>
-                <button type="button" onClick={() => setSearchQuery('')}>
-                  Clear Search
-                </button>
-              </div>
-            )}
-          </div>
+          {/* Secondary Banner */}
+          <HelpSecondaryBanner
+            onContactClick={() => setShowContactModal(true)}
+          />
 
-          {/* Secondary Banner Strip */}
-          <div className="help-secondary-banner">
-            <div className="help-secondary-left">
-              <div className="help-secondary-icon-badge" aria-hidden="true">
-                <i className="fa-solid fa-lightbulb"></i>
-              </div>
-              <div className="help-secondary-text">
-                <strong>Need more help?</strong>
-                <span>Our support team is here to assist you.</span>
-              </div>
-            </div>
-            <button
-              className="help-btn-contact-orange"
-              type="button"
-              onClick={() => setShowContactModal(true)}
-            >
-              <i className="fa-solid fa-envelope"></i> Contact Support <i className="fa-solid fa-arrow-right"></i>
-            </button>
-          </div>
+          {/* Quick Help Options */}
+          <HelpQuickOptions
+            items={filteredQuickHelp}
+            onSelectTopic={handleOpenTopic}
+          />
 
-          {/* 3. Quick Help Options */}
-          <section className="help-card-section" aria-label="Quick Help Options">
-            <div className="help-section-header">
-              <h2>Quick Help Options</h2>
-              <p>Get started with the most common tasks and resources.</p>
-            </div>
-            <div className="help-rows-list">
-              {filteredQuickHelp.length === 0 ? (
-                <p className="text-muted small py-2 mb-0">No quick help options match your search.</p>
-              ) : (
-                filteredQuickHelp.map((item) => (
-                  <div
-                    key={item.id}
-                    className="help-item-row"
-                    onClick={() => handleOpenTopic(item)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => e.key === 'Enter' && handleOpenTopic(item)}
-                    aria-label={`Open walkthrough for ${item.title}`}
-                  >
-                    <div className="help-row-left">
-                      <div
-                        className="help-row-icon-box"
-                        style={{ backgroundColor: item.iconBg, color: item.iconColor }}
-                        aria-hidden="true"
-                      >
-                        <i className={item.icon}></i>
-                      </div>
-                      <div className="help-row-text">
-                        <h3 className="help-row-title">{item.title}</h3>
-                        <p className="help-row-desc">{item.description}</p>
-                      </div>
-                    </div>
-                    <i className="fa-solid fa-chevron-right help-row-arrow" aria-hidden="true"></i>
-                  </div>
-                ))
-              )}
-            </div>
-          </section>
+          {/* Browse by Category */}
+          <HelpCategories
+            categories={filteredCategories}
+            onSelectTopic={handleOpenTopic}
+          />
 
-          {/* 4. Browse by Category */}
-          <section className="help-card-section" aria-label="Browse by Category">
-            <div className="help-section-header">
-              <h2>Browse by Category</h2>
-              <p>Quickly find help articles related to your needs.</p>
-            </div>
-            <div className="help-rows-list">
-              {filteredCategories.length === 0 ? (
-                <p className="text-muted small py-2 mb-0">No categories match your search.</p>
-              ) : (
-                filteredCategories.map((item) => (
-                  <div
-                    key={item.id}
-                    className="help-item-row"
-                    onClick={() => handleOpenTopic(item)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => e.key === 'Enter' && handleOpenTopic(item)}
-                    aria-label={`Open topic ${item.title}`}
-                  >
-                    <div className="help-row-left">
-                      <div
-                        className="help-row-icon-box"
-                        style={{ backgroundColor: item.iconBg, color: item.iconColor }}
-                        aria-hidden="true"
-                      >
-                        <i className={item.icon}></i>
-                      </div>
-                      <div className="help-row-text">
-                        <h3 className="help-row-title">{item.title}</h3>
-                        <p className="help-row-desc">{item.description}</p>
-                      </div>
-                    </div>
-                    <i className="fa-solid fa-chevron-right help-row-arrow" aria-hidden="true"></i>
-                  </div>
-                ))
-              )}
-            </div>
-          </section>
+          {/* Quick Guides */}
+          <HelpQuickGuides
+            guides={filteredGuides}
+            onSelectTopic={handleOpenTopic}
+          />
 
-          {/* 5. Quick Guides */}
-          <section className="help-card-section" aria-label="Quick Guides">
-            <div className="help-section-header">
-              <h2>Quick Guides</h2>
-              <p>Step-by-step guides to help you get started.</p>
-            </div>
-            <div className="help-rows-list">
-              {filteredGuides.length === 0 ? (
-                <p className="text-muted small py-2 mb-0">No guides match your search.</p>
-              ) : (
-                filteredGuides.map((guide) => (
-                  <div
-                    key={guide.id}
-                    className="help-item-row"
-                    onClick={() => handleOpenTopic(guide)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => e.key === 'Enter' && handleOpenTopic(guide)}
-                    aria-label={`Open guide ${guide.title}`}
-                  >
-                    <div className="help-row-left">
-                      <div className="help-guide-icon-box" aria-hidden="true">
-                        <i className={guide.icon}></i>
-                      </div>
-                      <div className="help-row-text">
-                        <h3 className="help-row-title">{guide.title}</h3>
-                        <p className="help-row-desc">{guide.readTime}</p>
-                      </div>
-                    </div>
-                    <i className="fa-solid fa-chevron-right help-row-arrow" aria-hidden="true"></i>
-                  </div>
-                ))
-              )}
-            </div>
-          </section>
+          {/* Frequently Asked Questions */}
+          <HelpFaqsAccordion
+            faqs={displayedFaqs}
+            showAllFaqs={showAllFaqs}
+            onToggleShowAll={() => setShowAllFaqs((prev) => !prev)}
+          />
 
-          {/* 6. Frequently Asked Questions */}
-          <section className="help-card-section" aria-label="Frequently Asked Questions">
-            <div className="help-section-header-row">
-              <div>
-                <h2>Frequently Asked Questions</h2>
-                <p>Find quick answers to the most common questions.</p>
-              </div>
-              <button
-                type="button"
-                className="help-view-all-link"
-                onClick={() => setShowAllFaqs((prev) => !prev)}
-              >
-                {showAllFaqs ? 'Show less FAQs' : 'View all FAQs'}
-                <i className="fa-solid fa-arrow-right"></i>
-              </button>
-            </div>
-
-            <Accordion className="help-accordion" defaultActiveKey={null}>
-              {displayedFaqs.length === 0 ? (
-                <p className="text-muted small py-2 mb-0">No questions found matching your query.</p>
-              ) : (
-                displayedFaqs.map((faq, index) => (
-                  <Accordion.Item eventKey={String(index)} key={faq.id}>
-                    <Accordion.Header>{faq.question}</Accordion.Header>
-                    <Accordion.Body>{faq.answer}</Accordion.Body>
-                  </Accordion.Item>
-                ))
-              )}
-            </Accordion>
-          </section>
-
-          {/* 7. Footer Support Strip */}
-          <section className="help-footer-strip" aria-label="Still need help support section">
-            <div className="help-footer-left">
-              <div className="help-footer-icon-badge" aria-hidden="true">
-                <i className="fa-solid fa-headset"></i>
-              </div>
-              <div className="help-footer-text">
-                <h3>Still need help?</h3>
-                <p>Get in touch with our support team.</p>
-              </div>
-            </div>
-
-            <div className="help-footer-details">
-              <a
-                href={`mailto:${contactInfo.email}`}
-                className="help-footer-detail-item"
-                title="Send email to support"
-              >
-                <i className="fa-regular fa-envelope"></i>
-                <span>{contactInfo.email}</span>
-              </a>
-              <a
-                href={`tel:${contactInfo.phone}`}
-                className="help-footer-detail-item"
-                title="Call support hotline"
-              >
-                <i className="fa-solid fa-phone"></i>
-                <span>{contactInfo.phone}</span>
-              </a>
-              <div className="help-footer-detail-item">
-                <i className="fa-regular fa-clock"></i>
-                <span>{contactInfo.hours}</span>
-              </div>
-            </div>
-
-            <div className="help-footer-right">
-              <button
-                className="help-btn-contact-orange"
-                type="button"
-                onClick={() => setShowContactModal(true)}
-              >
-                <i className="fa-solid fa-envelope"></i> Contact Support <i className="fa-solid fa-arrow-right"></i>
-              </button>
-            </div>
-          </section>
+          {/* Footer Support Strip */}
+          <HelpFooterSupport
+            contactInfo={contactInfo}
+            onContactClick={() => setShowContactModal(true)}
+          />
         </div>
       </main>
 
-      {/* CORE INTERACTION: Numbered Step-by-Step Modal */}
-      <Modal
+      {/* 3. Numbered Step-by-Step Modal */}
+      <HelpStepModal
         show={showStepModal}
-        onHide={handleCloseStepModal}
-        centered
-        dialogClassName="help-step-modal"
-      >
-        {selectedTopic && (
-          <>
-            <div className="help-step-modal-header">
-              <div className="help-step-modal-title">
-                <div
-                  className="help-step-modal-icon"
-                  style={{
-                    backgroundColor: selectedTopic.iconBg || '#eff6ff',
-                    color: selectedTopic.iconColor || '#2563eb'
-                  }}
-                  aria-hidden="true"
-                >
-                  <i className={selectedTopic.icon || 'fa-solid fa-circle-info'}></i>
-                </div>
-                <h5>{selectedTopic.title}</h5>
-              </div>
-              <button
-                type="button"
-                className="help-step-modal-close"
-                onClick={handleCloseStepModal}
-                aria-label="Close modal"
-              >
-                <i className="fa-solid fa-xmark"></i>
-              </button>
-            </div>
+        onClose={() => {
+          setShowStepModal(false);
+          setSelectedTopic(null);
+        }}
+        topic={selectedTopic}
+        isLoading={loadingTopicDetail}
+      />
 
-            <div className="help-step-modal-body">
-              {selectedTopic.steps && selectedTopic.steps.length > 0 ? (
-                <ol className="help-steps-ol">
-                  {selectedTopic.steps.map((st) => (
-                    <li key={st.number} className="help-step-item">
-                      <span className="help-step-number">{st.number}</span>
-                      <div className="help-step-details">
-                        <strong>{st.title}</strong>
-                        <p>{st.description}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              ) : (
-                <div className="help-modal-article">
-                  {selectedTopic.content && selectedTopic.content.map((paragraph, i) => (
-                    <p key={i}>{paragraph}</p>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="help-step-modal-footer">
-              <button
-                type="button"
-                className="help-btn-got-it"
-                onClick={handleCloseStepModal}
-              >
-                Got it
-              </button>
-            </div>
-          </>
-        )}
-      </Modal>
-
-      {/* Contact Support Modal */}
-      <Modal
+      {/* 4. Contact Support Modal */}
+      <ContactSupportModal
         show={showContactModal}
-        onHide={() => setShowContactModal(false)}
-        centered
-        dialogClassName="help-step-modal"
-      >
-        <div className="help-step-modal-header">
-          <div className="help-step-modal-title">
-            <div
-              className="help-step-modal-icon"
-              style={{ backgroundColor: '#fff7ed', color: '#ea580c' }}
-              aria-hidden="true"
-            >
-              <i className="fa-solid fa-headset"></i>
-            </div>
-            <h5>Contact Support</h5>
-          </div>
-          <button
-            type="button"
-            className="help-step-modal-close"
-            onClick={() => setShowContactModal(false)}
-            aria-label="Close modal"
-          >
-            <i className="fa-solid fa-xmark"></i>
-          </button>
-        </div>
+        onClose={() => setShowContactModal(false)}
+        contactInfo={contactInfo}
+        contactForm={contactForm}
+        onFormChange={setContactForm}
+        onSubmit={handleContactSubmit}
+        sendingMessage={sendingMessage}
+        userName={userName}
+      />
 
-        <div className="help-step-modal-body">
-          <div className="contact-modal-info-card">
-            <div className="contact-modal-item">
-              <span className="contact-modal-item-left">
-                <i className="fa-regular fa-envelope"></i> Email Support
-              </span>
-              <a href={`mailto:${contactInfo.email}`}>{contactInfo.email}</a>
-            </div>
-            <div className="contact-modal-item">
-              <span className="contact-modal-item-left">
-                <i className="fa-solid fa-phone"></i> Direct Line
-              </span>
-              <a href={`tel:${contactInfo.phone}`}>{contactInfo.phone}</a>
-            </div>
-            <div className="contact-modal-item">
-              <span className="contact-modal-item-left">
-                <i className="fa-regular fa-clock"></i> Working Hours
-              </span>
-              <span>{contactInfo.hours}</span>
-            </div>
-          </div>
-
-          <form onSubmit={handleContactSubmit}>
-            <div className="mb-3">
-              <label className="contact-form-label" htmlFor="help-contact-name">Your Name</label>
-              <input
-                id="help-contact-name"
-                type="text"
-                className="contact-form-input"
-                placeholder={userName}
-                value={contactForm.name}
-                onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-              />
-            </div>
-            <div className="mb-3">
-              <label className="contact-form-label" htmlFor="help-contact-email">Email Address</label>
-              <input
-                id="help-contact-email"
-                type="email"
-                className="contact-form-input"
-                placeholder="your.email@example.com"
-                value={contactForm.email}
-                onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-              />
-            </div>
-            <div className="mb-3">
-              <label className="contact-form-label" htmlFor="help-contact-msg">How can we assist you?</label>
-              <textarea
-                id="help-contact-msg"
-                rows="3"
-                className="contact-form-textarea"
-                placeholder="Briefly describe what you need help with..."
-                value={contactForm.message}
-                onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                required
-              ></textarea>
-            </div>
-            <div className="d-flex justify-content-end gap-2">
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-secondary"
-                onClick={() => setShowContactModal(false)}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="help-btn-contact-orange"
-                disabled={sendingMessage}
-              >
-                {sendingMessage ? 'Sending...' : 'Send Message'}
-              </button>
-            </div>
-          </form>
-        </div>
-      </Modal>
-
-      {/* Report Wizard Modal */}
+      {/* 5. Report Wizard Modal */}
       {showReportWizard && (
         <ReportWizard
           onClose={() => setShowReportWizard(false)}
