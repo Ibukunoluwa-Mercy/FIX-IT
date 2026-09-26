@@ -1,0 +1,158 @@
+/* ════════════════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════════════════ */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .register-split {
+    gap: 32px;
+    padding: 20px 10px;
+  }
+
+  .register-form-side {
+    flex: 0 0 420px;
+  }
+}
+
+/* Mobile — stack layout */
+@media (max-width: 860px) {
+  .register-page {
+    padding: 80px 16px 32px 16px;
+    align-items: flex-start;
+  }
+
+  .register-logo-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 14px 20px;
+    background: #faf8f5f2;
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid #ede8e0;
+  }
+
+  .register-split {
+    flex-direction: column;
+    gap: 36px;
+  }
+
+  .register-hero {
+    padding: 0;
+    width: 100%;
+  }
+
+  .register-hero-content {
+    max-width: 100%;
+  }
+
+  .register-hero-headline {
+    font-size: 32px;
+  }
+
+  .register-badges {
+    gap: 16px;
+  }
+
+  .register-illustration-wrap {
+    max-width: 100%;
+  }
+
+  .register-illustration {
+    max-height: 220px;
+  }
+
+  .register-form-side {
+    width: 100%;
+    flex: 1 1 auto;
+  }
+
+  .register-card {
+    border-radius: 20px;
+    padding: 28px 20px;
+    box-shadow: 0 4px 24px #0d1b2a0f;
+  }
+
+  .official-page {
+    padding: 76px 16px 20px;
+  }
+
+  .official-page-heading {
+    margin-bottom: 24px;
+  }
+
+  .official-page-heading h1 {
+    font-size: 20.8px;
+  }
+
+  .official-page .register-form-side {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 460px;
+  }
+
+  .secure-strip {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    min-height: 0;
+    padding: 18px;
+  }
+
+  .secure-strip > svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .secure-strip strong {
+    font-size: 12.8px;
+  }
+
+  .secure-strip span {
+    font-size: 10.88px;
+  }
+
+  .secure-strip img {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-hero-headline {
+    font-size: 26.4px;
+  }
+
+  .register-card {
+    padding: 22px 16px;
+  }
+
+  .register-role-tabs {
+    gap: 8px;
+  }
+
+  .role-tab {
+    padding: 12px 8px;
+    font-size: 12.8px;
+  }
+}
+
+@media (max-width: 430px) {
+  .official-page .register-card {
+    padding: 24px 18px 20px;
+  }
+
+  .wizard-progress {
+    gap: 4px;
+  }
+
+  .wizard-step {
+    font-size: 8.96px;
+  }
+
+  .wizard-line {
+    min-width: 10px;
+  }
+
+  .secure-strip {
+    gap: 9px;
+  }
+}

@@ -1,0 +1,162 @@
+/* Help Center - Search Bar & Secondary Banner */
+
+/* 2. Search Bar */
+.help-search-wrapper {
+  margin-top: 18px;
+}
+
+.help-search-bar {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 6px 6px 6px 18px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+.help-search-bar:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.help-search-icon {
+  color: #64748b;
+  font-size: 16px;
+  margin-right: 12px;
+}
+
+.help-search-input {
+  border: 0;
+  outline: none;
+  font-size: 14px;
+  color: #1e293b;
+  width: 100%;
+  background: transparent;
+}
+
+.help-search-input::placeholder {
+  color: #94a3b8;
+}
+
+.help-search-clear-btn {
+  border: 0;
+  background: transparent;
+  color: #94a3b8;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  border-radius: 4px;
+}
+
+.help-search-clear-btn:hover {
+  color: #0f172a;
+}
+
+.help-search-btn {
+  border: 0;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 9px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+
+.help-search-btn:hover {
+  background: #1e293b;
+}
+
+/* Active Search Filter Banner */
+.help-search-status {
+  margin-top: 12px;
+  padding: 8px 14px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.help-search-status button {
+  border: 0;
+  background: transparent;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-size: 12.5px;
+}
+
+/* Secondary Banner Strip */
+.help-secondary-banner {
+  margin-top: 18px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.help-secondary-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.help-secondary-icon-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fef3c7;
+  color: #d97706;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.help-secondary-text strong {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.help-secondary-text span {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.help-btn-contact-orange {
+  border: 0;
+  background: var(--orange);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 9px 20px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.help-btn-contact-orange:hover {
+  background: var(--orange-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(249, 115, 22, 0.25);
+}

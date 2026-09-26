@@ -1,0 +1,250 @@
+/* Help Center - Sidebar Styling */
+
+.help-center-page {
+  --navy: #101a2b;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --card-border: #edf2f7;
+  --orange: #f97316;
+  --orange-hover: #ea580c;
+  --blue: #2563eb;
+  --blue-soft: #eff6ff;
+  --blue-border: #bfdbfe;
+  display: flex;
+  min-height: 100vh;
+  background: #f8fafc;
+  color: var(--ink);
+  font-family: "Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Sidebar reuse */
+.help-sidebar {
+  background: var(--navy);
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 260px;
+  padding: 19px 12px 16px;
+  transition: flex-basis 0.25s ease;
+  position: relative;
+  z-index: 4;
+}
+
+.help-center-page.sidebar-collapsed .help-sidebar {
+  flex-basis: 76px;
+}
+
+.help-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px 30px;
+}
+
+.help-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.help-brand-img {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+}
+
+.help-sidebar-toggle {
+  border: 0;
+  background: transparent;
+  color: #94a3b8;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.help-sidebar-toggle:hover {
+  background: #223149;
+  color: #fff;
+}
+
+.help-nav {
+  flex: 1;
+}
+
+.help-nav-group {
+  display: grid;
+  gap: 5px;
+}
+
+.help-nav-group-secondary {
+  border-top: 1px solid #293448;
+  margin-top: 22px;
+  padding-top: 20px;
+}
+
+.help-nav-link {
+  position: relative;
+  border: 0;
+  background: transparent;
+  color: #c5cfdd;
+  text-align: left;
+  width: 100%;
+  border-radius: 8px;
+  padding: 11px 13px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.help-nav-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.help-nav-link.active {
+  background: #ff9f05;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(11, 19, 32, 0.35);
+  font-weight: 600;
+}
+
+.help-nav-badge {
+  margin-left: auto;
+  background: #ef4444;
+  color: #fff;
+  border-radius: 99px;
+  min-width: 18px;
+  height: 18px;
+  text-align: center;
+  font-size: 10px;
+  line-height: 18px;
+  padding: 0 4px;
+}
+
+.help-profile-wrap {
+  position: relative;
+  margin-top: auto;
+}
+
+.help-profile-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px;
+  border: 1px solid #29374d;
+  background: #17243a;
+  border-radius: 8px;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.help-profile-btn:hover {
+  background: #1e2e4a;
+}
+
+.help-avatar-circle {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  background: #fbbf24;
+  color: #78350f;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.help-profile-copy {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.help-profile-copy strong {
+  font-size: 12.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.help-profile-copy small {
+  color: #94a3b8;
+  font-size: 10.5px;
+}
+
+.help-profile-menu {
+  position: absolute;
+  bottom: 58px;
+  left: 0;
+  width: 200px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 12px 30px rgba(18, 33, 58, 0.15);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 6px;
+  z-index: 20;
+}
+
+.help-profile-menu button {
+  border: 0;
+  background: transparent;
+  width: 100%;
+  padding: 9px 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  text-align: left;
+  font-size: 12.5px;
+  border-radius: 6px;
+  color: #334155;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.help-profile-menu button:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* Sidebar collapsed rules */
+.sidebar-collapsed .help-brand span,
+.sidebar-collapsed .help-nav-link span,
+.sidebar-collapsed .help-profile-copy,
+.sidebar-collapsed .help-profile-btn > .fa-chevron-down {
+  display: none;
+}
+
+.sidebar-collapsed .help-nav-link {
+  justify-content: center;
+  padding: 11px 0;
+}
+
+.sidebar-collapsed .help-nav-badge {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+}
+
+.sidebar-collapsed .help-profile-btn {
+  justify-content: center;
+}

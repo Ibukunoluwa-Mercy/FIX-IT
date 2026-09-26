@@ -1,0 +1,263 @@
+/* Help Center - Modals & Responsive Styles */
+
+/* Step Modal Styling */
+.help-step-modal .modal-content {
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.help-step-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #ffffff;
+}
+
+.help-step-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.help-step-modal-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+}
+
+.help-step-modal-title h5 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.help-step-modal-close {
+  border: 0;
+  background: #f1f5f9;
+  color: #64748b;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.help-step-modal-close:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.help-step-modal-body {
+  padding: 20px 24px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+/* Numbered Steps List */
+.help-steps-ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.help-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.help-step-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  font-weight: 700;
+  font-size: 12.5px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.help-step-details {
+  flex: 1;
+}
+
+.help-step-details strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 2px;
+}
+
+.help-step-details p {
+  font-size: 13px;
+  color: #475569;
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* Plain explanatory content in modal */
+.help-modal-article {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.help-modal-article p {
+  margin-bottom: 12px;
+}
+
+.help-modal-article p:last-child {
+  margin-bottom: 0;
+}
+
+.help-step-modal-footer {
+  padding: 14px 24px;
+  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.help-btn-got-it {
+  border: 0;
+  background: #0f172a;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.help-btn-got-it:hover {
+  background: #1e293b;
+}
+
+/* Contact Support Modal */
+.contact-modal-info-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+
+.contact-modal-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #edf2f7;
+  font-size: 13px;
+}
+
+.contact-modal-item:last-child {
+  border-bottom: 0;
+}
+
+.contact-modal-item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #475569;
+}
+
+.contact-modal-item-left i {
+  color: #2563eb;
+  width: 16px;
+}
+
+.contact-modal-item a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.contact-modal-item a:hover {
+  text-decoration: underline;
+}
+
+.contact-form-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 4px;
+}
+
+.contact-form-input,
+.contact-form-textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.contact-form-input:focus,
+.contact-form-textarea:focus {
+  border-color: #3b82f6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .help-banner-illustration-wrap {
+    display: none;
+  }
+  .help-footer-strip {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .help-sidebar {
+    display: none;
+  }
+  .help-sidebar.mobile-open {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 260px;
+    z-index: 100;
+  }
+  .help-mobile-brand {
+    display: flex;
+  }
+  .help-content-container {
+    padding: 16px;
+  }
+  .help-secondary-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .help-secondary-banner > .help-btn-contact-orange,
+  .help-footer-right > .help-btn-contact-orange {
+    width: 100%;
+    justify-content: center;
+  }
+}

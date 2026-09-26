@@ -1,0 +1,217 @@
+/* Help Center - Header & Main Banner Styling */
+
+/* Main Area */
+.help-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.help-header {
+  height: 64px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.help-mobile-brand {
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.help-mobile-brand img {
+  height: 28px;
+}
+
+.help-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-left: auto;
+}
+
+.help-btn-new-report {
+  border: 0;
+  background: var(--orange);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.help-btn-new-report:hover {
+  background: var(--orange-hover);
+  transform: translateY(-1px);
+}
+
+.help-header-icon-btn {
+  border: 0;
+  background: transparent;
+  color: #475569;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.help-header-icon-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.help-notification-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+
+.help-header-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e0e7ff;
+  color: #4338ca;
+  font-weight: 700;
+  font-size: 13px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  border: 1px solid #c7d2fe;
+}
+
+.help-header-avatar-button {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.help-notification-popover {
+  position: absolute;
+  top: 58px;
+  right: 48px;
+  width: 260px;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 12px;
+  z-index: 25;
+}
+
+.help-notification-popover strong {
+  font-size: 13px;
+  display: block;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+
+.help-notification-popover p {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Page Content */
+.help-content-container {
+  padding: 24px 28px 48px;
+  max-width: 1080px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* 1. Header Banner */
+.help-banner-card {
+  background: linear-gradient(135deg, #eff6ff 0%, #e0edfe 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 16px;
+  padding: 24px 28px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.05);
+}
+
+.help-banner-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.help-banner-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  max-width: 620px;
+}
+
+.help-banner-icon-badge {
+  width: 52px;
+  height: 52px;
+  background: #dbeafe;
+  border: 2px solid #bfdbfe;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #2563eb;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.help-banner-text h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.02em;
+}
+
+.help-banner-text p {
+  font-size: 14px;
+  color: #475569;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.help-banner-illustration-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.help-banner-illustration {
+  height: 110px;
+  max-width: 220px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08));
+}
