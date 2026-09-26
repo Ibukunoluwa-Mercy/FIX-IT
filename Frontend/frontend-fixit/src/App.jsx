@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import Navbar from './components/Navbar/Navbar'
 import Footer from './components/Footer/Footer'
 import HomePage from './pages/HomePage/HomePage'
@@ -14,6 +15,7 @@ import MyReports from './pages/MyReports/MyReports'
 import UserLocationMapPage from './pages/UserLocationMapPage/UserLocationMapPage'
 import HelpCenter from './pages/HelpCenter/HelpCenter'
 import SettingsPage from './pages/SettingsPage/SettingsPage'
+import './dashboard-theme.css'
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -29,6 +31,26 @@ function AppShell() {
   const isAuthPage = AUTH_ROUTES.includes(pathname);
   const isDashboard = DASHBOARD_ROUTES.includes(pathname);
   const isLocationPage = LOCATION_ROUTES.includes(pathname);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (!isDashboard && !isLocationPage) {
+      delete root.dataset.dashboardTheme;
+      return undefined;
+    }
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const applyTheme = () => {
+      const preference = localStorage.getItem('fixitTheme') || 'system';
+      const resolvedTheme = preference === 'system' ? (mediaQuery.matches ? 'dark' : 'light') : preference;
+      root.dataset.dashboardTheme = resolvedTheme;
+    };
+
+    applyTheme();
+    if (localStorage.getItem('fixitTheme') !== 'system') return undefined;
+    mediaQuery.addEventListener?.('change', applyTheme);
+    return () => mediaQuery.removeEventListener?.('change', applyTheme);
+  }, [isDashboard, isLocationPage]);
 
   if (isAuthPage) {
     return (

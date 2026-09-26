@@ -29,7 +29,7 @@ const isValidEmail = (email) => {
  * Receives support form submissions from resident dashboard or help center.
  *
  * Implements validation, sanitization, database persistence, and automated
- * email alerting to the support team (ibukunoludapo2022@gmail.com).
+ * email alerting to the support team (ibukunojedapo2022@gmail.com).
  * Uses .then() / .catch() promise chaining throughout.
  */
 const submitContactSupport = (req, res) => {
@@ -71,37 +71,43 @@ const submitContactSupport = (req, res) => {
 		status: 'open',
 	})
 		.then((ticket) => {
-			// Step 3: Trigger background notification email to the support desk
-			// Handled gracefully so email transport issues do not fail the user's ticket creation
-			sendSupportTicketEmail({
-				name: ticket.name,
-				email: ticket.email,
-				subject: ticket.subject,
-				message: ticket.message,
+			// Wait for the actual delivery attempt so the browser can distinguish
+			// a delivered email from a ticket saved while SMTP was unavailable.
+			return sendSupportTicketEmail({
+				name: trimmedName,
+				email: trimmedEmail.toLowerCase(),
+				subject: trimmedSubject,
+				message: trimmedMessage,
 				ticketId: ticket._id.toString(),
 			})
 				.then((mailResult) => {
-					if (mailResult && mailResult.sent) {
-						console.log(`Support ticket email successfully sent for Ticket #${ticket._id}`);
-					}
+					const emailSent = Boolean(mailResult?.sent);
+					if (emailSent) console.log(`Support ticket email successfully sent for Ticket #${ticket._id}`);
+					return res.status(201).json({
+						success: true,
+						emailSent,
+						message: emailSent
+							? 'Your support inquiry has been emailed to our team.'
+							: 'Your inquiry was saved, but email delivery is unavailable. Please contact support directly.',
+						ticket: {
+							id: ticket._id.toString(),
+							name: ticket.name,
+							email: ticket.email,
+							subject: ticket.subject,
+							status: ticket.status,
+							createdAt: ticket.createdAt,
+						},
+					});
 				})
 				.catch((mailErr) => {
-					console.warn(`Support ticket email delivery deferred: ${mailErr.message}`);
+					console.error(`Support ticket email delivery failed for Ticket #${ticket._id}:`, mailErr);
+					return res.status(201).json({
+						success: true,
+						emailSent: false,
+						message: 'Your inquiry was saved, but email delivery failed. Please contact support directly.',
+						ticket: { id: ticket._id.toString(), status: ticket.status, createdAt: ticket.createdAt },
+					});
 				});
-
-			// Step 4: Return 201 Created with ticket summary
-			return res.status(201).json({
-				success: true,
-				message: 'Your support inquiry has been received. Our team will get back to you shortly.',
-				ticket: {
-					id: ticket._id.toString(),
-					name: ticket.name,
-					email: ticket.email,
-					subject: ticket.subject,
-					status: ticket.status,
-					createdAt: ticket.createdAt,
-				},
-			});
 		})
 		.catch((err) => {
 			console.error('Error creating support ticket:', err);

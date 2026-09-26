@@ -95,7 +95,7 @@ const sendAccountDeletionEmail = async ({ email, fullName }) => {
 
 const sendSupportTicketEmail = async ({ name, email, subject, message, ticketId }) => {
 	const transporter = createTransporter();
-	const supportTargetEmail = process.env.SUPPORT_EMAIL || 'ibukunoludapo2022@gmail.com';
+	const supportTargetEmail = process.env.SUPPORT_EMAIL || 'ibukunojedapo2022@gmail.com';
 	if (!transporter) return { sent: false, skipped: true };
 
 	const safeName = escapeHtml(name);

@@ -1129,7 +1129,8 @@
     flex-direction: column;
     align-items: flex-start;
   }
-  .help-btn-contact-orange {
+  .help-secondary-banner > .help-btn-contact-orange,
+  .help-footer-right > .help-btn-contact-orange {
     width: 100%;
     justify-content: center;
   }

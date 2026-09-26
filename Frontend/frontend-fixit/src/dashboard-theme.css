@@ -1,0 +1,232 @@
+html[data-dashboard-theme="dark"] {
+  color-scheme: dark;
+  --dashboard-bg: #0b1220;
+  --dashboard-surface: #152238;
+  --dashboard-surface-raised: #1b2b42;
+  --dashboard-text: #e5edf7;
+  --dashboard-muted: #a3b2c6;
+  --dashboard-line: #34465e;
+  --dashboard-input: #101a2b;
+}
+
+html[data-dashboard-theme="dark"] body {
+  background: var(--dashboard-bg) !important;
+  color: var(--dashboard-text) !important;
+}
+
+html[data-dashboard-theme="dark"] .resident-dashboard,
+html[data-dashboard-theme="dark"] .nearby-page,
+html[data-dashboard-theme="dark"] .help-center-page {
+  background: var(--dashboard-bg) !important;
+  color: var(--dashboard-text) !important;
+}
+
+html[data-dashboard-theme="dark"] .resident-main,
+html[data-dashboard-theme="dark"] .nearby-main,
+html[data-dashboard-theme="dark"] .help-main {
+  background: var(--dashboard-bg) !important;
+  color: var(--dashboard-text) !important;
+}
+
+html[data-dashboard-theme="dark"] .resident-header,
+html[data-dashboard-theme="dark"] .nearby-header,
+html[data-dashboard-theme="dark"] .help-header {
+  background: var(--dashboard-surface) !important;
+  border-color: var(--dashboard-line) !important;
+  color: var(--dashboard-text) !important;
+}
+
+html[data-dashboard-theme="dark"] .resident-content,
+html[data-dashboard-theme="dark"] .nearby-content,
+html[data-dashboard-theme="dark"] .help-content-container {
+  color: var(--dashboard-text) !important;
+}
+
+html[data-dashboard-theme="dark"] .dashboard-panel,
+html[data-dashboard-theme="dark"] .stat-card,
+html[data-dashboard-theme="dark"] .report-row,
+html[data-dashboard-theme="dark"] .intro-search,
+html[data-dashboard-theme="dark"] .notification-popover,
+html[data-dashboard-theme="dark"] .profile-menu,
+html[data-dashboard-theme="dark"] .report-modal,
+html[data-dashboard-theme="dark"] .report-card,
+html[data-dashboard-theme="dark"] .pagination-footer,
+html[data-dashboard-theme="dark"] .nearby-map-card,
+html[data-dashboard-theme="dark"] .nearby-list-section,
+html[data-dashboard-theme="dark"] .nearby-filters-card,
+html[data-dashboard-theme="dark"] .nearby-issue-card,
+html[data-dashboard-theme="dark"] .nearby-search,
+html[data-dashboard-theme="dark"] .nearby-chips button,
+html[data-dashboard-theme="dark"] .help-search-bar,
+html[data-dashboard-theme="dark"] .help-search-status,
+html[data-dashboard-theme="dark"] .help-secondary-banner,
+html[data-dashboard-theme="dark"] .help-card-section,
+html[data-dashboard-theme="dark"] .help-footer-strip,
+html[data-dashboard-theme="dark"] .help-notification-popover,
+html[data-dashboard-theme="dark"] .help-profile-menu,
+html[data-dashboard-theme="dark"] .help-step-modal .modal-content,
+html[data-dashboard-theme="dark"] .help-step-modal-header,
+html[data-dashboard-theme="dark"] .contact-modal-info-card {
+  background: var(--dashboard-surface) !important;
+  border-color: var(--dashboard-line) !important;
+  color: var(--dashboard-text) !important;
+}
+
+html[data-dashboard-theme="dark"] .stat-orange,
+html[data-dashboard-theme="dark"] .stat-green,
+html[data-dashboard-theme="dark"] .stat-amber,
+html[data-dashboard-theme="dark"] .stat-blue,
+html[data-dashboard-theme="dark"] .report-cta,
+html[data-dashboard-theme="dark"] .help-banner-card {
+  background: var(--dashboard-surface-raised) !important;
+  border-color: var(--dashboard-line) !important;
+}
+
+html[data-dashboard-theme="dark"] .nearby-location-notice,
+html[data-dashboard-theme="dark"] .nearby-location-value,
+html[data-dashboard-theme="dark"] .nearby-filters-heading,
+html[data-dashboard-theme="dark"] .settings-location-value {
+  background: var(--dashboard-surface-raised) !important;
+  border-color: var(--dashboard-line) !important;
+}
+
+html[data-dashboard-theme="dark"] .nearby-filters-card,
+html[data-dashboard-theme="dark"] .nearby-filters-card * {
+  --bs-body-bg: var(--dashboard-surface);
+}
+
+html[data-dashboard-theme="dark"] .settings-dashboard[data-settings-theme="system"],
+html[data-dashboard-theme="dark"] .settings-dashboard[data-settings-theme="light"] {
+  background: var(--dashboard-bg) !important;
+}
+
+html[data-dashboard-theme="dark"] .settings-dashboard[data-settings-theme="system"] .settings-main,
+html[data-dashboard-theme="dark"] .settings-dashboard[data-settings-theme="system"] .resident-header,
+html[data-dashboard-theme="dark"] .settings-dashboard[data-settings-theme="light"] .settings-main,
+html[data-dashboard-theme="dark"] .settings-dashboard[data-settings-theme="light"] .resident-header {
+  background: var(--dashboard-bg) !important;
+}
+
+html[data-dashboard-theme="dark"] .resident-dashboard h1,
+html[data-dashboard-theme="dark"] .resident-dashboard h2,
+html[data-dashboard-theme="dark"] .resident-dashboard h3,
+html[data-dashboard-theme="dark"] .nearby-page h1,
+html[data-dashboard-theme="dark"] .nearby-page h2,
+html[data-dashboard-theme="dark"] .nearby-page h3,
+html[data-dashboard-theme="dark"] .help-center-page h1,
+html[data-dashboard-theme="dark"] .help-center-page h2,
+html[data-dashboard-theme="dark"] .help-center-page h3,
+html[data-dashboard-theme="dark"] .help-center-page h4,
+html[data-dashboard-theme="dark"] .settings-dashboard h1,
+html[data-dashboard-theme="dark"] .settings-dashboard h2,
+html[data-dashboard-theme="dark"] .settings-dashboard h3 {
+  color: var(--dashboard-text) !important;
+}
+
+html[data-dashboard-theme="dark"] .resident-dashboard p,
+html[data-dashboard-theme="dark"] .resident-dashboard small,
+html[data-dashboard-theme="dark"] .resident-dashboard time,
+html[data-dashboard-theme="dark"] .resident-dashboard .stat-label,
+html[data-dashboard-theme="dark"] .resident-dashboard .report-details > span,
+html[data-dashboard-theme="dark"] .resident-dashboard .report-details small,
+html[data-dashboard-theme="dark"] .nearby-page p,
+html[data-dashboard-theme="dark"] .nearby-page span,
+html[data-dashboard-theme="dark"] .nearby-page small,
+html[data-dashboard-theme="dark"] .help-center-page p,
+html[data-dashboard-theme="dark"] .help-center-page .help-row-title,
+html[data-dashboard-theme="dark"] .help-center-page .help-row-desc,
+html[data-dashboard-theme="dark"] .help-center-page .help-section-header p,
+html[data-dashboard-theme="dark"] .help-center-page .help-secondary-text span,
+html[data-dashboard-theme="dark"] .my-reports-dashboard .report-info p,
+html[data-dashboard-theme="dark"] .my-reports-dashboard .report-info h3,
+html[data-dashboard-theme="dark"] .my-reports-dashboard .pagination-footer {
+  color: var(--dashboard-muted) !important;
+}
+
+html[data-dashboard-theme="dark"] .nearby-page-intro p,
+html[data-dashboard-theme="dark"] .nearby-map-heading span,
+html[data-dashboard-theme="dark"] .nearby-section-heading span,
+html[data-dashboard-theme="dark"] .nearby-filters-heading span,
+html[data-dashboard-theme="dark"] .nearby-account-field,
+html[data-dashboard-theme="dark"] .help-center-page .help-banner-text h1,
+html[data-dashboard-theme="dark"] .help-center-page .help-banner-text p,
+html[data-dashboard-theme="dark"] .help-center-page .help-section-header h2,
+html[data-dashboard-theme="dark"] .help-center-page .help-accordion .accordion-button,
+html[data-dashboard-theme="dark"] .help-center-page .help-accordion .accordion-body {
+  color: var(--dashboard-text) !important;
+}
+
+html[data-dashboard-theme="dark"] .report-row,
+html[data-dashboard-theme="dark"] .report-card,
+html[data-dashboard-theme="dark"] .nearby-issue-card,
+html[data-dashboard-theme="dark"] .nearby-map-heading,
+html[data-dashboard-theme="dark"] .nearby-section-heading,
+html[data-dashboard-theme="dark"] .nearby-filters-heading,
+html[data-dashboard-theme="dark"] .nearby-notification-row,
+html[data-dashboard-theme="dark"] .help-item-row,
+html[data-dashboard-theme="dark"] .contact-modal-item {
+  border-color: var(--dashboard-line) !important;
+}
+
+html[data-dashboard-theme="dark"] .report-row:hover,
+html[data-dashboard-theme="dark"] .tab-btn:not(.active),
+html[data-dashboard-theme="dark"] .nearby-chips button:not(.active),
+html[data-dashboard-theme="dark"] .help-item-row:hover,
+html[data-dashboard-theme="dark"] .help-search-status,
+html[data-dashboard-theme="dark"] .help-accordion .accordion-button {
+  background: var(--dashboard-surface-raised) !important;
+  color: var(--dashboard-text) !important;
+}
+
+html[data-dashboard-theme="dark"] .nearby-search input,
+html[data-dashboard-theme="dark"] .nearby-select-label input,
+html[data-dashboard-theme="dark"] .nearby-select-label select,
+html[data-dashboard-theme="dark"] .nearby-search,
+html[data-dashboard-theme="dark"] .intro-search input,
+html[data-dashboard-theme="dark"] .help-search-input,
+html[data-dashboard-theme="dark"] .help-step-modal .contact-form-input,
+html[data-dashboard-theme="dark"] .help-step-modal .contact-form-textarea,
+html[data-dashboard-theme="dark"] .settings-dashboard .form-control,
+html[data-dashboard-theme="dark"] .settings-dashboard .form-select,
+html[data-dashboard-theme="dark"] .my-reports-dashboard .pagination-controls button {
+  background: var(--dashboard-input) !important;
+  border-color: var(--dashboard-line) !important;
+  color: var(--dashboard-text) !important;
+}
+
+html[data-dashboard-theme="dark"] .help-center-page .help-accordion .accordion-item,
+html[data-dashboard-theme="dark"] .help-center-page .help-accordion .accordion-button,
+html[data-dashboard-theme="dark"] .help-center-page .help-accordion .accordion-body {
+  border-color: var(--dashboard-line) !important;
+}
+
+html[data-dashboard-theme="dark"] .my-reports-dashboard .tab-btn:not(.active) {
+  background: var(--dashboard-surface) !important;
+  border-color: var(--dashboard-line) !important;
+  color: var(--dashboard-text) !important;
+}
+
+html[data-dashboard-theme="dark"] .my-reports-dashboard .report-card {
+  background: var(--dashboard-surface) !important;
+  border-color: var(--dashboard-line) !important;
+}
+
+html[data-dashboard-theme="dark"] .my-reports-dashboard .report-card h3,
+html[data-dashboard-theme="dark"] .my-reports-dashboard .report-card span,
+html[data-dashboard-theme="dark"] .my-reports-dashboard .report-card small {
+  color: var(--dashboard-text) !important;
+}
+
+html[data-dashboard-theme="dark"] .settings-dashboard[data-settings-theme="system"] .settings-card,
+html[data-dashboard-theme="dark"] .settings-dashboard[data-settings-theme="system"] .settings-subnav,
+html[data-dashboard-theme="dark"] .settings-dashboard[data-settings-theme="light"] .settings-card,
+html[data-dashboard-theme="dark"] .settings-dashboard[data-settings-theme="light"] .settings-subnav {
+  background: var(--dashboard-surface) !important;
+  border-color: var(--dashboard-line) !important;
+  color: var(--dashboard-text) !important;
+}
+
+html[data-dashboard-theme="dark"] .settings-dashboard[data-settings-theme="system"] .settings-account-field strong,
+html[data-dashboard-theme="dark"] .settings-dashboard[data-settings-theme="light"] .settings-account-field strong {
+  color: var(--dashboard-text) !important;
+}

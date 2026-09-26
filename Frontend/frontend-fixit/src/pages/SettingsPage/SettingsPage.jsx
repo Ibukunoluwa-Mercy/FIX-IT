@@ -119,6 +119,16 @@ const SettingsPage = () => {
     const userInitial = userName.trim().charAt(0).toUpperCase() || 'R';
     const avatarSource = avatarPreview || (account.avatarUrl.startsWith('/uploads/') ? `${API_URL}${account.avatarUrl}` : account.avatarUrl);
 
+    const saveAppearance = (preference) => {
+        const resolvedTheme = preference === 'system'
+            ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+            : preference;
+        setAppearance(preference);
+        localStorage.setItem('fixitTheme', preference);
+        document.documentElement.dataset.dashboardTheme = resolvedTheme;
+        toast.success('Appearance preference saved.');
+    };
+
     const signOut = () => {
         localStorage.removeItem('fixitToken');
         localStorage.removeItem('token');
@@ -373,7 +383,7 @@ const SettingsPage = () => {
         if (activeSection === 'Notifications') return renderNotifications();
         if (activeSection === 'Privacy & Security') return <>{renderPassword()}{renderDeleteAccount()}</>;
         if (activeSection === 'Location') return <section className="settings-card"><div className="settings-card-heading"><div><h2>Location</h2><p>Your saved account location is used when nearby issues cannot access your live location.</p></div></div><div className="settings-location-value"><i className="fa-solid fa-location-dot" /><div><strong>{account.location || 'Location not provided'}</strong><span>{account.location ? 'Account location' : 'Add a location in Account Information.'}</span></div></div>{account.location && <Button variant="outline-primary" size="sm" onClick={beginAccountEdit}>Edit account details</Button>}</section>;
-        if (activeSection === 'Appearance') return <section className="settings-card"><div className="settings-card-heading"><div><h2>Appearance</h2><p>Choose how FixIt looks on this device.</p></div></div><Form.Select aria-label="Theme" value={appearance} onChange={(event) => { setAppearance(event.target.value); localStorage.setItem('fixitTheme', event.target.value); toast.success('Appearance preference saved.'); }}><option value="system">Use device setting</option><option value="light">Light</option><option value="dark">Dark</option></Form.Select></section>;
+        if (activeSection === 'Appearance') return <section className="settings-card"><div className="settings-card-heading"><div><h2>Appearance</h2><p>Choose how FixIt looks on this device.</p></div></div><Form.Select aria-label="Theme" value={appearance} onChange={(event) => saveAppearance(event.target.value)}><option value="system">Use device setting</option><option value="light">Light</option><option value="dark">Dark</option></Form.Select></section>;
         return <section className="settings-card"><div className="settings-card-heading"><div><h2>Help &amp; Support</h2><p>Find answers and contact the FixIt support team.</p></div></div><Button variant="outline-primary" onClick={() => navigate('/help-center')}>Open Help Center</Button></section>;
     };
 

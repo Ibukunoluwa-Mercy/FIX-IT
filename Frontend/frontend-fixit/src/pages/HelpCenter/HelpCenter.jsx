@@ -41,7 +41,7 @@ const navGroups = [
   ],
   [
     { label: 'Help Center', iconClass: 'fa-solid fa-circle-question', path: '/help-center', active: true },
-    { label: 'Settings', iconClass: 'fa-solid fa-gear' },
+    { label: 'Settings', iconClass: 'fa-solid fa-gear', path: '/settings' },
   ],
 ];
 
@@ -82,6 +82,15 @@ const HelpCenter = () => {
   }, []);
   const userName = user.name || user.fullName || 'Resident';
   const firstName = userName.split(' ')[0];
+
+  const handleOpenContactModal = () => {
+    setContactForm((current) => ({
+      ...current,
+      name: current.name || (user.name || user.fullName || ''),
+      email: current.email || user.email || '',
+    }));
+    setShowContactModal(true);
+  };
 
   // Fetch topics and FAQs on component mount
   useEffect(() => {
@@ -190,8 +199,6 @@ const HelpCenter = () => {
       navigate(item.path);
     } else if (item.label === 'Notifications') {
       setShowNotifications((prev) => !prev);
-    } else if (item.label === 'Settings') {
-      toast.info('Settings page is available in your profile menu.');
     } else {
       toast.info(`${item.label} section`);
     }
@@ -224,17 +231,21 @@ const HelpCenter = () => {
   // Contact support submission
   const handleContactSubmit = (e) => {
     e.preventDefault();
-    if (!contactForm.message.trim()) {
-      toast.error('Please enter a message.');
+    if (sendingMessage) return;
+    const name = contactForm.name.trim();
+    const email = contactForm.email.trim();
+    const message = contactForm.message.trim();
+    if (!name || !email || !message) {
+      toast.error('Please provide your name, email address, and message.');
       return;
     }
     setSendingMessage(true);
 
     const payload = {
-      name: contactForm.name.trim() || userName,
-      email: contactForm.email.trim() || user.email || 'resident@fixit.app',
+      name,
+      email,
       subject: 'Help Center Inquiry',
-      message: contactForm.message.trim(),
+      message,
       userId: user._id || user.id || null,
     };
 
@@ -243,7 +254,11 @@ const HelpCenter = () => {
         setSendingMessage(false);
         setShowContactModal(false);
         setContactForm({ name: '', email: '', message: '' });
-        toast.success(res.data?.message || 'Thank you! Our support team has received your message and will respond shortly.');
+        if (res.data?.emailSent === false) {
+          toast.warning(res.data.message || 'Your message was saved, but email delivery to support failed.');
+        } else {
+          toast.success(res.data?.message || 'Thank you! Our support team has received your message and will respond shortly.');
+        }
       })
       .catch((err) => {
         setSendingMessage(false);
@@ -266,7 +281,7 @@ const HelpCenter = () => {
         onSignOut={handleSignOut}
         onSettingsClick={() => {
           setShowProfileMenu(false);
-          navigate('/dashboard');
+          navigate('/settings');
         }}
       />
 
@@ -296,7 +311,7 @@ const HelpCenter = () => {
 
           {/* Secondary Banner */}
           <HelpSecondaryBanner
-            onContactClick={() => setShowContactModal(true)}
+            onContactClick={handleOpenContactModal}
           />
 
           {/* Quick Help Options */}
@@ -327,7 +342,7 @@ const HelpCenter = () => {
           {/* Footer Support Strip */}
           <HelpFooterSupport
             contactInfo={contactInfo}
-            onContactClick={() => setShowContactModal(true)}
+            onContactClick={handleOpenContactModal}
           />
         </div>
       </main>

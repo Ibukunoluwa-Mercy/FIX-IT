@@ -198,7 +198,7 @@ export const categoriesList = [
       '• Photos Not Uploading: Check that your images are under 5MB each and formatted as JPEG, PNG, or WebP. Verify that your device has an active internet connection.',
       '• Session Expired / 401 Error: If you see an authentication alert, click your profile menu, sign out, and log back in to refresh your secure token.',
       '• Map Not Rendering: Ensure WebGL is enabled in your browser and disable ad-blockers that might block tile servers (OpenStreetMap/Leaflet).',
-      '• Still Stuck?: Reach out directly to our support desk via email at ibukunoludapo2022@gmail.com or call 09134640553.'
+      '• Still Stuck?: Reach out directly to our support desk via email at ibukunojedapo2022@gmail.com or call 09134640553.'
     ]
   },
   {
@@ -214,7 +214,7 @@ export const categoriesList = [
       'Looking for additional resources or municipal partnership information?',
       '• Municipal & Resolver Inquiries: If you are a municipal staff member or community ward leader seeking resolver portal access, contact our administrative desk.',
       '• Data Privacy & GDPR: You can request an export of your personal reports or account data deletion at any time.',
-      '• Feature Requests & Feedback: We are continuously improving FixIt. If you have suggestions for new features, send them to our support email at ibukunoludapo2022@gmail.com.',
+      '• Feature Requests & Feedback: We are continuously improving FixIt. If you have suggestions for new features, send them to our support email at ibukunojedapo2022@gmail.com.',
       '• Emergency Contacts: For urgent police, fire, or medical emergencies, please dial your official local emergency numbers directly.'
     ]
   }

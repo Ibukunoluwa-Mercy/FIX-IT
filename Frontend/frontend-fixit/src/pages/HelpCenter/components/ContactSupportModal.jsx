@@ -73,6 +73,8 @@ const ContactSupportModal = ({
               placeholder={userName}
               value={contactForm.name}
               onChange={(e) => onFormChange({ ...contactForm, name: e.target.value })}
+              autoComplete="name"
+              required
             />
           </div>
           <div className="mb-3">
@@ -83,9 +85,11 @@ const ContactSupportModal = ({
               id="help-contact-email"
               type="email"
               className="contact-form-input"
-              placeholder="your.email@example.com"
+              placeholder="name@example.com"
               value={contactForm.email}
               onChange={(e) => onFormChange({ ...contactForm, email: e.target.value })}
+              autoComplete="email"
+              required
             />
           </div>
           <div className="mb-3">
@@ -99,6 +103,7 @@ const ContactSupportModal = ({
               placeholder="Briefly describe what you need help with..."
               value={contactForm.message}
               onChange={(e) => onFormChange({ ...contactForm, message: e.target.value })}
+              minLength={5}
               required
             ></textarea>
           </div>

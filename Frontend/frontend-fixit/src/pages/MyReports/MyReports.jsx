@@ -103,7 +103,7 @@ const MyReports = () => {
   if (!token) return null;
 
   return (
-    <div className={`resident-dashboard ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+    <div className={`resident-dashboard my-reports-dashboard ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <aside className="resident-sidebar">
         <div className="resident-brand-row">
           <Link to="/dashboard" className="resident-brand" aria-label="Fixit dashboard">
