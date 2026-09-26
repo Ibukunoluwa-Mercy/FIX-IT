@@ -119,7 +119,6 @@ export const useSettingsAccount = (token, navigate) => {
       });
       setAccount((current) => ({ ...current, avatarUrl: data.avatarUrl }));
       publishResidentAvatar(data.avatarUrl);
-      setResidentAvatar(data.avatarUrl);
       setAvatarFile(null);
       setAvatarPreview('');
       toast.success('Profile picture updated.');

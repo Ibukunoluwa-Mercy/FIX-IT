@@ -89,7 +89,7 @@ const HomePage = () => {
               </button>
               <button 
                 className="btn-secondary-custom"
-                onClick={() => navigate('/map')}
+                onClick={() => navigate('/explore')}
               >
                 <i className="fa-solid fa-compass" style={{ marginRight: 6 }}></i> Explore Community Issues
               </button>
@@ -112,9 +112,6 @@ const HomePage = () => {
               <h2 className="section-title">Recent Activity</h2>
               <p className="section-subtitle">See what's being reported and resolved near you.</p>
             </div>
-            <Link to="/map" className="view-all-link">
-              View All Map <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i>
-            </Link>
           </div>
           <Row className="g-4">
             {data?.recentActivity?.map((item, index) => (
