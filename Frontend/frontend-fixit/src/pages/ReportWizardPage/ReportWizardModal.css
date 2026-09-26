@@ -1,0 +1,219 @@
+.wizard-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: #07111ddd;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.wizard-intro {
+  position: relative;
+  width: min(100%, 440px);
+  padding: 34px 30px 24px;
+  background: #fff;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 20px 60px #0004;
+}
+.wizard-close {
+  position: absolute;
+  right: 16px;
+  top: 14px;
+  border: 0;
+  background: none;
+  color: #475569;
+  cursor: pointer;
+}
+.wizard-intro-icon {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 17px;
+  border-radius: 50%;
+  background: #fff1e8;
+  color: #f45116;
+}
+.wizard-intro h2,
+.wizard-title h2 {
+  margin: 0;
+  color: #121a28;
+  font-size: 23px;
+}
+.wizard-intro > p {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 10px auto 22px;
+  max-width: 320px;
+}
+.intro-benefit {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  gap: 14px;
+  margin: 14px 0;
+}
+.intro-benefit > span {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff3e8;
+  color: #f45116;
+  font-weight: 700;
+}
+.intro-benefit strong,
+.intro-benefit small {
+  display: block;
+}
+.intro-benefit strong {
+  font-size: 13px;
+}
+.intro-benefit small {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 3px;
+}
+.wizard-primary,
+.wizard-secondary,
+.wizard-cancel {
+  border: 0;
+  border-radius: 6px;
+  padding: 11px 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.wizard-primary {
+  background: #f45116;
+  color: #fff;
+}
+.wizard-primary:disabled {
+  opacity: 0.6;
+}
+.wizard-cancel,
+.wizard-secondary {
+  background: #fff;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+.wizard-intro .wizard-primary,
+.wizard-intro .wizard-cancel {
+  width: 100%;
+  margin-top: 18px;
+}
+.wizard-intro .wizard-cancel {
+  margin-top: 12px;
+}
+.wizard-shell {
+  position: relative;
+  width: min(1120px, 100%);
+  height: min(760px, 100%);
+  overflow: auto;
+  background: #fff;
+  border-radius: 8px;
+  padding: 22px 28px;
+}
+.wizard-header {
+  display: flex;
+  justify-content: space-between;
+}
+.wizard-header > button:first-child {
+  border: 0;
+  background: none;
+  color: #475569;
+  font-size: 12px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  cursor: pointer;
+}
+.wizard-title {
+  margin: 18px 0 20px;
+}
+.wizard-title p {
+  font-size: 12px;
+  color: #64748b;
+}
+.wizard-body {
+  display: flex;
+  gap: 28px;
+}
+.wizard-stepper {
+  width: 150px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  padding-top: 10px;
+}
+.wizard-stepper button {
+  border: 0;
+  background: none;
+  text-align: left;
+  color: #94a3b8;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: default;
+}
+.wizard-stepper button span {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  color: #fff;
+  font-weight: 700;
+}
+.wizard-stepper button.current {
+  color: #f45116;
+  font-weight: 700;
+}
+.wizard-stepper button.current span {
+  background: #fff;
+  border: 2px solid #f45116;
+  color: #f45116;
+}
+.wizard-stepper button.complete {
+  color: #15803d;
+  cursor: pointer;
+}
+.wizard-stepper button.complete span {
+  background: #16a34a;
+}
+
+@media (max-width: 650px) {
+  .wizard-shell {
+    padding: 18px 14px;
+  }
+  .wizard-body {
+    display: block;
+  }
+  .wizard-stepper {
+    width: 100%;
+    flex-direction: row;
+    overflow: auto;
+    gap: 8px;
+    padding: 0 0 18px;
+  }
+  .wizard-stepper button {
+    min-width: 105px;
+    display: block;
+    text-align: center;
+  }
+  .wizard-stepper button span {
+    margin: 0 auto 5px;
+  }
+  .wizard-intro {
+    padding: 28px 20px 20px;
+  }
+}

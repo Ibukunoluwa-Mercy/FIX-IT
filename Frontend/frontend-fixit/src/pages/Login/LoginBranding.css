@@ -1,0 +1,137 @@
+.login-branding {
+  padding: 12px 12px 0 12px;
+}
+
+.brand-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  background: transparent;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.brand-link:hover {
+  transform: scale(1.03);
+  opacity: 0.9;
+}
+
+.brand-badge {
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-logo {
+  height: 70px;
+  width: 70px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px #00000014);
+}
+
+.brand-label {
+  font-size: 16.8px;
+  font-weight: 800;
+  color: var(--fixit-navy);
+  letter-spacing: -0.02em;
+}
+
+.login-copy-block {
+  margin-bottom: 30px;
+}
+
+.login-headline {
+  font-size: clamp(36.8px, 3vw, 65.6px);
+  line-height: 0.96;
+  letter-spacing: -0.07em;
+  margin: 0;
+  color: var(--fixit-navy);
+  font-weight: 800;
+}
+
+.headline-highlight {
+  display: block;
+  color: var(--fixit-orange);
+  margin-top: 12px;
+}
+
+.login-subtext {
+  margin-top: 24px;
+  font-size: 17.28px;
+  color: #4b5563;
+  line-height: 1.6;
+  max-width: 500px;
+}
+
+.feature-grid {
+  display: flex;
+  gap: 26px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.feature-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 230px;
+  min-width: 180px;
+}
+
+.feature-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.feature-icon.orange {
+  background: #fff1e7;
+  color: var(--fixit-orange);
+}
+
+.feature-icon.blue {
+  background: #ebf5ff;
+  color: #2563eb;
+}
+
+.feature-copy h2 {
+  margin: 0 0 4px;
+  font-size: 17.6px;
+  font-weight: 700;
+  color: var(--fixit-navy);
+}
+
+.feature-copy p {
+  margin: 0;
+  font-size: 13.28px;
+  line-height: 1.5;
+  color: #6b7280;
+}
+
+.illustration-card {
+  width: min(100%, 560px);
+  background: #dfeaf4;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 16px 30px #0f172a0f;
+}
+
+.illustration-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}

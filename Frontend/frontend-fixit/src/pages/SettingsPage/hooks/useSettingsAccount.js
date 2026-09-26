@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { publishResidentAvatar } from '../../../components/residentAvatarEvents';
+import { setResidentAvatar } from '../../../components/ResidentAvatar';
 import {
   emptyAccount,
   normalizeSettingsAccount,
@@ -117,6 +119,8 @@ export const useSettingsAccount = (token, navigate) => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAccount((current) => ({ ...current, avatarUrl: data.avatarUrl }));
+      publishResidentAvatar(data.avatarUrl);
+      setResidentAvatar(data.avatarUrl);
       setAvatarFile(null);
       setAvatarPreview('');
       toast.success('Profile picture updated.');
