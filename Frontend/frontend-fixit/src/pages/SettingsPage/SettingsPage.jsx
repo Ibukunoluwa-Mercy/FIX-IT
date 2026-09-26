@@ -126,6 +126,7 @@ const SettingsPage = () => {
         setAppearance(preference);
         localStorage.setItem('fixitTheme', preference);
         document.documentElement.dataset.dashboardTheme = resolvedTheme;
+        window.dispatchEvent(new Event('fixit-theme-change'));
         toast.success('Appearance preference saved.');
     };
 

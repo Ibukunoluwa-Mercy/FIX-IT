@@ -36,8 +36,6 @@ const navGroups = [
     { label: 'Nearby Issues', iconClass: 'fa-solid fa-location-dot', path: '/map' },
     { label: 'My Reports', iconClass: 'fa-solid fa-file-lines', path: '/reports' },
     { label: 'Notifications', iconClass: 'fa-solid fa-bell', badge: 0 },
-    { label: 'Community Discussions', iconClass: 'fa-solid fa-comments', path: '/community-map' },
-    { label: 'Zonal Locations', iconClass: 'fa-solid fa-map-pin' },
   ],
   [
     { label: 'Help Center', iconClass: 'fa-solid fa-circle-question', path: '/help-center', active: true },

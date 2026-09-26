@@ -47,9 +47,12 @@ function AppShell() {
     };
 
     applyTheme();
-    if (localStorage.getItem('fixitTheme') !== 'system') return undefined;
+    window.addEventListener('fixit-theme-change', applyTheme);
     mediaQuery.addEventListener?.('change', applyTheme);
-    return () => mediaQuery.removeEventListener?.('change', applyTheme);
+    return () => {
+      window.removeEventListener('fixit-theme-change', applyTheme);
+      mediaQuery.removeEventListener?.('change', applyTheme);
+    };
   }, [isDashboard, isLocationPage]);
 
   if (isAuthPage) {
