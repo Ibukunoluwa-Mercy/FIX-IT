@@ -15,6 +15,7 @@ const LocationSearchControls = ({
   accuracy,
   handleResultSelect,
   emptyMessage,
+  retrySearch,
 }) => {
   return (
     <div className="location-search-wrapper" ref={dropdownRef}>
@@ -96,8 +97,9 @@ const LocationSearchControls = ({
 
       {/* Empty State Message Inline */}
       {emptyMessage && query.length >= 3 && !isSearching && (
-        <div className="location-empty-message">
-          <i className="fa-solid fa-circle-exclamation"></i> {emptyMessage}
+        <div className="location-empty-message d-flex align-items-center justify-content-between gap-2" role="status">
+          <span><i className="fa-solid fa-circle-exclamation"></i> {emptyMessage}</span>
+          <button type="button" className="btn btn-link btn-sm p-0 text-danger fw-semibold" onClick={retrySearch}>Search again</button>
         </div>
       )}
     </div>

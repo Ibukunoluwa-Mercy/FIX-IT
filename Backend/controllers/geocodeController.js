@@ -21,7 +21,14 @@ const providerRequest = async (path, params) => {
 			'User-Agent': process.env.GEOCODING_USER_AGENT || 'FixIt/1.0 (location support)',
 		},
 	});
-	if (!response.ok) throw new Error(`Geocoding provider returned ${response.status}`);
+	if (!response.ok) {
+		const responseBody = await response.text().catch(() => '');
+		const error = new Error(`Geocoding provider returned ${response.status}`);
+		error.status = response.status;
+		// Retain a bounded provider response for diagnostics without allowing oversized error bodies into logs.
+		error.responseBody = responseBody.slice(0, 500);
+		throw error;
+	}
 	return response.json();
 };
 
@@ -54,21 +61,81 @@ const reverseGeocode = async (req, res) => {
 	}
 };
 
-const searchGeocode = async (req, res) => {
-	const query = String(req.query.q || '').trim();
-	if (query.length < 3) return res.status(400).json({ error: 'Search must be at least 3 characters.' });
-	const key = query.toLowerCase();
+const fallbackSearch = (query) => {
+	const url = new URL(process.env.GEOCODING_FALLBACK_URL || 'https://photon.komoot.io/api/');
+	// Photon has no country-code parameter, so request Nigeria explicitly and verify the returned country.
+	url.searchParams.set('q', `${query}, Nigeria`);
+	url.searchParams.set('limit', '5');
+	url.searchParams.set('lang', 'en');
+	return fetch(url, {
+		headers: { Accept: 'application/json', 'User-Agent': process.env.GEOCODING_USER_AGENT || 'FixIt/1.0 (location support)' },
+	}).then((response) => response.text().then((body) => {
+		if (!response.ok) {
+			const error = new Error(`Photon returned ${response.status}`);
+			error.status = response.status;
+			error.responseBody = body.slice(0, 500);
+			throw error;
+		}
+		const features = JSON.parse(body).features || [];
+		return features
+			.filter((feature) => {
+				const address = feature.properties || {};
+				return String(address.countrycode || '').toLowerCase() === 'ng'
+					|| String(address.country || '').toLowerCase() === 'nigeria';
+			})
+			.map((feature) => {
+				const address = feature.properties || {};
+				const labelParts = [address.name, address.street, address.district, address.city, address.county, address.state, address.country]
+					.filter(Boolean);
+				const [longitude, latitude] = feature.geometry.coordinates;
+				return { label: [...new Set(labelParts)].join(', '), latitude: Number(latitude), longitude: Number(longitude) };
+			})
+			.filter((result) => result.label && Number.isFinite(result.latitude) && Number.isFinite(result.longitude))
+			.slice(0, 5);
+	}));
+};
+
+const searchGeocode = (req, res) => {
+	const query = String(req.query.q || '');
+	if (query.trim().length < 3) return res.status(400).json({ error: 'Search must be at least 3 characters.' });
+	const key = query.trim().replace(/\s+/g, ' ').toLowerCase();
 	const cached = searchCache.get(key);
 	if (cached && cached.expiresAt > Date.now()) return res.json(cached.value);
 	if (cached) searchCache.delete(key);
-	try {
-		const results = await providerRequest('/search', { format: 'jsonv2', addressdetails: 1, limit: 5, countrycodes: 'ng', viewbox: '3.0,6.8,3.8,6.3', bounded: 0, q: `${query}, Lagos, Nigeria` });
-		const normalized = results.slice(0, 5).map((result) => ({ label: result.display_name, latitude: Number(result.lat), longitude: Number(result.lon) }));
-		searchCache.set(key, { value: normalized, expiresAt: Date.now() + CACHE_TTL_MS });
+	// Search all of Nigeria with the exact text received; the former Lagos suffix and viewbox biased results away from other states.
+	const primaryRequest = providerRequest('/search', {
+		format: 'jsonv2', addressdetails: 1, limit: 5, countrycodes: 'ng', q: query,
+	});
+	const runFallback = (reason) => {
+		console.warn('[geocode] Using Photon fallback for Nigeria location search.', { reason });
+		return fallbackSearch(query).then((results) => {
+			console.info('[geocode] Photon search response.', { resultCount: results.length });
+			return results;
+		});
+	};
+	return primaryRequest.then((results) => {
+		const matches = Array.isArray(results) ? results : [];
+		console.info('[geocode] Primary search response.', { provider: provider(), resultCount: matches.length });
+		if (matches.length === 0) return runFallback('no-results');
+		return matches.slice(0, 5).map((result) => ({
+			label: result.display_name || result.label || '',
+			latitude: Number(result.lat),
+			longitude: Number(result.lon),
+		}));
+	}, (error) => {
+		console.error('[geocode] Primary provider request failed.', {
+			provider: provider(), status: error.status || null, message: error.message, response: error.responseBody || '',
+		});
+		return runFallback('provider-error');
+	}).then((normalized) => {
+		if (normalized.length > 0) searchCache.set(key, { value: normalized, expiresAt: Date.now() + CACHE_TTL_MS });
 		return res.json(normalized);
-	} catch (error) {
+	}).catch((error) => {
+		console.error('[geocode] Fallback provider request failed.', {
+			provider: 'photon', status: error.status || null, message: error.message, response: error.responseBody || '',
+		});
 		return res.status(502).json({ error: 'Unable to search locations right now.' });
-	}
+	});
 };
 
 module.exports = { reverseGeocode, searchGeocode, reverseCache };

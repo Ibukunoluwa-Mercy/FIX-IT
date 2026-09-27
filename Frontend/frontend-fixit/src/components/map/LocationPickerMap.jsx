@@ -73,6 +73,7 @@ const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat
     dropdownRef,
     handleInputChange,
     handleResultSelect,
+    retrySearch,
   } = useLocationPickerSearch(initialAddress, (lat, lon, label) => {
     setMapLocation(lat, lon, label, 'search', 0, true);
   });
@@ -213,6 +214,7 @@ const LocationPickerMap = ({ onLocationSelect, onNearbyReportsChange, initialLat
         accuracy={accuracy}
         handleResultSelect={handleResultSelect}
         emptyMessage={emptyMessage}
+        retrySearch={retrySearch}
       />
 
       <div className="map-picker-wrapper mt-3 rounded overflow-hidden border shadow-sm">

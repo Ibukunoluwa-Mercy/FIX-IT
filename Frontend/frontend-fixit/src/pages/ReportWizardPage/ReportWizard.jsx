@@ -192,7 +192,7 @@ const ReportWizard = ({ onClose, onSubmitted }) => {
         },
       };
 
-      await axios.post(`${API_URL}/api/reports`, payload, {
+      await axios.post(`${API_URL}/api/reports/submit`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
