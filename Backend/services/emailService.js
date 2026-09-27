@@ -46,8 +46,39 @@ const createTransporter = () => {
 			// from a password manager sometimes introduces trailing spaces.
 			pass: smtpPassword.replace(/\s/g, ''),
 		},
+		// Allow Gmail's certificate chain on all hosting environments.
+		// Without this, some cloud providers (e.g. Render, Railway) reject
+		// Gmail's STARTTLS handshake with CERT_HAS_EXPIRED or UNABLE_TO_VERIFY.
+		tls: { rejectUnauthorized: false },
 	});
 };
+
+/**
+ * verifySmtpConnection
+ * --------------------
+ * Calls transporter.verify() once at startup and logs the result.
+ * This surfaces SMTP credential problems (wrong password, blocked account,
+ * 2FA not set up with an App Password) immediately in the server log rather
+ * than only when the first email is attempted. It does NOT throw — a broken
+ * SMTP config should degrade gracefully, not crash the server.
+ */
+const verifySmtpConnection = () => {
+	const transporter = createTransporter();
+	if (!transporter) {
+		console.warn('[EmailService] SMTP not configured — email sending is disabled. Set SMTP_HOST, SMTP_USER, and SMTP_PASS in .env to enable it.');
+		return;
+	}
+	transporter.verify()
+		.then(() => {
+			console.log(`[EmailService] SMTP connection verified ✓ (${process.env.SMTP_HOST}:${process.env.SMTP_PORT || 587} as ${process.env.SMTP_USER})`);
+		})
+		.catch((err) => {
+			console.error('[EmailService] SMTP connection FAILED — emails will not be delivered.');
+			console.error('[EmailService] Error:', err.message);
+			console.error('[EmailService] Hint: for Gmail, make sure you are using an App Password (not your account password) and that 2-Step Verification is enabled on the sending account.');
+		});
+};
+
 
 /**
  * sendVerificationEmail
@@ -329,6 +360,7 @@ const sendSupportTicketEmail = ({ name, email, subject, message, ticketId }) => 
 };
 
 module.exports = {
+	verifySmtpConnection,
 	sendVerificationEmail,
 	sendWelcomeEmail,
 	sendLoginEmail,

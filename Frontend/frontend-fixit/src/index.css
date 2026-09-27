@@ -13,6 +13,12 @@
   --card-bg: #ffffff;
   --icon-bg-green: #dcfce7;
   --icon-color-green: #16a34a;
+  /* Orange brand colour — defined globally so Bootstrap Modal portals
+     (rendered outside .help-center-page) can inherit it. Without this,
+     the Send button in ContactSupportModal renders transparent because
+     the variable is not available outside .help-center-page scope. */
+  --orange: #f97316;
+  --orange-hover: #ea580c;
 }
 
 body,

@@ -20,6 +20,7 @@ const issuesRoutes = require('./routes/issuesRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 const helpRoutes = require('./routes/helpRoutes');
 const supportRoutes = require('./routes/supportRoutes');
+const { verifySmtpConnection } = require('./services/emailService');
 const HelpTopic = require('./models/HelpTopic');
 const { seedHelpCenter } = require('./seed/seedHelpCenter');
 
@@ -78,6 +79,10 @@ const startServer = async () => {
 	if (!connected) {
 		console.error('Database unavailable. API started, but database-backed requests will return an error until MongoDB reconnects.');
 	} else {
+		// Verify SMTP credentials once at startup so email problems surface
+		// immediately in the server log (not silently on the first registration).
+		verifySmtpConnection();
+
 		// Verify and seed help content if empty
 		HelpTopic.countDocuments()
 			.then((count) => {
