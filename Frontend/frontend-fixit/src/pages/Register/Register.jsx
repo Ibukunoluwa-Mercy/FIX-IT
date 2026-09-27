@@ -5,15 +5,11 @@ import axios from 'axios';
 import logo from '../../assets/fixit-logo-white.png';
 import neighborhoodIllustration from '../../assets/neighborhood_illustration.png';
 import securityIllustration from '../../assets/security building illustration.png';
+import { officialOptions } from '../SettingsPage/settingsConstants';
 import './Register.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
 const initialForm = { fullName: '', email: '', neighborhood: '', phone: '', password: '', office: '', position: '', lga: '', staffId: '', officialId: null };
-const officialOptions = {
-    office: ['Health Department', 'Public Works', 'Environmental Services', 'Transport Authority'],
-    position: ['Environmental Health Officer', 'Community Liaison Officer', 'Infrastructure Officer', 'Public Safety Officer'],
-    lga: ['Ogbomosho North LGA','Oyo East LGA ','Ogbomosho South LGA','Oyo West LGA','Oriire LGA ','Atiba LGA','Ogo-Oluwa LGA ','Afijio LGA','Ikeja LGA', 'Surulere LGA', 'Lagos Island LGA', 'Yaba LGA', 'Alimosho LGA'],
-};
 
 const Register = () => {
     const navigate = useNavigate();

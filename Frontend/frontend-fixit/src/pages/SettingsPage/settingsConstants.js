@@ -25,7 +25,21 @@ export const settingsSections = [
 export const officialOptions = {
   office: ['Health Department', 'Public Works', 'Environmental Services', 'Transport Authority'],
   position: ['Environmental Health Officer', 'Community Liaison Officer', 'Infrastructure Officer', 'Public Safety Officer'],
-  lga: ['Ikeja LGA', 'Surulere LGA', 'Lagos Island LGA', 'Yaba LGA', 'Alimosho LGA'],
+  lga: [
+    'Ogbomosho North LGA',
+    'Oyo East LGA',
+    'Ogbomosho South LGA',
+    'Oyo West LGA',
+    'Oriire LGA',
+    'Atiba LGA',
+    'Ogo-Oluwa LGA',
+    'Afijio LGA',
+    'Ikeja LGA',
+    'Surulere LGA',
+    'Lagos Island LGA',
+    'Yaba LGA',
+    'Alimosho LGA',
+  ],
 };
 
 export const emptyAccount = {
