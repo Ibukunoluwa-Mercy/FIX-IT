@@ -29,7 +29,7 @@ function AppShell() {
   const location = useLocation();
   const pathname = location.pathname.replace(/\/+$/, '') || '/';
   const isAuthPage = AUTH_ROUTES.includes(pathname);
-  const isDashboard = DASHBOARD_ROUTES.includes(pathname);
+  const isDashboard = DASHBOARD_ROUTES.includes(pathname) || pathname.startsWith('/my-reports/');
   const isLocationPage = LOCATION_ROUTES.includes(pathname);
 
   useEffect(() => {
@@ -71,7 +71,9 @@ function AppShell() {
       <Routes>
         <Route path="/dashboard" element={<ResidentDashboard />} />
         <Route path="/my-reports" element={<MyReports />} />
+        <Route path="/my-reports/:id" element={<MyReports />} />
         <Route path="/reports" element={<MyReports />} />
+        <Route path="/reports/:id" element={<MyReports />} />
         <Route path="/help-center" element={<HelpCenter />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Routes>

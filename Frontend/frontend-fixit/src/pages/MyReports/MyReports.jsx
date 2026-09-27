@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useParams } from 'react-router-dom';
 import ResidentAvatar from '../../components/ResidentAvatar';
 import { normalizeReportImageUrl } from '../../utils/reportImages';
+import ReportDetails from './ReportDetails';
 import logoWhite from '../../assets/fixit-white-logo.png';
 import './MyReports.css';
 
@@ -29,6 +30,7 @@ const navGroups = [
 const MyReports = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { id: reportId } = useParams();
   const searchParams = new URLSearchParams(location.search);
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -80,8 +82,8 @@ const MyReports = () => {
   }, [token, statusTab, debouncedQuery, location.search, navigate]);
 
   useEffect(() => {
-    loadReports();
-  }, [loadReports]);
+    if (!reportId) loadReports();
+  }, [loadReports, reportId]);
 
   const handleTabChange = (tab) => {
     setStatusTab(tab);
@@ -171,6 +173,7 @@ const MyReports = () => {
         </header>
 
         <div className="resident-content">
+          {reportId ? <ReportDetails /> : <>
           <section className="dashboard-intro">
             <div>
               <h1>My Reports</h1>
@@ -252,6 +255,7 @@ const MyReports = () => {
               )}
             </>
           )}
+          </>}
         </div>
       </main>
     </div>

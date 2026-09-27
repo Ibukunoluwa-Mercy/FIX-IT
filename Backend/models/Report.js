@@ -8,7 +8,11 @@ const reportSchema = new mongoose.Schema(
 		description: { type: String, default: '', maxlength: 500, trim: true },
 		category: { type: String, required: true, trim: true, default: 'Other' },
 		severity: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Medium' },
-		status: { type: String, enum: ['New', 'In Progress', 'Resolved'], default: 'New' },
+		status: { type: String, enum: ['reported', 'in_progress', 'resolved', 'closed'], default: 'reported' },
+		reportedAt: { type: Date, default: Date.now },
+		inProgressAt: { type: Date, default: null },
+		resolvedAt: { type: Date, default: null },
+		closedAt: { type: Date, default: null },
 		location: {
 			address: { type: String, default: '' },
 			lat: { type: Number },
@@ -32,7 +36,6 @@ const reportSchema = new mongoose.Schema(
 		createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 		confirmedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 		priorityScore: { type: Number, default: 0 },
-		resolvedAt: { type: Date },
 		completedAt: { type: Date },
 		updates: [{
 			type: { type: String, enum: ['STATUS_CHANGE', 'NEW_COMMENT', 'SUBMITTED'] },
@@ -45,6 +48,22 @@ const reportSchema = new mongoose.Schema(
 );
 
 reportSchema.index({ 'location.geo': '2dsphere' });
+
+reportSchema.pre('validate', function normalizeLegacyStatus() {
+	// Translate stored legacy labels before validation so editing an older report won't violate the new enum.
+	const legacyStatuses = {
+		new: 'reported',
+		pending: 'reported',
+		reported: 'reported',
+		'in progress': 'in_progress',
+		in_progress: 'in_progress',
+		resolved: 'resolved',
+		closed: 'closed',
+		rejected: 'closed',
+	};
+	const normalizedStatus = legacyStatuses[String(this.status || '').toLowerCase().trim()];
+	if (normalizedStatus) this.status = normalizedStatus;
+});
 
 reportSchema.pre('save', function normalizeReportData() {
 	const normalizedCategory = (this.category || '').trim();

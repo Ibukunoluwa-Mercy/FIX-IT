@@ -1,5 +1,6 @@
 const Report = require('../models/Report');
 const User = require('../models/User');
+const Comment = require('../models/Comment');
 const mongoose = require('mongoose');
 const {
 	CATEGORY_GROUPS,
@@ -200,9 +201,9 @@ const getReportsByMe = async (req, res) => {
 		
 		const [allCount, pendingCount, inProgressCount, resolvedCount, rejectedCount] = await Promise.all([
 			Report.countDocuments(baseFilter),
-			Report.countDocuments({ ...baseFilter, status: { $regex: /^New$|^Pending$/i } }),
-			Report.countDocuments({ ...baseFilter, status: { $regex: /In Progress/i } }),
-			Report.countDocuments({ ...baseFilter, status: { $regex: /Resolved/i } }),
+			Report.countDocuments({ ...baseFilter, status: { $in: ['reported', 'New', 'Pending'] } }),
+			Report.countDocuments({ ...baseFilter, status: { $in: ['in_progress', 'In Progress'] } }),
+			Report.countDocuments({ ...baseFilter, status: { $in: ['resolved', 'Resolved'] } }),
 			Report.countDocuments({ ...baseFilter, status: { $regex: /Rejected/i } }),
 		]);
 		
@@ -216,9 +217,9 @@ const getReportsByMe = async (req, res) => {
 		
 		const queryFilter = { ...baseFilter };
 		if (status !== 'all') {
-			if (status === 'pending') queryFilter.status = { $regex: /^New$|^Pending$/i };
-			else if (status === 'in_progress') queryFilter.status = { $regex: /In Progress/i };
-			else if (status === 'resolved') queryFilter.status = { $regex: /Resolved/i };
+			if (status === 'pending') queryFilter.status = { $in: ['reported', 'New', 'Pending'] };
+			else if (status === 'in_progress') queryFilter.status = { $in: ['in_progress', 'In Progress'] };
+			else if (status === 'resolved') queryFilter.status = { $in: ['resolved', 'Resolved'] };
 			else if (status === 'rejected') queryFilter.status = { $regex: /Rejected/i };
 		}
 		
@@ -234,7 +235,7 @@ const getReportsByMe = async (req, res) => {
 			title: r.title,
 			category: r.category,
 			description: r.description,
-			status: r.status,
+			status: normalizeReportStatus(r.status),
 			addressText: r.location?.addressText || r.location?.address || '',
 			thumbnailUrl: r.images?.[0] || r.photos?.[0] || r.imageUrl || null,
 			createdAt: r.createdAt
@@ -250,4 +251,114 @@ const getReportsByMe = async (req, res) => {
 	}
 };
 
-module.exports = { getHomeData, getCommunityOverview, getMapReports, getNearbyReports, getReportsByMe };
+const normalizeReportStatus = (value) => {
+	const status = String(value || '').toLowerCase().trim().replace(/[_-]+/g, ' ');
+	if (status === 'new' || status === 'pending' || status === 'reported') return 'reported';
+	if (status === 'in progress') return 'in_progress';
+	if (status === 'resolved') return 'resolved';
+	if (status === 'closed' || status === 'rejected') return 'closed';
+	return 'reported';
+};
+
+const getMyReport = (req, res) => {
+	const userId = req.user?._id || req.user?.id;
+	const reportId = req.params.id;
+	if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+	if (!mongoose.Types.ObjectId.isValid(reportId)) return res.status(404).json({ error: 'Report not found' });
+
+	// Scope the lookup to the signed-in reporter so a valid ID alone cannot expose another resident's report.
+	return Report.findOne({ _id: reportId, $or: [{ user: userId }, { createdBy: userId }] }).lean()
+		.then((report) => {
+			if (!report) return null;
+			return User.findById(report.createdBy || report.user).select('name avatarUrl').lean()
+				.then((reporter) => ({ report, reporter }));
+		})
+		.then((result) => {
+			if (!result) return res.status(404).json({ error: 'Report not found' });
+			const { report, reporter } = result;
+			const images = [...new Set([...(report.images || []), ...(report.photos || []), report.imageUrl].filter(Boolean))];
+			const location = report.location || {};
+			// Return a flat, version-stable contract with canonical lifecycle names and explicit future timestamps.
+			return res.json({
+				id: String(report._id),
+				reportId: report.reportId || '',
+				title: report.title || report.category || '',
+				category: report.category || '',
+				description: report.description || '',
+				location: {
+					address: location.addressText || location.address || '',
+					lat: location.latitude ?? location.lat ?? null,
+					lng: location.longitude ?? location.lng ?? null,
+				},
+				images,
+				reportedBy: {
+					id: String(reporter?._id || report.createdBy || report.user),
+					name: reporter?.name || 'Resident',
+					avatar: reporter?.avatarUrl || '',
+				},
+				createdAt: report.createdAt,
+				reportedAt: report.reportedAt || report.createdAt,
+				status: normalizeReportStatus(report.status),
+				inProgressAt: report.inProgressAt || null,
+				resolvedAt: report.resolvedAt || null,
+				closedAt: report.closedAt || null,
+				updates: report.updates || [],
+			});
+		})
+		.catch((error) => {
+			console.error('Report details fetch failed:', error);
+			return res.status(500).json({ error: 'Unable to load report details' });
+		});
+};
+
+const getMyReportComments = (req, res) => {
+	const userId = req.user?._id || req.user?.id;
+	const reportId = req.params.id;
+	if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+	if (!mongoose.Types.ObjectId.isValid(reportId)) return res.status(404).json({ error: 'Report not found' });
+
+	// Confirm ownership before querying either persisted comments or the report's embedded update history.
+	return Report.findOne({ _id: reportId, $or: [{ user: userId }, { createdBy: userId }] }).lean()
+		.then((report) => {
+			if (!report) return null;
+			return Promise.all([
+				Comment.find({ report: report._id }).populate('createdBy', 'name avatarUrl').sort({ createdAt: 1 }).lean(),
+				User.findById(report.createdBy || report.user).select('name avatarUrl').lean(),
+			]).then(([comments, reporter]) => ({ report, comments, reporter }));
+		})
+		.then((result) => {
+			if (!result) return res.status(404).json({ error: 'Report not found' });
+			const commentItems = result.comments.map((comment) => ({
+				id: String(comment._id),
+				type: 'comment',
+				commenter: {
+					id: String(comment.createdBy?._id || comment.createdBy || ''),
+					name: comment.createdBy?.name || 'Community member',
+					avatar: comment.createdBy?.avatarUrl || '',
+				},
+				message: comment.text,
+				timestamp: comment.createdAt,
+			}));
+			const updateItems = (result.report.updates || []).map((update, index) => ({
+				id: `update-${index}`,
+				type: 'update',
+				commenter: {
+					id: String(result.report.createdBy || result.report.user),
+					name: update.author || result.reporter?.name || 'FixIt',
+					avatar: result.reporter?.avatarUrl || '',
+				},
+				message: update.text,
+				timestamp: update.timestamp,
+			}));
+			const comments = [...commentItems, ...updateItems]
+				.filter((item) => item.message)
+				.sort((left, right) => new Date(left.timestamp || 0) - new Date(right.timestamp || 0));
+			return res.json({ reportId: String(result.report._id), comments });
+		})
+		.catch((error) => {
+			console.error('Report comments fetch failed:', error);
+			return res.status(500).json({ error: 'Unable to load report comments' });
+		});
+};
+
+module.exports = { getHomeData, getCommunityOverview, getMapReports, getNearbyReports, getReportsByMe, getMyReport, getMyReportComments };

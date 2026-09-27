@@ -178,6 +178,7 @@ const submitWizardReport = async (req, res) => {
 		if (!user) return res.status(404).json({ message: 'User not found.' });
 
 		const reportId = await getNextReportId();
+		const reportedAt = new Date();
 		const photoList = normalizePhotoUrls(req.body.photos || req.body.images || (req.body.imageUrl ? [req.body.imageUrl] : []));
 		const report = await Report.create({
 			reportId,
@@ -187,7 +188,8 @@ const submitWizardReport = async (req, res) => {
 			category: rawCategory,
 			description: rawDescription.slice(0, 500),
 			severity: normalizedSeverity,
-			status: 'New',
+			status: 'reported',
+			reportedAt,
 			location,
 			photos: photoList,
 			images: photoList,
@@ -218,6 +220,7 @@ const submitReport = async (req, res) => {
 		if (!title || !address) return res.status(400).json({ error: 'Title and address are required', message: 'Title and address are required' });
 		if (!validatedLocation.valid) return res.status(400).json({ error: validatedLocation.error, message: validatedLocation.error });
 		const reportId = await getNextReportId();
+		const reportedAt = new Date();
 		const report = await Report.create({
 			reportId, user: userId, createdBy: userId, title, category, description,
 			location: {
@@ -232,7 +235,7 @@ const submitReport = async (req, res) => {
 				capturedAt: validatedLocation.capturedAt,
 				lowAccuracy: validatedLocation.source === 'gps' && validatedLocation.accuracy > 100,
 			},
-			status: 'New', imageUrl, images: imageUrl ? [imageUrl] : [],
+			status: 'reported', reportedAt, imageUrl, images: imageUrl ? [imageUrl] : [],
 			updates: [{ type: 'SUBMITTED', text: 'Report submitted and pending review.', author: req.user?.name || '', timestamp: new Date() }],
 		});
 		return res.status(201).json(report);

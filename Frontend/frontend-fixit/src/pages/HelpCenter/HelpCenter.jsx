@@ -76,6 +76,10 @@ const HelpCenter = () => {
     contactForm,
     setContactForm,
     sendingMessage,
+    contactFieldErrors,
+    contactError,
+    submitSuccess,
+    setSubmitSuccess,
     handleOpenContactModal,
     handleContactSubmit,
   } = useHelpCenterData(user);
@@ -191,6 +195,15 @@ const HelpCenter = () => {
         onFormChange={setContactForm}
         onSubmit={handleContactSubmit}
         sendingMessage={sendingMessage}
+        fieldErrors={contactFieldErrors}
+        submitError={contactError}
+        submitSuccess={submitSuccess}
+        onDismissSuccess={() => {
+          // When the resident clicks "Close" on the success banner,
+          // reset the success flag and close the modal cleanly.
+          setSubmitSuccess(false);
+          setShowContactModal(false);
+        }}
         userName={userName}
       />
 
