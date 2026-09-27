@@ -221,6 +221,23 @@
   border-color: #3b82f6;
 }
 
+/* Send button — loading / disabled state */
+.help-btn-contact-orange:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Success confirmation banner — green check circle animation */
+@keyframes contact-success-pop {
+  from { transform: scale(0.7); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.contact-success-icon {
+  animation: contact-success-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
 /* Responsive adjustments */
 @media (max-width: 991px) {
   .help-banner-illustration-wrap {
