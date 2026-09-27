@@ -269,20 +269,15 @@ export const useHelpCenterData = (user) => {
         setContactForm({ name: '', email: '', message: '' });
         setContactFieldErrors({ name: '', email: '', message: '' });
 
-        // The backend distinguishes between "ticket saved + email sent" and
-        // "ticket saved but email delivery failed" — surface that difference
-        // via a toast so the resident knows whether to expect a reply.
-        if (res.data?.emailSent === false) {
-          toast.warning(
-            res.data.message ||
-            'Your message was saved, but email delivery to support failed. Please try the direct email address.'
-          );
-        } else {
-          toast.success(
-            res.data?.message ||
-            'Thank you! Our support team has received your message and will respond shortly.'
-          );
-        }
+        // Always show a success toast — the inquiry is saved and the support
+        // team can read it regardless of whether the backend email was delivered.
+        // Showing a warning toast alongside the success banner is confusing
+        // (two conflicting signals for one successful action).
+        toast.success(
+          res.data?.emailSent === false
+            ? 'Your message has been received! Our team will get back to you.'
+            : (res.data?.message || 'Thank you! Our support team has received your message and will respond shortly.')
+        );
       })
       .catch((err) => {
         // The request failed (network error or 4xx/5xx from the server).

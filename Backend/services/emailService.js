@@ -46,6 +46,13 @@ const createTransporter = () => {
 			// from a password manager sometimes introduces trailing spaces.
 			pass: smtpPassword.replace(/\s/g, ''),
 		},
+		// Force IPv4 resolution.
+		// Node.js resolves smtp.gmail.com to an IPv6 address (2a00:1450:...)
+		// first. If the host network does not support IPv6 (common on Windows,
+		// Render, Railway, etc.) this causes an ETIMEDOUT error. Pinning to
+		// IPv4 (family: 4) makes the DNS lookup return a 142.250.x.x address
+		// that works on all networks.
+		family: 4,
 		// Allow Gmail's certificate chain on all hosting environments.
 		// Without this, some cloud providers (e.g. Render, Railway) reject
 		// Gmail's STARTTLS handshake with CERT_HAS_EXPIRED or UNABLE_TO_VERIFY.
@@ -223,6 +230,8 @@ const sendSupportTicketEmail = ({ name, email, subject, message, ticketId }) => 
 	// support address is not configured, skip silently and let the controller
 	// handle the degraded-mode response to the client.
 	if (!transporter || !supportTargetEmail) {
+		if (!transporter) console.warn('[EmailService] sendSupportTicketEmail: SMTP not configured (SMTP_HOST / SMTP_USER / SMTP_PASS missing).');
+		if (!supportTargetEmail) console.warn('[EmailService] sendSupportTicketEmail: SUPPORT_EMAIL env var is not set.');
 		return Promise.resolve({ sent: false, skipped: true });
 	}
 

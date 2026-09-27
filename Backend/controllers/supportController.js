@@ -82,7 +82,12 @@ const submitContactSupport = (req, res) => {
 			})
 				.then((mailResult) => {
 					const emailSent = Boolean(mailResult?.sent);
-					if (emailSent) console.log(`Support ticket email successfully sent for Ticket #${ticket._id}`);
+					const emailSkipped = Boolean(mailResult?.skipped);
+					if (emailSent) {
+						console.log(`[Support] Email sent to ${process.env.SUPPORT_EMAIL} for Ticket #${ticket._id}`);
+					} else if (emailSkipped) {
+						console.warn(`[Support] Email skipped (SMTP/SUPPORT_EMAIL not configured) for Ticket #${ticket._id}`);
+					}
 					return res.status(201).json({
 						success: true,
 						emailSent,

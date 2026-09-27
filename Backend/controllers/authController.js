@@ -60,19 +60,23 @@ const register = async (req, res) => {
 		// Send verification & welcome emails in the background (non-blocking)
 		setImmediate(async () => {
 			try {
-				await sendVerificationEmail({
+				const resVerify = await sendVerificationEmail({
 					email,
 					fullName,
 					verificationUrl: `${verificationBaseUrl}/verify-email?token=${verification.rawToken}`,
 				});
+				if (resVerify.skipped) console.log(`[Auth] Verification email SKIPPED (SMTP not configured) for ${email}`);
+				else console.log(`[Auth] Verification email SENT to ${email}`);
 			} catch (emailError) {
-				console.error('Verification email failed:', emailError.message);
+				console.error('[Auth] Verification email failed:', emailError.message);
 			}
 
 			try {
-				await sendWelcomeEmail({ email, fullName });
+				const resWelcome = await sendWelcomeEmail({ email, fullName });
+				if (resWelcome.skipped) console.log(`[Auth] Welcome email SKIPPED (SMTP not configured) for ${email}`);
+				else console.log(`[Auth] Welcome email SENT to ${email}`);
 			} catch (emailError) {
-				console.error('Welcome email failed:', emailError.message);
+				console.error('[Auth] Welcome email failed:', emailError.message);
 			}
 		});
 
@@ -261,9 +265,11 @@ const login = async (req, res) => {
 		// Send login notification in background (non-blocking)
 		setImmediate(async () => {
 			try {
-				await sendLoginEmail({ email: user.email, fullName: user.name || user.email });
+				const resLogin = await sendLoginEmail({ email: user.email, fullName: user.name || user.email });
+				if (resLogin.skipped) console.log(`[Auth] Login email SKIPPED (SMTP not configured) for ${user.email}`);
+				else console.log(`[Auth] Login notification email SENT to ${user.email}`);
 			} catch (emailError) {
-				console.error('Login email failed:', emailError.message);
+				console.error('[Auth] Login email failed:', emailError.message);
 			}
 		});
 
