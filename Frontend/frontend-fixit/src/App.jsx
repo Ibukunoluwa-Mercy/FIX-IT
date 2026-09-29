@@ -7,6 +7,7 @@ import CommunityMapPage from './pages/CommunityMapPage/CommunityMapPage'
 import ExploreIssuesPage from './pages/ExploreIssuesPage/ExploreIssuesPage'
 import AboutPage from './pages/AboutPage/AboutPage'
 import Register from './pages/Register/Register'
+import RegisterArtisan from './pages/Register/RegisterArtisan'
 import Login from './pages/Login/Login'
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
 import ResetPassword from './pages/ResetPassword/ResetPassword'
@@ -21,7 +22,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Auth-only routes that should render without the Navbar/Footer shell
-const AUTH_ROUTES = ['/register', '/login', '/forgot-password', '/reset-password'];
+const AUTH_ROUTES = ['/register', '/login', '/forgot-password', '/reset-password', '/signup/artisan'];
 const DASHBOARD_ROUTES = ['/dashboard', '/reports', '/my-reports', '/help-center', '/settings'];
 const LOCATION_ROUTES = ['/map'];
 
@@ -59,6 +60,7 @@ function AppShell() {
     return (
       <Routes>
         <Route path="/register" element={<Register />} />
+        <Route path="/signup/artisan" element={<RegisterArtisan />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />

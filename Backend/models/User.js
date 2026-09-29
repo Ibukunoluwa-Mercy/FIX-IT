@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema(
 		},
 		phone: { type: String, trim: true, index: true, sparse: true },
 		password: { type: String, required: true, minlength: 8, select: false },
-		role: { type: String, enum: ['resident', 'admin', 'Community Member', 'Issue Resolver', 'Administrator'], default: 'resident', required: true },
+		role: { type: String, enum: ['resident', 'admin', 'Community Member', 'Issue Resolver', 'Administrator', 'artisan'], default: 'resident', required: true },
 		location: { type: String, trim: true, default: '' },
 		notificationPreferences: {
 			issueUpdates: { type: Boolean, default: true },

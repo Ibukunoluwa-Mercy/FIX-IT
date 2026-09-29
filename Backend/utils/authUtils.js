@@ -5,6 +5,7 @@ const ROLE_MAP = {
 	resident: 'resident',
 	official: 'admin',
 	admin: 'admin',
+	artisan: 'artisan',
 };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
