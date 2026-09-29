@@ -20,6 +20,8 @@ const issuesRoutes = require('./routes/issuesRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 const helpRoutes = require('./routes/helpRoutes');
 const supportRoutes = require('./routes/supportRoutes');
+const artisanRoutes = require('./routes/artisanRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const { verifySmtpConnection } = require('./services/emailService');
 const HelpTopic = require('./models/HelpTopic');
 const { seedHelpCenter } = require('./seed/seedHelpCenter');
@@ -62,6 +64,8 @@ app.get('/api/health', (req, res) => res.status(mongoose.connection.readyState =
 }));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/artisans', artisanRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/geocode', geocodeRoutes);
 app.use('/api/users', userRoutes);

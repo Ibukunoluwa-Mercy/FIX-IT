@@ -199,98 +199,6 @@ const registerOfficial = async (req, res) => {
 	}
 };
 
-const registerArtisan = async (req, res) => {
-	const fullName = normalizeText(req.body.fullName);
-	const email = normalizeText(req.body.email).toLowerCase();
-	const phone = normalizeText(req.body.phone);
-	const neighborhood = normalizeText(req.body.neighborhood);
-	const password = typeof req.body.password === 'string' ? req.body.password : '';
-	const businessName = normalizeText(req.body.businessName);
-
-	const removeUploadedFile = async () => {
-		if (req.file?.path) await fs.unlink(req.file.path).catch(() => {});
-	};
-
-	if (!fullName || !email || !phone || !password || !neighborhood || !businessName) {
-		await removeUploadedFile();
-		return res.status(400).json({ message: 'All required fields must be provided' });
-	}
-	if (!req.file) return res.status(400).json({ message: 'Certificate document is required' });
-	if (!emailPattern.test(email)) { await removeUploadedFile(); return res.status(400).json({ message: 'Please provide a valid email address' }); }
-	if (password.length < 8 || password.length > 128) { await removeUploadedFile(); return res.status(400).json({ message: 'Password must be between 8 and 128 characters' }); }
-
-	try {
-		const duplicate = await User.findOne({ $or: [{ email }, { phone }] }).select('email phone').lean();
-		if (duplicate) {
-			await removeUploadedFile();
-			return res.status(409).json({ message: duplicate.email === email ? 'An account with this email already exists' : 'An account with this phone number already exists' });
-		}
-
-		const verification = createVerificationToken();
-		const user = await User.create({
-			name: fullName,
-			email,
-			phone,
-			location: neighborhood,
-			password,
-			role: 'artisan',
-			emailVerificationTokenHash: verification.hash,
-			emailVerificationExpires: verification.expires,
-		});
-
-		const ArtisanProfile = require('../models/ArtisanProfile');
-		let profile;
-		try {
-			profile = await ArtisanProfile.create({
-				user: user._id,
-				businessName,
-				certificateUrl: `/uploads/official-ids/${req.file.filename}`, // Reuse same upload folder for simplicity
-			});
-		} catch (profileError) {
-			await User.deleteOne({ _id: user._id });
-			await removeUploadedFile();
-			throw profileError;
-		}
-
-		// Send verification & welcome emails in the background (non-blocking)
-		setImmediate(async () => {
-			try {
-				await sendVerificationEmail({
-					email,
-					fullName,
-					verificationUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${verification.rawToken}`,
-				});
-			} catch (emailError) {
-				console.error('Artisan verification email failed:', emailError.message);
-			}
-
-			try {
-				await sendWelcomeEmail({ email, fullName });
-			} catch (emailError) {
-				console.error('Artisan welcome email failed:', emailError.message);
-			}
-		});
-
-		return res.status(201).json({
-			message: 'Artisan account created successfully',
-			token: createToken(user),
-			profile: {
-				...user.toSafeProfile(),
-				phone: user.phone,
-				role: 'artisan',
-				artisanDetails: {
-					businessName: profile.businessName,
-					certificateUrl: profile.certificateUrl,
-				},
-			},
-		});
-	} catch (error) {
-		await removeUploadedFile();
-		if (error.code === 11000) return res.status(409).json({ message: 'An account with this email or phone number already exists' });
-		console.error('Artisan registration failed:', error.message);
-		return res.status(500).json({ message: 'Unable to create Artisan account' });
-	}
-};
 
 const verifyEmail = async (req, res) => {
 	const rawToken = normalizeText(req.query.token);
@@ -386,7 +294,7 @@ const login = async (req, res) => {
 module.exports = {
 	register,
 	registerOfficial,
-	registerArtisan,
+	registerOfficial,
 	verifyEmail,
 	forgotPassword,
 	resetPassword,

@@ -6,6 +6,7 @@ import logo from '../../assets/fixit-logo-white.png';
 import neighborhoodIllustration from '../../assets/neighborhood_illustration.png';
 import securityIllustration from '../../assets/security building illustration.png';
 import './Register.css';
+import { Step1Personal, Step2Business, Step3Review } from './ArtisanFormSteps';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
 const initialForm = { fullName: '', email: '', phone: '', neighborhood: '', password: '', businessName: '', certificateFile: null };
@@ -118,7 +119,7 @@ const RegisterArtisan = () => {
         formData.append('businessName', form.businessName.trim());
         formData.append('certificate', form.certificateFile);
 
-        axios.post(`${API_URL}/api/auth/register-artisan`, formData)
+        axios.post(`${API_URL}/api/artisans/register`, formData)
             .then((response) => {
                 setLoading(false);
                 if (response.status === 201 || response.status === 200) {
@@ -134,38 +135,6 @@ const RegisterArtisan = () => {
                 setErrors({ form: message });
             });
     };
-
-    // Reusable input component helper
-    const input = (name, label, iconClass, placeholder, type = 'text', extra = {}) => (
-        <div className="reg-field">
-            <label className="reg-label" htmlFor={name}>{label}</label>
-            <div className={`reg-input-wrap ${errors[name] ? 'has-error' : ''}`}>
-                <i className={`${iconClass} reg-input-icon`}></i>
-                <input
-                    id={name} name={name} type={type} className="reg-input"
-                    placeholder={placeholder} value={form[name]}
-                    onChange={updateField} {...extra}
-                />
-                {name === 'password' && (
-                    <button type="button" className="reg-eye-btn" onClick={() => setShowPassword((value) => !value)} aria-label="Toggle password visibility">
-                        {showPassword ? <i className="fa-solid fa-eye-slash"></i> : <i className="fa-solid fa-eye"></i>}
-                    </button>
-                )}
-            </div>
-            {errors[name] && <span className="reg-error">{errors[name]}</span>}
-        </div>
-    );
-
-    // Terms checkbox component
-    const terms = (
-        <div className="reg-terms">
-            <label className="reg-terms-label">
-                <input type="checkbox" checked={agreed} onChange={(event) => setAgreed(event.target.checked)} className="reg-checkbox" />
-                <span>I agree to the <Link to="/terms" className="reg-link">Terms of Service</Link> and <Link to="/privacy" className="reg-link">Privacy Policy</Link>.</span>
-            </label>
-            {errors.agreed && <span className="reg-error">{errors.agreed}</span>}
-        </div>
-    );
 
     // Common Progress Indicator for Artisan
     const progress = (
@@ -188,127 +157,6 @@ const RegisterArtisan = () => {
         </div>
     );
 
-    // Renders Step 1: Personal Info
-    const personalStep = (
-        <>
-            <h2 className="register-card-title">Create Your Account</h2>
-            <p className="register-card-sub">Join our artisan community and get access to more opportunities.</p>
-            
-            <h3 className="step-section-title">Personal Information</h3>
-            {input('fullName', 'Full Name *', 'fa-solid fa-user', 'Enter your full name', 'text', { autoComplete: 'name' })}
-            {input('email', 'Email Address *', 'fa-solid fa-envelope', 'you@example.com', 'email', { autoComplete: 'email' })}
-            {input('phone', 'Phone Number *', 'fa-solid fa-phone', '+234 801 234 5678', 'tel', { autoComplete: 'tel' })}
-            {input('neighborhood', 'Neighborhood / Zip Code *', 'fa-solid fa-location-dot', 'e.g. 90210 or Downtown')}
-            {input('password', 'Password *', 'fa-solid fa-lock', 'Create a strong password', showPassword ? 'text' : 'password', { autoComplete: 'new-password' })}
-            
-            {terms}
-            {errors.form && <span className="reg-error">{errors.form}</span>}
-            
-            <div className="wizard-actions" style={{ marginTop: '20px' }}>
-                <button type="button" className="reg-submit-btn" onClick={goNext}>
-                    Continue <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i>
-                </button>
-            </div>
-        </>
-    );
-
-    // Renders Step 2: Business Information and Certificate Upload
-    const businessStep = (
-        <>
-            <h2 className="register-card-title">Business Information</h2>
-            <p className="register-card-sub">Tell us about your brand and provide verification.</p>
-            
-            {input('businessName', 'Brand / Business Name *', 'fa-solid fa-store', 'Enter your official brand or business name')}
-            <p className="password-hint" style={{ marginTop: '-8px', marginBottom: '12px' }}>This will be displayed on your profile and to customers.</p>
-            
-            <div className="reg-field">
-                <label className="reg-label">Certificate Verification Upload *</label>
-                <p className="password-hint">Upload your professional certification or qualification documents (e.g. trade test certificate, professional license).</p>
-                
-                <button type="button" className={`upload-dropzone ${errors.certificateFile ? 'has-error' : ''}`} onClick={() => fileRef.current?.click()} onDragOver={(event) => event.preventDefault()} onDrop={handleDrop}>
-                    {form.certificateFile ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', width: '100%' }}>
-                            {form.certificateFile.type.startsWith('image/') && (
-                                <img 
-                                    src={URL.createObjectURL(form.certificateFile)} 
-                                    alt="Preview" 
-                                    style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }} 
-                                />
-                            )}
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                                <i className="fa-solid fa-file-check" style={{ fontSize: 20, color: '#10b981' }}></i>
-                                <strong>{form.certificateFile.name}</strong>
-                                <span style={{ fontSize: '12px' }}>({(form.certificateFile.size / 1024 / 1024).toFixed(2)} MB)</span>
-                                <i className="fa-solid fa-xmark" style={{ cursor: 'pointer', color: '#ef4444', padding: '4px' }} onClick={removeFile} aria-label="Remove file"></i>
-                            </div>
-                        </div>
-                    ) : (
-                        <>
-                            <i className="fa-solid fa-cloud-arrow-up" style={{ fontSize: 20 }}></i>
-                            <strong>Click to upload or drag and drop</strong>
-                            <span>PDF, JPG or PNG (Max. 5MB)</span>
-                        </>
-                    )}
-                </button>
-                <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" hidden onChange={handleFile} />
-                {errors.certificateFile && <span className="reg-error">{errors.certificateFile}</span>}
-            </div>
-
-            <div className="wizard-actions">
-                <button type="button" className="wizard-secondary" onClick={() => setStep(1)}>Back</button>
-                <button type="button" className="reg-submit-btn" onClick={goNext}>
-                    Continue <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i>
-                </button>
-            </div>
-        </>
-    );
-
-    // Summary block helper for Step 3
-    const summaryBlock = (title, onEdit, items) => (
-        <section className="summary-card">
-            <div className="summary-header">
-                <strong>{title}</strong>
-                <button type="button" onClick={onEdit}>Edit</button>
-            </div>
-            {items.map(([iconClass, label, value]) => (
-                <div className="summary-row" key={label}>
-                    <i className={`${iconClass}`} style={{ fontSize: 13 }}></i>
-                    <span>{label}</span>
-                    <strong>{value || 'Not provided'}</strong>
-                </div>
-            ))}
-        </section>
-    );
-
-    // Renders Step 3: Review Details and Submit
-    const reviewStep = (
-        <>
-            <h2 className="review-title">Review &amp; Create</h2>
-            <p className="register-card-sub">Please confirm your information is correct before submitting.</p>
-            
-            {summaryBlock('Personal Information', () => setStep(1), [
-                ['fa-solid fa-user', 'Full Name', form.fullName],
-                ['fa-solid fa-envelope', 'Email Address', form.email],
-                ['fa-solid fa-phone', 'Phone Number', form.phone],
-                ['fa-solid fa-location-dot', 'Neighborhood', form.neighborhood]
-            ])}
-            
-            {summaryBlock('Business Information', () => setStep(2), [
-                ['fa-solid fa-store', 'Business Name', form.businessName],
-                ['fa-solid fa-file-lines', 'Certificate', form.certificateFile?.name || 'Not uploaded']
-            ])}
-            
-            {errors.form && <span className="reg-error">{errors.form}</span>}
-            
-            <div className="wizard-actions">
-                <button type="button" className="wizard-secondary" onClick={() => setStep(2)}>Back</button>
-                <button type="submit" className="reg-submit-btn" disabled={loading}>
-                    {loading ? 'Submitting...' : <>Create Account <i className="fa-solid fa-check" style={{ marginLeft: 6 }}></i></>}
-                </button>
-            </div>
-        </>
-    );
-
     // Render Success Screen
     if (success) {
         return (
@@ -317,11 +165,15 @@ const RegisterArtisan = () => {
                     <Link to="/"><img src={logo} alt="Fixit" className="register-logo" /></Link>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
-                    <div className="register-card" style={{ textAlign: 'center', maxWidth: '400px' }}>
-                        <i className="fa-solid fa-circle-check" style={{ fontSize: '48px', color: '#10b981', marginBottom: '16px' }}></i>
-                        <h2 className="register-card-title">Registration Received</h2>
-                        <p className="register-card-sub" style={{ marginTop: '12px' }}>Your artisan profile and certificate are currently under review. We will notify you once your account has been verified.</p>
-                        <button className="reg-submit-btn" onClick={() => navigate('/')} style={{ marginTop: '24px' }}>Return to Home</button>
+                    <div className="register-card" style={{ textAlign: 'center', maxWidth: '400px', padding: '40px' }}>
+                        <i className="fa-solid fa-circle-check" style={{ fontSize: '56px', color: '#10b981', marginBottom: '16px', padding: '10px' }}></i>
+                        <h2 className="register-card-title" style={{ color: '#0f172a', fontWeight: '700' }}>Registration Successful!</h2>
+                        <p className="register-card-sub" style={{ marginTop: '16px', fontSize: '15px', color: '#475569', lineHeight: '1.5' }}>
+                            Login in the next five minutes to have access to your dashboard. We're currently verifying your information.
+                        </p>
+                        <button className="reg-submit-btn" onClick={() => navigate('/login')} style={{ marginTop: '28px' }}>
+                            Go to Login <i className="fa-solid fa-arrow-right" style={{ marginLeft: '6px' }}></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -379,7 +231,26 @@ const RegisterArtisan = () => {
                     <div className="register-card">
                         {progress}
                         <form onSubmit={submit} className="register-form" noValidate>
-                            {step === 1 ? personalStep : step === 2 ? businessStep : reviewStep}
+                            {step === 1 && (
+                                <Step1Personal 
+                                    form={form} errors={errors} updateField={updateField} 
+                                    agreed={agreed} setAgreed={setAgreed} 
+                                    showPassword={showPassword} setShowPassword={setShowPassword} 
+                                    goNext={goNext} 
+                                />
+                            )}
+                            {step === 2 && (
+                                <Step2Business 
+                                    form={form} errors={errors} updateField={updateField} 
+                                    fileRef={fileRef} handleDrop={handleDrop} removeFile={removeFile} handleFile={handleFile} 
+                                    goNext={goNext} setStep={setStep} 
+                                />
+                            )}
+                            {step === 3 && (
+                                <Step3Review 
+                                    form={form} errors={errors} loading={loading} setStep={setStep} 
+                                />
+                            )}
                         </form>
                         <p className="reg-footer-link">Already have an account? <Link to="/login" className="reg-link">Log in here</Link></p>
                     </div>
@@ -404,3 +275,4 @@ const RegisterArtisan = () => {
 };
 
 export default RegisterArtisan;
+
