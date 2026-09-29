@@ -49,14 +49,18 @@ const RegisterArtisan = () => {
         return nextErrors;
     };
 
+    const [lastStepChange, setLastStepChange] = useState(0);
+
     // Proceed to next step if validation passes
-    const goNext = () => {
+    const goNext = (e) => {
+        if (e && e.preventDefault) e.preventDefault();
         const nextErrors = step === 1 ? validateStep1() : validateStep2();
         if (Object.keys(nextErrors).length) {
             setErrors(nextErrors);
             return;
         }
         setStep((current) => current + 1);
+        setLastStepChange(Date.now());
         setErrors({});
     };
 
@@ -89,7 +93,12 @@ const RegisterArtisan = () => {
 
     // Submit form to API using promise chaining (no async/await)
     const submit = (event) => {
-        event.preventDefault();
+        if (event && event.preventDefault) event.preventDefault();
+        
+        // Prevent ghost clicks and double clicks that happen immediately after step change
+        if (Date.now() - lastStepChange < 500) {
+            return;
+        }
         
         // Prevent premature submission (e.g. if user hits Enter in an input on Step 1 or 2)
         if (step < 3) {
