@@ -5,6 +5,7 @@ const dns = require('dns');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 dns.setServers(['8.8.8.8', '8.8.4.4']);
@@ -55,6 +56,7 @@ app.use(cors({
 }));
 app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: process.env.URLENCODED_BODY_LIMIT || '2mb' }));
+app.use(cookieParser());
 app.use('/uploads/reports', express.static(reportUploadDirectory, { maxAge: '1d' }));
 app.use('/uploads', express.static(uploadDirectory, { maxAge: '1d' }));
 

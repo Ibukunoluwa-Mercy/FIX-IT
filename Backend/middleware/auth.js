@@ -5,7 +5,7 @@ const getJwtSecret = () => process.env.JWT_SECRET || 'fixit-development-secret';
 
 const protect = async (req, res, next) => {
 	const authorization = req.headers.authorization || '';
-	const token = authorization.startsWith('Bearer ') ? authorization.slice(7).trim() : '';
+	const token = req.cookies?.token || (authorization.startsWith('Bearer ') ? authorization.slice(7).trim() : '');
 	if (!token) return res.status(401).json({ message: 'Authentication required' });
 
 	try {

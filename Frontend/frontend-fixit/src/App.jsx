@@ -16,6 +16,7 @@ import MyReports from './pages/MyReports/MyReports'
 import UserLocationMapPage from './pages/UserLocationMapPage/UserLocationMapPage'
 import HelpCenter from './pages/HelpCenter/HelpCenter'
 import SettingsPage from './pages/SettingsPage/SettingsPage'
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
 import './dashboard-theme.css'
 
 import { ToastContainer } from 'react-toastify';
@@ -70,15 +71,17 @@ function AppShell() {
 
   if (isDashboard) {
     return (
-      <Routes>
-        <Route path="/dashboard" element={<ResidentDashboard />} />
-        <Route path="/my-reports" element={<MyReports />} />
-        <Route path="/my-reports/:id" element={<MyReports />} />
-        <Route path="/reports" element={<MyReports />} />
-        <Route path="/reports/:id" element={<MyReports />} />
-        <Route path="/help-center" element={<HelpCenter />} />
-        <Route path="/settings" element={<SettingsPage />} />
-      </Routes>
+      <ProtectedRoute>
+        <Routes>
+          <Route path="/dashboard" element={<ResidentDashboard />} />
+          <Route path="/my-reports" element={<MyReports />} />
+          <Route path="/my-reports/:id" element={<MyReports />} />
+          <Route path="/reports" element={<MyReports />} />
+          <Route path="/reports/:id" element={<MyReports />} />
+          <Route path="/help-center" element={<HelpCenter />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Routes>
+      </ProtectedRoute>
     );
   }
 

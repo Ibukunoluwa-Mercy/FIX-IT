@@ -37,6 +37,10 @@ const register = async (req, res) => {
 		if (existingUser) return res.status(409).json({ message: 'An account with this email already exists' });
 
 		const verification = createVerificationToken();
+		
+		const verifMinutes = parseInt(process.env.VERIFICATION_MINUTES, 10) || 2;
+		const verificationEndsAt = new Date(Date.now() + verifMinutes * 60 * 1000);
+
 		const user = await User.create({
 			name: fullName,
 			email,
@@ -45,6 +49,7 @@ const register = async (req, res) => {
 			role: ROLE_MAP[roleKey] || 'resident',
 			emailVerificationTokenHash: verification.hash,
 			emailVerificationExpires: verification.expires,
+			verificationEndsAt,
 		});
 
 		try {
@@ -83,6 +88,7 @@ const register = async (req, res) => {
 		return res.status(201).json({
 			message: 'Account created successfully',
 			token: createToken(user),
+			verificationEndsAt,
 			user: user.toSafeProfile(),
 			emailVerification: { sent: true, queued: true },
 			welcomeEmail: { sent: true, queued: true },
@@ -128,6 +134,10 @@ const registerOfficial = async (req, res) => {
 		}
 
 		const verification = createVerificationToken();
+		
+		const verifMinutes = parseInt(process.env.VERIFICATION_MINUTES, 10) || 2;
+		const verificationEndsAt = new Date(Date.now() + verifMinutes * 60 * 1000);
+
 		const user = await User.create({
 			name: fullName,
 			email,
@@ -137,6 +147,7 @@ const registerOfficial = async (req, res) => {
 			role: 'admin',
 			emailVerificationTokenHash: verification.hash,
 			emailVerificationExpires: verification.expires,
+			verificationEndsAt,
 		});
 		let profile;
 		try {
@@ -177,6 +188,7 @@ const registerOfficial = async (req, res) => {
 		return res.status(201).json({
 			message: 'Local Official account created successfully',
 			token: createToken(user),
+			verificationEndsAt,
 			profile: {
 				...user.toSafeProfile(),
 				phone: user.phone,
@@ -239,56 +251,91 @@ const createAdmin = async (req, res) => {
 	}
 };
 
-const login = async (req, res) => {
+// Login with Promise Chaining, accountStatus checking, and httpOnly cookie setup
+const login = (req, res) => {
 	const email = normalizeText(req.body.email).toLowerCase();
 	const password = typeof req.body.password === 'string' ? req.body.password : '';
 	if (!email || !password) {
 		return res.status(400).json({ message: 'Email and password are required' });
 	}
 
-	try {
-		const user = await User.findOne({ email }).select('+password');
+	User.findOne({ email }).select('+password').then((user) => {
 		if (!user) {
-			return res.status(401).json({ message: 'Invalid credentials' });
+			return res.status(401).json({ message: 'Invalid email or password' });
 		}
 
-		const isPasswordCorrect = await user.matchPassword(password);
-		if (!isPasswordCorrect) {
-			return res.status(401).json({ message: 'Invalid credentials' });
-		}
-
-		if (user.isActive === false) {
-			return res.status(403).json({ message: 'This account is inactive' });
-		}
-
-		const token = createToken(user);
-
-		// Send login notification in background (non-blocking)
-		setImmediate(async () => {
-			try {
-				const resLogin = await sendLoginEmail({ email: user.email, fullName: user.name || user.email });
-				if (resLogin.skipped) console.log(`[Auth] Login email SKIPPED (SMTP not configured) for ${user.email}`);
-				else console.log(`[Auth] Login notification email SENT to ${user.email}`);
-			} catch (emailError) {
-				console.error('[Auth] Login email failed:', emailError.message);
+		user.matchPassword(password).then((isPasswordCorrect) => {
+			if (!isPasswordCorrect) {
+				return res.status(401).json({ message: 'Invalid email or password' });
 			}
-		});
 
-		return res.status(200).json({
-			message: 'Login successful',
-			token,
-			user: {
-				id: user._id,
-				fullName: user.name,
-				name: user.name,
-				email: user.email,
-				role: user.role,
-			},
+			// Password is correct, now check accountStatus
+			const now = new Date();
+			if (user.accountStatus === 'suspended') {
+				return res.status(403).json({ code: 'ACCOUNT_SUSPENDED', message: 'This account is not active. Contact support.' });
+			}
+
+			if (user.accountStatus === 'verifying') {
+				if (user.verificationEndsAt && now < user.verificationEndsAt) {
+					const secondsRemaining = Math.ceil((user.verificationEndsAt.getTime() - now.getTime()) / 1000);
+					return res.status(403).json({ code: 'ACCOUNT_VERIFYING', secondsRemaining, message: 'We are still verifying your information.' });
+				} else {
+					// Lazy activation
+					user.accountStatus = 'active';
+					user.activatedAt = now;
+					user.save().catch(err => console.error('Failed to lazy-activate user:', err));
+				}
+			}
+
+			// Sign JWT and set it in httpOnly cookie
+			const token = createToken(user);
+			res.cookie('token', token, {
+				httpOnly: true,
+				secure: process.env.NODE_ENV === 'production',
+				sameSite: 'lax',
+				maxAge: 3600000 // 1 hour
+			});
+
+			// Send login notification in background (non-blocking)
+			setImmediate(() => {
+				sendLoginEmail({ email: user.email, fullName: user.name || user.email })
+					.then(resLogin => {
+						if (resLogin.skipped) console.log(`[Auth] Login email SKIPPED for ${user.email}`);
+						else console.log(`[Auth] Login notification email SENT to ${user.email}`);
+					})
+					.catch(emailError => console.error('[Auth] Login email failed:', emailError.message));
+			});
+
+			return res.status(200).json({
+				message: 'Login successful',
+				user: {
+					id: user._id,
+					fullName: user.name,
+					role: user.role,
+				},
+			});
+		}).catch(error => {
+			console.error('Password comparison failed:', error.message);
+			return res.status(500).json({ message: 'Unable to sign in' });
 		});
-	} catch (error) {
-		console.error('Login failed:', error.message);
+	}).catch(error => {
+		console.error('Login query failed:', error.message);
 		return res.status(500).json({ message: 'Unable to sign in' });
-	}
+	});
+};
+
+const getMe = (req, res) => {
+	// authMiddleware guarantees req.user is populated
+	return res.status(200).json({ user: req.user.toSafeProfile() });
+};
+
+const logout = (req, res) => {
+	res.clearCookie('token', {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === 'production',
+		sameSite: 'lax',
+	});
+	return res.status(200).json({ message: 'Logged out successfully' });
 };
 
 module.exports = {
@@ -300,4 +347,6 @@ module.exports = {
 	resetPassword,
 	createAdmin,
 	login,
+	getMe,
+	logout,
 };

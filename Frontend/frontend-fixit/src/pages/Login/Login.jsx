@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
@@ -24,7 +24,24 @@ const Login = () => {
     setError('');
   };
 
-  const handleSubmit = async (event) => {
+  const [countdown, setCountdown] = useState(null);
+  
+  // Optional: Update countdown live if it's set
+  useEffect(() => {
+      if (countdown !== null && countdown > 0) {
+          const timer = setInterval(() => setCountdown(c => c - 1), 1000);
+          return () => clearInterval(timer);
+      }
+  }, [countdown]);
+
+  // Pre-fill email if passed from Registration success screen
+  useEffect(() => {
+      if (location.state?.email && !form.email) {
+          setForm(prev => ({ ...prev, email: location.state.email }));
+      }
+  }, [location.state]);
+
+  const handleSubmit = (event) => {
     event.preventDefault();
 
     if (!form.email.trim() || !form.password.trim()) {
@@ -34,33 +51,68 @@ const Login = () => {
 
     setLoading(true);
     setError('');
+    setCountdown(null);
 
-    try {
-      const response = await axios.post(`${API_URL}/api/auth/login`, {
-          email: form.email.trim().toLowerCase(),
-          password: form.password,
-        });
+    // 1. Submit with fetch using .then()/.catch() promise chaining (no async/await)
+    // 2. Include credentials to store httpOnly cookies securely
+    fetch(`${API_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        email: form.email.trim().toLowerCase(),
+        password: form.password,
+      }),
+    })
+      .then((response) => {
+        // We need to parse JSON to see error codes/messages
+        return response.json().then((data) => ({ status: response.status, data }));
+      })
+      .then(({ status, data }) => {
+        setLoading(false);
 
-      const data = response.data;
+        // 3. Handle responses by status code as requested
+        if (status === 200) {
+          localStorage.setItem('fixitToken', data.token); // Optional: if using bearer fallback
+          localStorage.setItem('fixitUser', JSON.stringify(data.user || {}));
+          localStorage.setItem('fixitDashboardGreeting', 'welcome-back');
 
-      if (!data) {
-        throw new Error('Unable to sign in right now.');
-      }
-
-      localStorage.setItem('fixitToken', data.token);
-      localStorage.setItem('fixitUser', JSON.stringify(data.user || {}));
-      localStorage.setItem('fixitDashboardGreeting', 'welcome-back');
-
-      const firstName = data.user?.name?.split(' ')[0] || 'there';
-      toast.success(`Welcome back, ${firstName}!`);
-      navigate('/dashboard');
-    } catch (err) {
-      const message = err.response?.data?.message || err.message || 'Unable to sign in right now.';
-      setError(message);
-      toast.error(message);
-    } finally {
-      setLoading(false);
-    }
+          const firstName = data.user?.name?.split(' ')[0] || 'there';
+          toast.success(`Welcome back, ${firstName}!`);
+          
+          // Redirect by role
+          const role = data.user?.role?.toLowerCase() || 'resident';
+          if (role === 'admin' || role === 'official') {
+              navigate('/dashboard/official');
+          } else if (role === 'artisan') {
+              navigate('/dashboard/artisan');
+          } else {
+              navigate('/dashboard/resident');
+          }
+        } else if (status === 403 && data.code === 'ACCOUNT_VERIFYING') {
+          // Do NOT show a red error. Show a friendly notice with a live countdown
+          setCountdown(data.secondsRemaining || 300);
+        } else if (status === 401) {
+          setError('Invalid email or password.');
+          toast.error('Invalid email or password.');
+        } else if (status === 403 && data.code === 'ACCOUNT_SUSPENDED') {
+          setError('This account is not active. Contact support.');
+          toast.error('This account is not active. Contact support.');
+        } else if (status === 429) {
+          setError('Too many attempts. Try again later.');
+          toast.error('Too many attempts. Try again later.');
+        } else {
+          const message = data.message || 'Unable to sign in right now.';
+          setError(message);
+          toast.error(message);
+        }
+      })
+      .catch((err) => {
+        setLoading(false);
+        const message = 'Unable to reach the server. Please try again.';
+        setError(message);
+        toast.error(message);
+      });
   };
 
   return (
@@ -165,9 +217,18 @@ const Login = () => {
                 </div>
               </div>
 
-              {error && <div className="form-error">{error}</div>}
+              {countdown !== null ? (
+                <div className="form-notice" style={{ color: '#f59e0b', backgroundColor: '#fffbeb', padding: '12px', borderRadius: '8px', border: '1px solid #fde68a', marginBottom: '16px', fontSize: '14px', lineHeight: '1.5' }}>
+                  <i className="fa-solid fa-clock" style={{ marginRight: '8px' }}></i>
+                  {countdown > 0 
+                    ? `We're still verifying your information. You can log in in ${Math.floor(countdown / 60)}:${(countdown % 60).toString().padStart(2, '0')}.`
+                    : "You're all set, log in now."}
+                </div>
+              ) : error ? (
+                <div className="form-error">{error}</div>
+              ) : null}
 
-              <button type="submit" className="login-submit" disabled={loading}>
+              <button type="submit" className="login-submit" disabled={loading || (countdown !== null && countdown > 0)}>
                 {loading ? 'Logging in...' : 'Login'}
                 <i className="fa-solid fa-arrow-right" style={{ marginLeft: 8 }}></i>
               </button>

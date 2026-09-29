@@ -54,6 +54,10 @@ const registerArtisan = (req, res) => {
 
 			// 4. Create User first
 			const verification = createVerificationToken();
+			
+			const verifMinutes = parseInt(process.env.VERIFICATION_MINUTES, 10) || 2;
+			const verificationEndsAt = new Date(Date.now() + verifMinutes * 60 * 1000);
+
 			return User.create({
 				name: fullName,
 				email,
@@ -63,6 +67,7 @@ const registerArtisan = (req, res) => {
 				role: 'artisan',
 				emailVerificationTokenHash: verification.hash,
 				emailVerificationExpires: verification.expires,
+				verificationEndsAt,
 			}).then((user) => {
 				// 5. Create ArtisanProfile
 				return ArtisanProfile.create({
@@ -87,6 +92,7 @@ const registerArtisan = (req, res) => {
 					return res.status(201).json({
 						message: 'Artisan account created successfully',
 						token: createToken(user),
+						verificationEndsAt,
 						profile: {
 							...user.toSafeProfile(),
 							phone: user.phone,

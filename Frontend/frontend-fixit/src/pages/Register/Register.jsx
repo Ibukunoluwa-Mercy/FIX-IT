@@ -6,6 +6,7 @@ import logo from '../../assets/fixit-logo-white.png';
 import neighborhoodIllustration from '../../assets/neighborhood_illustration.png';
 import securityIllustration from '../../assets/security building illustration.png';
 import { officialOptions } from '../SettingsPage/settingsConstants';
+import RegistrationSuccess from './RegistrationSuccess';
 import './Register.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
@@ -22,6 +23,7 @@ const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
+    const [success, setSuccess] = useState(false);
 
     const updateField = (event) => {
         const { name, value } = event.target;
@@ -113,7 +115,7 @@ const Register = () => {
                 setShowPassword(false);
             }
 
-            navigate('/dashboard');
+            setSuccess(true);
         } catch (error) {
             const message = error.response?.data?.message || (error instanceof TypeError && error.message.toLowerCase().includes('fetch')
                 ? 'Unable to reach the Fixit server. Start the backend and check its MongoDB connection.'
@@ -134,6 +136,11 @@ const Register = () => {
     const officialStep = <><h2 className="register-card-title">Create your account</h2><p className="register-card-sub">I am joining as a:</p>{roleTabs}<h3 className="step-section-title">Official Information</h3>{select('office', 'Office / Department', officialOptions.office, 'Select your office')}{select('position', 'Role / Position', officialOptions.position, 'Select your position')}{select('lga', 'Local Government Area', officialOptions.lga, 'Select your LGA')}{input('staffId', 'Employee / Staff ID (Optional)', 'fa-solid fa-id-badge', 'e.g. LG/2024/001234')}<div className="reg-field"><label className="reg-label">Upload Official ID</label><button type="button" className={`upload-dropzone ${errors.officialId ? 'has-error' : ''}`} onClick={() => fileRef.current?.click()} onDragOver={(event) => event.preventDefault()} onDrop={handleDrop}><i className="fa-solid fa-cloud-arrow-up" style={{ fontSize: 20 }}></i><strong>{form.officialId ? form.officialId.name : 'Click to upload or drag and drop'}</strong><span>PDF, JPG or PNG (Max. 5MB)</span></button><input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" hidden onChange={handleFile} />{errors.officialId && <span className="reg-error">{errors.officialId}</span>}</div><div className="wizard-actions"><button type="button" className="wizard-secondary" onClick={() => setStep(1)}>Back</button><button type="button" className="reg-submit-btn" onClick={goNext}>Continue <i className="fa-solid fa-arrow-right" style={{ marginLeft: 6 }}></i></button></div></>;
     const summary = (title, onEdit, items) => <section className="summary-card"><div className="summary-header"><strong>{title}</strong><button type="button" onClick={onEdit}>Edit</button></div>{items.map(([iconClass, label, value]) => <div className="summary-row" key={label}><i className={`${iconClass}`} style={{ fontSize: 13 }}></i><span>{label}</span><strong>{value || 'Not provided'}</strong></div>)}</section>;
     const reviewStep = <><h2 className="review-title">Review your details</h2><p className="register-card-sub">Please confirm your information is correct.</p>{summary('Personal Information', () => setStep(1), [['fa-solid fa-user', 'Full Name', form.fullName], ['fa-solid fa-envelope', 'Email Address', form.email], ['fa-solid fa-phone', 'Phone Number', form.phone]])}{summary('Official Information', () => setStep(2), [['fa-solid fa-building', 'Office / Department', form.office], ['fa-solid fa-shield-halved', 'Role / Position', form.position], ['fa-solid fa-location-dot', 'Local Government Area', form.lga], ['fa-solid fa-file-lines', 'Official ID', form.officialId?.name || 'Not uploaded']])}<label className="review-confirm"><input type="checkbox" checked={reviewed} onChange={(event) => setReviewed(event.target.checked)} /><span>I confirm that the information provided is true and accurate.</span></label>{errors.reviewed && <span className="reg-error">{errors.reviewed}</span>}{errors.form && <span className="reg-error">{errors.form}</span>}<button type="submit" className="reg-submit-btn" disabled={loading}>{loading ? 'Creating Account...' : <>Create Account <i className="fa-solid fa-check" style={{ marginLeft: 6 }}></i></>}</button></>;
+
+    if (success) {
+        const verificationEndsAt = Date.now() + 2 * 60 * 1000;
+        return <RegistrationSuccess email={form.email} verificationEndsAt={verificationEndsAt} />;
+    }
 
     return <div className={`register-page ${role === 'official' ? 'official-page' : ''}`}><div className="register-logo-bar"><Link to="/"><img src={logo} alt="Fixit" className="register-logo" /></Link></div>{role === 'official' && <header className="official-page-heading"><h1>Local Official - Create Account</h1><p>A secure and simple sign up experience for verified local officials.</p></header>}<div className="register-split"><div className="register-hero register-reveal register-reveal-hero"><div className="register-hero-content"><h1 className="register-hero-headline">Your community,<span className="hero-accent">built better together.</span></h1><p className="register-hero-subtitle">Connect with neighbors, report local issues, and collaborate with officials to create a safer, cleaner environment for everyone.</p><div className="register-badges"><div className="register-badge"><div className="badge-icon-wrap"><i className="fa-solid fa-building" style={{ fontSize: 20 }}></i></div><div><div className="badge-title">Local Impact</div><div className="badge-desc">See immediate changes in your neighborhood.</div></div></div><div className="register-badge"><div className="badge-icon-wrap"><i className="fa-solid fa-users" style={{ fontSize: 20 }}></i></div><div><div className="badge-title">Community Driven</div><div className="badge-desc">Join thousands making a difference daily.</div></div></div></div></div><div className="register-illustration-wrap"><img src={neighborhoodIllustration} alt="Connected neighborhood" className="register-illustration" /></div></div><div className="register-form-side register-reveal register-reveal-card"><div className="register-card">{progress}<form onSubmit={submit} className="register-form" noValidate>{role === 'official' && step === 2 ? officialStep : role === 'official' && step === 3 ? reviewStep : personalStep}</form><p className="reg-footer-link">Already have an account? <Link to="/login" className="reg-link">Log in here</Link></p></div></div></div>{role === 'official' && <div className="secure-strip register-reveal register-reveal-strip"><i className="fa-solid fa-shield-halved" style={{ fontSize: 24 }}></i><div><strong>Secure &amp; Verified</strong><span>All local official accounts are reviewed and verified before full access is granted.</span></div><i className="fa-solid fa-lock" style={{ fontSize: 20 }}></i><div><strong>Your data is encrypted and secure</strong><span>We take your privacy seriously.</span></div><img src={securityIllustration} alt="Secure Fixit community" /></div>}</div>;
 };
