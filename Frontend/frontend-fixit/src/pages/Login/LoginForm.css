@@ -205,12 +205,13 @@
     grid-template-columns: unset;
   }
 
-  /* Left/hero branding section stacked like register page */
+  /* Left/hero branding section — always on top on mobile */
   .login-branding {
     display: flex;
     flex-direction: column;
     padding: 0;
     width: 100%;
+    order: 1;
   }
 
   .login-branding .brand-row {
@@ -239,14 +240,16 @@
   }
 
   .feature-grid {
-    gap: 16px;
+    flex-direction: column;
+    gap: 12px;
     margin-bottom: 24px;
   }
 
   .feature-card {
     max-width: 100%;
     min-width: 0;
-    flex: 1 1 200px;
+    flex: none;
+    width: 100%;
   }
 
   .illustration-card {
@@ -262,10 +265,11 @@
     border-radius: 20px;
   }
 
-  /* Right form card */
+  /* Right form card — always below branding on mobile */
   .login-card-wrap {
     width: 100%;
     flex: 1 1 auto;
+    order: 2;
   }
 
   .login-card {
