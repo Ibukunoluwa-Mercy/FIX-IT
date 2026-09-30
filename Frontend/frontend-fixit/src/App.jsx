@@ -24,7 +24,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 // Auth-only routes that should render without the Navbar/Footer shell
 const AUTH_ROUTES = ['/register', '/login', '/forgot-password', '/reset-password', '/signup/artisan'];
-const DASHBOARD_ROUTES = ['/dashboard', '/reports', '/my-reports', '/help-center', '/settings'];
+const DASHBOARD_ROUTES = ['/dashboard', '/dashboard/resident', '/dashboard/official', '/dashboard/artisan', '/reports', '/my-reports', '/help-center', '/settings'];
 const LOCATION_ROUTES = ['/map'];
 
 function AppShell() {
@@ -74,6 +74,9 @@ function AppShell() {
       <ProtectedRoute>
         <Routes>
           <Route path="/dashboard" element={<ResidentDashboard />} />
+          <Route path="/dashboard/resident" element={<ResidentDashboard />} />
+          <Route path="/dashboard/official" element={<ResidentDashboard />} />
+          <Route path="/dashboard/artisan" element={<ResidentDashboard />} />
           <Route path="/my-reports" element={<MyReports />} />
           <Route path="/my-reports/:id" element={<MyReports />} />
           <Route path="/reports" element={<MyReports />} />

@@ -238,9 +238,6 @@ const Login = () => {
               <p>
                 Don&apos;t have an account? <Link to="/register">Register here</Link>
               </p>
-              <p>
-                System Admin? <Link to="/login?role=admin">Log in here</Link>
-              </p>
             </div>
           </div>
         </section>

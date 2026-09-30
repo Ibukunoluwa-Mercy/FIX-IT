@@ -308,6 +308,7 @@ const login = (req, res) => {
 
 			return res.status(200).json({
 				message: 'Login successful',
+				token, // Return token for localStorage fallback
 				user: {
 					id: user._id,
 					fullName: user.name,
