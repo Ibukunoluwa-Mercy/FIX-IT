@@ -38,6 +38,7 @@ const HelpCenter = () => {
 
   // Layout & UI states
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showReportWizard, setShowReportWizard] = useState(false);
@@ -109,6 +110,8 @@ const HelpCenter = () => {
       <HelpCenterSidebar
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
+        isMobileOpen={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
         navGroups={navGroups}
         onNavClick={handleNavClick}
         userName={userName}
@@ -117,6 +120,7 @@ const HelpCenter = () => {
         onSignOut={handleSignOut}
         onSettingsClick={() => {
           setShowProfileMenu(false);
+          setIsMobileSidebarOpen(false);
           navigate('/settings');
         }}
       />
@@ -124,7 +128,13 @@ const HelpCenter = () => {
       {/* 2. Main Page Layout */}
       <main className="help-main">
         <HelpCenterHeader
-          onToggleSidebar={() => setIsSidebarCollapsed((prev) => !prev)}
+          onToggleSidebar={() => {
+            if (window.innerWidth <= 768) {
+              setIsMobileSidebarOpen((prev) => !prev);
+            } else {
+              setIsSidebarCollapsed((prev) => !prev);
+            }
+          }}
           onOpenReportWizard={() => setShowReportWizard(true)}
           showNotifications={showNotifications}
           onToggleNotifications={() => setShowNotifications((prev) => !prev)}

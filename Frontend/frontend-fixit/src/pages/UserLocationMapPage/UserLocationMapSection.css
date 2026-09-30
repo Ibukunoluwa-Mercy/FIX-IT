@@ -164,11 +164,17 @@
 .nearby-map-wrap {
   height: 520px;
   padding: 0 14px 14px;
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
 }
 
 .nearby-map-wrap .map-wrapper {
   height: 100%;
   border-radius: 9px !important;
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
 }
 
 .nearby-map-wrap .map-legend {

@@ -37,6 +37,24 @@
   align-items: center;
   justify-content: center;
   font-family: "Google Sans", "Segoe UI", sans-serif;
+  position: relative;
+}
+
+.login-logo-bar {
+  display: none;
+}
+
+.login-logo {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 4px #00000014);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.login-logo:hover {
+  opacity: 0.85;
+  transform: scale(1.02);
 }
 
 .login-reveal {
@@ -69,4 +87,27 @@
   grid-template-columns: 1.1fr 0.9fr;
   align-items: center;
   gap: 44px;
+}
+
+@media (max-width: 860px) {
+  .login-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+    width: 100%;
+    max-width: 100%;
+    grid-template-columns: unset;
+    align-items: stretch;
+  }
+
+  .login-logo-bar {
+    display: flex;
+  }
+
+  /* Reset horizontal slide animations for stacked mobile layout */
+  .login-reveal-hero,
+  .login-reveal-card {
+    --login-slide-x: 0px;
+    --login-slide-y: 20px;
+  }
 }

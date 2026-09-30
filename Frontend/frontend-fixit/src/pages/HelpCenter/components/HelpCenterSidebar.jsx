@@ -6,6 +6,8 @@ import logoWhite from '../../../assets/fixit-white-logo.png';
 const HelpCenterSidebar = ({
   isCollapsed,
   onToggleCollapse,
+  isMobileOpen,
+  onCloseMobile,
   navGroups,
   onNavClick,
   userName,
@@ -15,23 +17,31 @@ const HelpCenterSidebar = ({
   onSettingsClick,
 }) => {
   return (
-    <aside className="help-sidebar" aria-label="Dashboard navigation">
-      <div className="help-brand-row">
-        <Link to="/dashboard" className="help-brand" aria-label="FixIt dashboard">
-          <img src={logoWhite} alt="FixIt" className="help-brand-img" />
-          <span>
-            Fix<span style={{ color: '#f59e0b' }}>It</span>
-          </span>
-        </Link>
-        <button
-          className="help-sidebar-toggle"
-          type="button"
-          onClick={onToggleCollapse}
-          aria-label="Toggle sidebar"
-        >
-          <i className={`fa-solid ${isCollapsed ? 'fa-bars' : 'fa-xmark'}`}></i>
-        </button>
-      </div>
+    <>
+      {isMobileOpen && (
+        <div
+          className="help-sidebar-backdrop"
+          onClick={onCloseMobile}
+          aria-hidden="true"
+        />
+      )}
+      <aside className={`help-sidebar ${isMobileOpen ? 'mobile-open' : ''}`} aria-label="Dashboard navigation">
+        <div className="help-brand-row">
+          <Link to="/dashboard" className="help-brand" aria-label="FixIt dashboard" onClick={onCloseMobile}>
+            <img src={logoWhite} alt="FixIt" className="help-brand-img" />
+            <span>
+              Fix<span style={{ color: '#f59e0b' }}>It</span>
+            </span>
+          </Link>
+          <button
+            className="help-sidebar-toggle"
+            type="button"
+            onClick={isMobileOpen ? onCloseMobile : onToggleCollapse}
+            aria-label="Toggle sidebar"
+          >
+            <i className={`fa-solid ${isMobileOpen ? 'fa-xmark' : isCollapsed ? 'fa-bars' : 'fa-xmark'}`}></i>
+          </button>
+        </div>
 
       <nav className="help-nav" aria-label="Sidebar main navigation">
         {navGroups.map((group, groupIndex) => (
@@ -43,7 +53,10 @@ const HelpCenterSidebar = ({
               <button
                 key={item.label}
                 className={`help-nav-link ${item.active ? 'active' : ''}`}
-                onClick={() => onNavClick(item)}
+                onClick={() => {
+                  onNavClick(item);
+                  if (onCloseMobile) onCloseMobile();
+                }}
                 title={item.label}
               >
                 <i className={item.iconClass} style={{ fontSize: 16 }}></i>
@@ -85,6 +98,7 @@ const HelpCenterSidebar = ({
         </button>
       </div>
     </aside>
+  </>
   );
 };
 

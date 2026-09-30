@@ -117,6 +117,12 @@ const Login = () => {
 
   return (
     <div className="login-page">
+      <div className="login-logo-bar">
+        <Link to="/" aria-label="Fixit Homepage">
+          <img src={logo} alt="Fixit" className="login-logo" />
+        </Link>
+      </div>
+
       <div className="login-shell">
         <aside className="login-branding login-reveal login-reveal-hero" aria-label="Fixit portal branding">
           <div className="brand-row">

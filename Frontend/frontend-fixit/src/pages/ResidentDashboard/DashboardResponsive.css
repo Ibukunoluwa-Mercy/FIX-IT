@@ -1,123 +1,224 @@
 .mobile-brand {
   display: none;
 }
+
+.resident-mobile-sidebar-toggle {
+  display: none;
+}
+
 @media (max-width: 900px) {
   .resident-sidebar {
-    flex-basis: 76px;
-  }
-  .resident-sidebar .brand-word,
-  .resident-sidebar .resident-nav-link span,
-  .resident-sidebar .profile-copy,
-  .resident-sidebar .resident-profile > svg {
     display: none;
   }
-  .resident-sidebar .resident-nav-link {
-    justify-content: center;
-    padding: 11px 0;
+
+  .resident-sidebar.mobile-open {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 270px;
+    flex-basis: 270px !important;
+    z-index: 9999;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+    animation: residentSidebarSlideIn 0.25s ease-out forwards;
+    padding: 18px 14px;
+    background: #0f1b2e;
   }
-  .resident-sidebar .nav-badge {
-    position: absolute;
-    right: 7px;
-    top: 5px;
+
+  .resident-sidebar.mobile-open .brand-word,
+  .resident-sidebar.mobile-open .resident-nav-link span,
+  .resident-sidebar.mobile-open .profile-copy,
+  .resident-sidebar.mobile-open .resident-profile > svg,
+  .resident-sidebar.mobile-open .resident-profile > i {
+    display: block !important;
   }
-  .resident-sidebar .resident-profile {
-    justify-content: center;
+
+  .resident-sidebar.mobile-open .resident-nav-link {
+    justify-content: flex-start !important;
+    padding: 12px 14px !important;
+    font-size: 14px !important;
+    gap: 14px !important;
+    border-radius: 8px !important;
   }
-  .resident-brand-row {
-    padding-left: 10px;
-    padding-right: 2px;
+
+  .resident-sidebar.mobile-open .resident-nav-link.active {
+    background: #ff9f05 !important;
+    color: #fff !important;
   }
-  .resident-brand {
-    margin: auto;
+
+  .resident-sidebar.mobile-open .resident-brand-row {
+    padding: 0 4px 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
   }
-  .sidebar-toggle {
-    display: none;
+
+  .resident-sidebar.mobile-open .sidebar-toggle {
+    display: grid !important;
+    place-items: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+    background: transparent !important;
+    color: #94a3b8 !important;
+    cursor: pointer !important;
   }
+
+  .resident-sidebar.mobile-open .resident-profile {
+    justify-content: flex-start !important;
+    padding: 10px 12px !important;
+  }
+
+  .resident-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(2px);
+    z-index: 9998;
+    animation: residentBackdropFade 0.2s ease-out forwards;
+  }
+
+  @keyframes residentSidebarSlideIn {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes residentBackdropFade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .resident-main {
+    margin-left: 0 !important;
+    width: 100%;
+  }
+
   .resident-header {
-    padding: 0 18px;
+    padding: 0 16px;
+    height: 62px;
   }
+
   .mobile-brand {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     margin-right: auto;
   }
-  .mobile-brand .brand-mark {
-    width: 27px;
-    height: 27px;
+
+  .resident-mobile-sidebar-toggle {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 8px;
+    background: #1e293b;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
   }
+
+  .resident-mobile-sidebar-toggle:hover {
+    background: #334155;
+  }
+
   .resident-content {
     padding: 22px 18px;
   }
+
   .dashboard-intro {
     align-items: start;
     gap: 15px;
   }
+
   .intro-search {
     display: none;
   }
 }
+
 @media (max-width: 600px) {
-  .resident-sidebar {
-    position: fixed;
-    inset: 0 auto 0 0;
-    width: 76px;
-  }
-  .resident-main {
-    margin-left: 76px;
-  }
   .resident-header {
     height: 58px;
+    padding: 0 14px;
   }
+
   .new-report-button {
     font-size: 0;
     padding: 9px;
   }
-  .new-report-button svg {
+
+  .new-report-button svg,
+  .new-report-button i {
     margin: 0;
+    font-size: 14px;
   }
+
   .header-actions {
     gap: 8px;
   }
+
   .dashboard-intro h1 {
     font-size: 20px;
   }
+
   .dashboard-intro p {
     line-height: 1.5;
   }
+
   .report-cta {
     align-items: flex-start;
     flex-wrap: wrap;
   }
+
   .report-cta button {
     margin-left: 52px;
   }
+
   .report-filter {
     max-width: 180px;
     overflow: auto;
   }
+
   .report-row {
     gap: 8px;
   }
+
   .report-row img {
     width: 49px;
     height: 49px;
   }
+
   .status-pill {
     font-size: 8px;
     padding: 4px 5px;
   }
+
   .row-chevron {
     display: none;
   }
+
   .map-label {
     font-size: 8px;
     padding: 5px 8px;
   }
+
   .resident-content {
     padding: 20px 12px;
   }
+
   .dashboard-panel {
     padding: 14px 10px;
   }
 }
+

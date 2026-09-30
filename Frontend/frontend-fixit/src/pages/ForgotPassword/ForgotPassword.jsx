@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
+import logo from '../../assets/fixit-logo-white.png';
 import ForgotPasswordBranding from './components/ForgotPasswordBranding';
 import ForgotPasswordSuccess from './components/ForgotPasswordSuccess';
 import './ForgotPassword.css';
@@ -109,6 +110,13 @@ const ForgotPassword = () => {
 
   return (
     <div className="forgot-password-page">
+      {/* Fixed top bar — only visible on mobile */}
+      <div className="forgot-logo-bar">
+        <Link to="/" aria-label="Fixit Homepage">
+          <img src={logo} alt="Fixit" className="forgot-logo" />
+        </Link>
+      </div>
+
       <div className="forgot-password-shell">
         <ForgotPasswordBranding resetToken={resetToken} />
 

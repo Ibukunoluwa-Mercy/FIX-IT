@@ -34,6 +34,7 @@ const MyReports = () => {
   const searchParams = new URLSearchParams(location.search);
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   
   const token = localStorage.getItem('fixitToken');
@@ -107,14 +108,30 @@ const MyReports = () => {
 
   return (
     <div className={`resident-dashboard my-reports-dashboard ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
-      <aside className="resident-sidebar">
+      {isMobileSidebarOpen && (
+        <div
+          className="resident-sidebar-backdrop"
+          onClick={() => setIsMobileSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+      <aside className={`resident-sidebar ${isMobileSidebarOpen ? 'mobile-open' : ''}`}>
         <div className="resident-brand-row">
-          <Link to="/dashboard" className="resident-brand" aria-label="Fixit dashboard">
+          <Link to="/dashboard" className="resident-brand" aria-label="Fixit dashboard" onClick={() => setIsMobileSidebarOpen(false)}>
             <img src={logoWhite} alt="FixIt" className="brand-logo-img" />
             <span className="brand-word">Fix<span style={{ color: '#f59e0b' }}>It</span></span>
           </Link>
-          <button className="icon-button sidebar-toggle" onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}>
-            {isSidebarCollapsed ? <i className="fa-solid fa-bars"></i> : <i className="fa-solid fa-xmark"></i>}
+          <button
+            className="icon-button sidebar-toggle"
+            onClick={() => {
+              if (isMobileSidebarOpen) {
+                setIsMobileSidebarOpen(false);
+              } else {
+                setIsSidebarCollapsed(!isSidebarCollapsed);
+              }
+            }}
+          >
+            {isMobileSidebarOpen ? <i className="fa-solid fa-xmark"></i> : isSidebarCollapsed ? <i className="fa-solid fa-bars"></i> : <i className="fa-solid fa-xmark"></i>}
           </button>
         </div>
         <nav className="resident-nav" aria-label="Dashboard navigation">
@@ -125,10 +142,11 @@ const MyReports = () => {
                   key={label} 
                   className={`resident-nav-link ${active ? 'active' : ''}`} 
                   onClick={() => {
+                    setIsMobileSidebarOpen(false);
                     if (label === 'Dashboard') navigate('/dashboard');
                     if (label === 'My Reports') navigate('/reports');
                     if (label === 'Nearby Issues') navigate('/map');
-                                        if (label === 'Settings') navigate('/settings');
+                    if (label === 'Settings') navigate('/settings');
                     if (label === 'Help Center') navigate('/help-center');
                   }} 
                   title={label}
@@ -144,7 +162,7 @@ const MyReports = () => {
         <div className="resident-profile-wrap">
           {showProfileMenu && (
             <div className="profile-menu">
-              <button onClick={() => navigate('/settings')}>
+              <button onClick={() => { setShowProfileMenu(false); setIsMobileSidebarOpen(false); navigate('/settings'); }}>
                 <i className="fa-solid fa-gear" style={{ fontSize: 14 }}></i> Account settings
               </button>
               <button onClick={logout}>
@@ -163,7 +181,14 @@ const MyReports = () => {
       <main className="resident-main">
         <header className="resident-header">
           <div className="mobile-brand">
-             <span className="brand-word">Fi<span style={{ color: '#f59e0b' }}>xIt</span></span>
+            <button
+              className="resident-mobile-sidebar-toggle"
+              type="button"
+              onClick={() => setIsMobileSidebarOpen(true)}
+              aria-label="Open navigation menu"
+            >
+              <i className="fa-solid fa-bars" />
+            </button>
           </div>
           <div className="header-actions">
             <button className="new-report-button" onClick={() => navigate('/dashboard?new_report=true')}>

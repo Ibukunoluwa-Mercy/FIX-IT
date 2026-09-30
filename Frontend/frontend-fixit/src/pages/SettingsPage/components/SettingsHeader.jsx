@@ -2,6 +2,7 @@ import logoWhite from '../../../assets/fixit-white-logo.png';
 import ResidentAvatar from '../../../components/ResidentAvatar';
 
 const SettingsHeader = ({
+  onToggleSidebar,
   onNotificationsClick,
   showHeaderProfileMenu,
   setShowHeaderProfileMenu,
@@ -11,10 +12,14 @@ const SettingsHeader = ({
   return (
     <header className="resident-header">
       <div className="mobile-brand">
-        <img src={logoWhite} alt="FixIt" className="brand-logo-img" />
-        <span className="brand-word">
-          Fix<span className="settings-brand-orange">It</span>
-        </span>
+        <button
+          className="resident-mobile-sidebar-toggle"
+          type="button"
+          onClick={onToggleSidebar}
+          aria-label="Open navigation menu"
+        >
+          <i className="fa-solid fa-bars" />
+        </button>
       </div>
       <div className="header-actions">
         <button

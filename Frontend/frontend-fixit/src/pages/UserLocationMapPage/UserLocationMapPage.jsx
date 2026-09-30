@@ -19,41 +19,50 @@ const formatDistance = (meters) => meters < 1000 ? `${Math.round(meters)} m away
 const formatDate = (value) => value ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(value)) : 'Recently reported';
 const normalizeStatus = (status) => status === 'New' ? 'Pending' : status || 'Pending';
 
-const ResidentSidebar = ({ navigate, isCollapsed, onToggle, userName, showProfileMenu, onToggleProfileMenu, onSignOut }) => (
-  <aside className={`nearby-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
-    <div className="nearby-brand-row">
-      <Link to="/dashboard" className="nearby-brand"><img src={logoWhite} alt="FixIt" /><span>Fix<span>It</span></span></Link>
-      <button className="nearby-sidebar-toggle" type="button" onClick={onToggle} aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
-        <i className={`fa-solid ${isCollapsed ? 'fa-bars' : 'fa-xmark'}`} />
-      </button>
-    </div>
-    <nav aria-label="Resident dashboard navigation" className="nearby-nav">
-      {[['Dashboard', 'fa-grip', '/dashboard'], ['My Reports', 'fa-file-lines', '/reports'], ['Nearby Issues', 'fa-location-dot', '/map'], ['Notifications', 'fa-bell'], ['Messages', 'fa-message'], ['Saved Locations', 'fa-bookmark']].map(([label, icon, path]) => (
-        <button key={label} className={`nearby-nav-link ${label === 'Nearby Issues' ? 'active' : ''}`} onClick={() => path && navigate(path)}><i className={`fa-solid ${icon}`} /><span>{label}</span></button>
-      ))}
-      <div className="nearby-nav-divider" />
-      {[['Help Center', 'fa-circle-question', '/help-center'], ['Settings', 'fa-gear', '/settings']].map(([label, icon, path]) => (
-        <button key={label} className="nearby-nav-link" onClick={() => path && navigate(path)}><i className={`fa-solid ${icon}`} /><span>{label}</span></button>
-      ))}
-    </nav>
-    <div className="nearby-profile-wrap">
-      {showProfileMenu && (
-        <div className="nearby-profile-menu" role="menu">
-          <button type="button" role="menuitem" onClick={() => { navigate('/settings'); onToggleProfileMenu(); }}>
-            <i className="fa-solid fa-gear" /> Account settings
-          </button>
-          <button type="button" role="menuitem" onClick={onSignOut}>
-            <i className="fa-solid fa-arrow-right-from-bracket" /> Sign out
-          </button>
-        </div>
-      )}
-      <button className="nearby-sidebar-user" type="button" onClick={onToggleProfileMenu} title={userName} aria-haspopup="menu" aria-expanded={showProfileMenu}>
-        <ResidentAvatar className="nearby-avatar" name={userName} />
-        <span className="nearby-sidebar-user-copy"><strong>{userName}</strong><small>Resident</small></span>
-        <i className="fa-solid fa-chevron-down" />
-      </button>
-    </div>
-  </aside>
+const ResidentSidebar = ({ navigate, isCollapsed, onToggle, isMobileOpen, onCloseMobile, userName, showProfileMenu, onToggleProfileMenu, onSignOut }) => (
+  <>
+    {isMobileOpen && (
+      <div
+        className="nearby-sidebar-backdrop"
+        onClick={onCloseMobile}
+        aria-hidden="true"
+      />
+    )}
+    <aside className={`nearby-sidebar ${isCollapsed ? 'collapsed' : ''} ${isMobileOpen ? 'mobile-open' : ''}`}>
+      <div className="nearby-brand-row">
+        <Link to="/dashboard" className="nearby-brand" onClick={onCloseMobile}><img src={logoWhite} alt="FixIt" /><span>Fix<span>It</span></span></Link>
+        <button className="nearby-sidebar-toggle" type="button" onClick={isMobileOpen ? onCloseMobile : onToggle} aria-label={isMobileOpen ? 'Close sidebar' : isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+          <i className={`fa-solid ${isMobileOpen ? 'fa-xmark' : isCollapsed ? 'fa-bars' : 'fa-xmark'}`} />
+        </button>
+      </div>
+      <nav aria-label="Resident dashboard navigation" className="nearby-nav">
+        {[['Dashboard', 'fa-grip', '/dashboard'], ['My Reports', 'fa-file-lines', '/reports'], ['Nearby Issues', 'fa-location-dot', '/map'], ['Notifications', 'fa-bell'], ['Messages', 'fa-message'], ['Saved Locations', 'fa-bookmark']].map(([label, icon, path]) => (
+          <button key={label} className={`nearby-nav-link ${label === 'Nearby Issues' ? 'active' : ''}`} onClick={() => { if (path) navigate(path); if (onCloseMobile) onCloseMobile(); }}><i className={`fa-solid ${icon}`} /><span>{label}</span></button>
+        ))}
+        <div className="nearby-nav-divider" />
+        {[['Help Center', 'fa-circle-question', '/help-center'], ['Settings', 'fa-gear', '/settings']].map(([label, icon, path]) => (
+          <button key={label} className="nearby-nav-link" onClick={() => { if (path) navigate(path); if (onCloseMobile) onCloseMobile(); }}><i className={`fa-solid ${icon}`} /><span>{label}</span></button>
+        ))}
+      </nav>
+      <div className="nearby-profile-wrap">
+        {showProfileMenu && (
+          <div className="nearby-profile-menu" role="menu">
+            <button type="button" role="menuitem" onClick={() => { navigate('/settings'); onToggleProfileMenu(); if (onCloseMobile) onCloseMobile(); }}>
+              <i className="fa-solid fa-gear" /> Account settings
+            </button>
+            <button type="button" role="menuitem" onClick={onSignOut}>
+              <i className="fa-solid fa-arrow-right-from-bracket" /> Sign out
+            </button>
+          </div>
+        )}
+        <button className="nearby-sidebar-user" type="button" onClick={onToggleProfileMenu} title={userName} aria-haspopup="menu" aria-expanded={showProfileMenu}>
+          <ResidentAvatar className="nearby-avatar" name={userName} />
+          <span className="nearby-sidebar-user-copy"><strong>{userName}</strong><small>Resident</small></span>
+          <i className="fa-solid fa-chevron-down" />
+        </button>
+      </div>
+    </aside>
+  </>
 );
 
 const CheckGroup = ({ title, options, selected, onToggle }) => (
@@ -70,6 +79,7 @@ const NearbyIssueCard = ({ issue }) => (
 const UserLocationMapPage = () => {
   const navigate = useNavigate();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const user = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('fixitUser') || '{}'); } catch { return {}; }
@@ -175,14 +185,49 @@ const UserLocationMapPage = () => {
   const mapIssues = filteredIssues.map((issue) => ({ ...issue, lat: Number(issue.lat), lng: Number(issue.lng) }));
   const center = location ? [location.latitude, location.longitude] : DEFAULT_CENTER;
 
-  return <div className={`nearby-page ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}><ResidentSidebar navigate={navigate} isCollapsed={isSidebarCollapsed} onToggle={() => setIsSidebarCollapsed((value) => !value)} userName={userName} showProfileMenu={showProfileMenu} onToggleProfileMenu={() => setShowProfileMenu((value) => !value)} onSignOut={signOut} /><main className="nearby-main"><header className="nearby-header"><div className="nearby-mobile-brand"><img src={logoWhite} alt="FixIt" /><strong>Fix<span>It</span></strong></div><div className="nearby-header-actions"><button className="nearby-header-icon" aria-label="Notifications"><i className="fa-regular fa-bell" /></button><ResidentAvatar className="nearby-header-avatar" name={userName} /></div></header><div className="nearby-content">
+  return (
+    <div className={`nearby-page ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+      <ResidentSidebar
+        navigate={navigate}
+        isCollapsed={isSidebarCollapsed}
+        onToggle={() => setIsSidebarCollapsed((value) => !value)}
+        isMobileOpen={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        userName={userName}
+        showProfileMenu={showProfileMenu}
+        onToggleProfileMenu={() => setShowProfileMenu((value) => !value)}
+        onSignOut={signOut}
+      />
+      <main className="nearby-main">
+        <header className="nearby-header">
+          <div className="nearby-mobile-brand">
+            <button
+              className="nearby-mobile-sidebar-toggle"
+              type="button"
+              onClick={() => setIsMobileSidebarOpen(true)}
+              aria-label="Open sidebar navigation"
+            >
+              <i className="fa-solid fa-bars" />
+            </button>
+          </div>
+          <div className="nearby-header-actions">
+            <button className="nearby-header-icon" aria-label="Notifications">
+              <i className="fa-regular fa-bell" />
+            </button>
+            <ResidentAvatar className="nearby-header-avatar" name={userName} />
+          </div>
+        </header>
+        <div className="nearby-content">
     <section className="nearby-page-intro"><div><p className="nearby-eyebrow">RESIDENT DASHBOARD</p><h1>Nearby Issues</h1><p>Explore issues around and update your nearest Zone/Ward. Click on a marker to view details and track progress.</p></div><div className="nearby-search"><i className="fa-solid fa-magnifying-glass" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search nearby issues..." aria-label="Search nearby issues" /></div></section>
     <div className="nearby-chips">{categoryChips.map(([label, value]) => <button key={label} className={activeChip === value ? 'active' : ''} onClick={() => setActiveChip(value)}>{label}</button>)}</div>
     {locationMessage && <div className="nearby-location-notice"><i className="fa-solid fa-location-dot" /><span>{locationMessage}</span><button onClick={resolveLocation}>Try again</button></div>}
     <section className="nearby-map-card"><div className="nearby-map-heading"><div><h2>Community map</h2><span>Reports within {RADIUS_METERS / 1000} km of your location</span></div><button className="nearby-filter-toggle" onClick={() => setShowFilters((value) => !value)}><i className="fa-solid fa-sliders" /> Filters {hasFilters && <b>{filteredIssues.length}</b>}</button></div><div className="nearby-map-wrap"><InteractiveMap center={center} issues={mapIssues} isLoading={locationLoading || issuesLoading} userLocation={location} satellite={satellite} onToggleSatellite={() => setSatellite((value) => !value)} /></div></section>
     <section className="nearby-list-section"><div className="nearby-section-heading"><div><h2>Issues near you</h2><span>{filteredIssues.length} of {issues.length} reports in your radius</span></div><button className="nearby-view-toggle active"><i className="fa-solid fa-list" /> List view</button></div>{issuesError && <div className="nearby-error">{issuesError}</div>}{!issuesLoading && !locationLoading && !issues.length && <div className="nearby-empty"><i className="fa-solid fa-location-dot" /><h3>No nearby issues</h3><p>There are currently no reports near your location.</p></div>}{!issuesLoading && issues.length > 0 && !filteredIssues.length && <div className="nearby-empty"><i className="fa-solid fa-filter-circle-xmark" /><h3>No issues match your filters</h3><p>Try changing your search or selected filters.</p><button onClick={clearFilters}>Clear filters</button></div>}<div className="nearby-issues-grid">{filteredIssues.map((issue) => <NearbyIssueCard key={issue.id} issue={issue} />)}</div></section>
     <section className={`nearby-filters-card ${showFilters ? 'open' : ''}`}><div className="nearby-filters-heading"><div><h2>Filter nearby issues</h2><span>Refine the same reports shown on the map.</span></div><button onClick={clearFilters}>Clear all filters</button></div><div className="nearby-filter-grid"><label className="nearby-select-label">Date reported<div className="nearby-date-fields"><input type="date" value={draftFilters.from} onChange={(event) => setDraftFilters({ ...draftFilters, from: event.target.value })} /><input type="date" value={draftFilters.to} onChange={(event) => setDraftFilters({ ...draftFilters, to: event.target.value })} /></div></label><CheckGroup title="Issue status" options={statusOptions} selected={draftFilters.statuses} onToggle={(value) => toggleDraft('statuses', value)} /><CheckGroup title="Severity" options={severityOptions} selected={draftFilters.severities} onToggle={(value) => toggleDraft('severities', value)} /><label className="nearby-select-label">Category<select multiple value={draftFilters.categories} onChange={(event) => setDraftFilters({ ...draftFilters, categories: [...event.target.selectedOptions].map((option) => option.value) })}>{categoryOptions.map((category) => <option key={category}>{category}</option>)}</select></label><label className="nearby-select-label">Sort by<select value={draftFilters.sort} onChange={(event) => setDraftFilters({ ...draftFilters, sort: event.target.value })}><option>Most Recent</option><option>Nearest</option><option>Highest Severity</option></select></label></div><button className="nearby-apply-button" onClick={() => { setFilters(draftFilters); setShowFilters(true); }}>Apply filters</button></section>
-  </div></main></div>;
+        </div>
+      </main>
+    </div>
+  );
 };
 
 export default UserLocationMapPage;

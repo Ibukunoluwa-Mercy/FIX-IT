@@ -5,6 +5,8 @@ import ResidentAvatar from '../../../components/ResidentAvatar';
 const SettingsSidebar = ({
   isSidebarCollapsed,
   setIsSidebarCollapsed,
+  isMobileOpen,
+  onCloseMobile,
   navGroups,
   navigate,
   showProfileMenu,
@@ -13,27 +15,43 @@ const SettingsSidebar = ({
   userName,
 }) => {
   return (
-    <aside className="resident-sidebar">
-      <div className="resident-brand-row">
-        <Link to="/dashboard" className="resident-brand" aria-label="FixIt dashboard">
-          <img src={logoWhite} alt="FixIt" className="brand-logo-img" />
-          <span className="brand-word">
-            Fix<span className="settings-brand-orange">It</span>
-          </span>
-        </Link>
-        <button
-          className="icon-button sidebar-toggle"
-          type="button"
-          onClick={() => setIsSidebarCollapsed((value) => !value)}
-          aria-label="Toggle sidebar"
-        >
-          {isSidebarCollapsed ? (
-            <i className="fa-solid fa-bars" />
-          ) : (
-            <i className="fa-solid fa-xmark" />
-          )}
-        </button>
-      </div>
+    <>
+      {isMobileOpen && (
+        <div
+          className="resident-sidebar-backdrop"
+          onClick={onCloseMobile}
+          aria-hidden="true"
+        />
+      )}
+      <aside className={`resident-sidebar ${isMobileOpen ? 'mobile-open' : ''}`}>
+        <div className="resident-brand-row">
+          <Link to="/dashboard" className="resident-brand" aria-label="FixIt dashboard" onClick={onCloseMobile}>
+            <img src={logoWhite} alt="FixIt" className="brand-logo-img" />
+            <span className="brand-word">
+              Fix<span className="settings-brand-orange">It</span>
+            </span>
+          </Link>
+          <button
+            className="icon-button sidebar-toggle"
+            type="button"
+            onClick={() => {
+              if (isMobileOpen) {
+                onCloseMobile();
+              } else {
+                setIsSidebarCollapsed((value) => !value);
+              }
+            }}
+            aria-label="Toggle sidebar"
+          >
+            {isMobileOpen ? (
+              <i className="fa-solid fa-xmark" />
+            ) : isSidebarCollapsed ? (
+              <i className="fa-solid fa-bars" />
+            ) : (
+              <i className="fa-solid fa-xmark" />
+            )}
+          </button>
+        </div>
       <nav className="resident-nav" aria-label="Dashboard navigation">
         {navGroups.map((group, groupIndex) => (
           <div
@@ -45,7 +63,10 @@ const SettingsSidebar = ({
                 type="button"
                 key={label}
                 className={`resident-nav-link ${label === 'Settings' ? 'active' : ''}`}
-                onClick={() => path && navigate(path)}
+                onClick={() => {
+                  if (onCloseMobile) onCloseMobile();
+                  if (path) navigate(path);
+                }}
                 title={label}
               >
                 <i className={iconClass} />
@@ -58,7 +79,13 @@ const SettingsSidebar = ({
       <div className="resident-profile-wrap">
         {showProfileMenu && (
           <div className="profile-menu">
-            <button type="button" onClick={() => setShowProfileMenu(false)}>
+            <button
+              type="button"
+              onClick={() => {
+                setShowProfileMenu(false);
+                if (onCloseMobile) onCloseMobile();
+              }}
+            >
               <i className="fa-solid fa-gear" /> Account settings
             </button>
             <button type="button" onClick={signOut}>
@@ -80,6 +107,7 @@ const SettingsSidebar = ({
         </button>
       </div>
     </aside>
+  </>
   );
 };
 

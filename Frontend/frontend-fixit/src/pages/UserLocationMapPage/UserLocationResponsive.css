@@ -21,16 +21,73 @@
     display: none;
   }
 
+  .nearby-sidebar.mobile-open {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 270px;
+    z-index: 9999;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.45);
+    animation: nearbySidebarSlideIn 0.25s ease-out forwards;
+  }
+
+  .nearby-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(2px);
+    z-index: 9998;
+    animation: nearbyBackdropFade 0.2s ease-out forwards;
+  }
+
+  @keyframes nearbySidebarSlideIn {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes nearbyBackdropFade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
   .nearby-header {
     height: 62px;
-    padding: 0 18px;
+    padding: 0 16px;
     justify-content: space-between;
   }
 
   .nearby-mobile-brand {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+  }
+
+  .nearby-mobile-sidebar-toggle {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 8px;
+    background: #1e293b;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .nearby-mobile-sidebar-toggle:hover {
+    background: #334155;
   }
 
   .nearby-mobile-brand img {
@@ -41,6 +98,7 @@
 
   .nearby-mobile-brand strong {
     font-size: 18px;
+    color: #0f172a;
   }
 
   .nearby-content {

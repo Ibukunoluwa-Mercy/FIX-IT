@@ -21,6 +21,7 @@ const SettingsPage = () => {
   const token = localStorage.getItem('fixitToken') || localStorage.getItem('token') || '';
   const [activeSection, setActiveSection] = useState('Account');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showHeaderProfileMenu, setShowHeaderProfileMenu] = useState(false);
   const [appearance, setAppearance] = useState(() => localStorage.getItem('fixitTheme') || 'system');
@@ -193,6 +194,8 @@ const SettingsPage = () => {
       <SettingsSidebar
         isSidebarCollapsed={isSidebarCollapsed}
         setIsSidebarCollapsed={setIsSidebarCollapsed}
+        isMobileOpen={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
         navGroups={navGroups}
         navigate={navigate}
         showProfileMenu={showProfileMenu}
@@ -203,6 +206,7 @@ const SettingsPage = () => {
       />
       <main className="resident-main settings-main">
         <SettingsHeader
+          onToggleSidebar={() => setIsMobileSidebarOpen(true)}
           onNotificationsClick={() => setActiveSection('Notifications')}
           showHeaderProfileMenu={showHeaderProfileMenu}
           setShowHeaderProfileMenu={setShowHeaderProfileMenu}

@@ -32,6 +32,7 @@ const statusClass = (status = 'Pending') => status.toLowerCase().replace(/\s+/g,
 const ResidentDashboard = () => {
   const navigate = useNavigate();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [activeNav, setActiveNav] = useState('Dashboard');
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -85,16 +86,34 @@ const ResidentDashboard = () => {
 
   return (
     <div className={`resident-dashboard ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
-      <aside className="resident-sidebar">
+      {isMobileSidebarOpen && (
+        <div
+          className="resident-sidebar-backdrop"
+          onClick={() => setIsMobileSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+      <aside className={`resident-sidebar ${isMobileSidebarOpen ? 'mobile-open' : ''}`}>
         <div className="resident-brand-row">
-          <Link to="/dashboard" className="resident-brand" aria-label="Fixit dashboard">
+          <Link to="/dashboard" className="resident-brand" aria-label="Fixit dashboard" onClick={() => setIsMobileSidebarOpen(false)}>
             <img src={logoWhite} alt="FixIt" className="brand-logo-img" />
             <span className="brand-word">
               Fix<span style={{ color: '#f59e0b' }}>It</span>
             </span>
           </Link>
-          <button className="icon-button sidebar-toggle" onClick={() => setIsSidebarCollapsed((value) => !value)} aria-label="Toggle sidebar" title="Toggle sidebar">
-            {isSidebarCollapsed ? <i className="fa-solid fa-bars" style={{ fontSize: 18 }}></i> : <i className="fa-solid fa-xmark" style={{ fontSize: 18 }}></i>}
+          <button
+            className="icon-button sidebar-toggle"
+            onClick={() => {
+              if (isMobileSidebarOpen) {
+                setIsMobileSidebarOpen(false);
+              } else {
+                setIsSidebarCollapsed((value) => !value);
+              }
+            }}
+            aria-label="Toggle sidebar"
+            title="Toggle sidebar"
+          >
+            {isMobileSidebarOpen ? <i className="fa-solid fa-xmark" style={{ fontSize: 18 }}></i> : isSidebarCollapsed ? <i className="fa-solid fa-bars" style={{ fontSize: 18 }}></i> : <i className="fa-solid fa-xmark" style={{ fontSize: 18 }}></i>}
           </button>
         </div>
 
@@ -102,7 +121,15 @@ const ResidentDashboard = () => {
           {navGroups.map((group, groupIndex) => (
             <div className={`nav-group ${groupIndex ? 'nav-group-secondary' : ''}`} key={groupIndex}>
               {group.map(({ label, iconClass, badge, active }) => (
-                <button key={label} className={`resident-nav-link ${(activeNav === label || (active && activeNav === 'Dashboard')) ? 'active' : ''}`} onClick={() => goToNav(label)} title={label}>
+                <button
+                  key={label}
+                  className={`resident-nav-link ${(activeNav === label || (active && activeNav === 'Dashboard')) ? 'active' : ''}`}
+                  onClick={() => {
+                    setIsMobileSidebarOpen(false);
+                    goToNav(label);
+                  }}
+                  title={label}
+                >
                   <i className={`${iconClass}`} style={{ fontSize: 16 }}></i>
                   <span>{label}</span>
                   {Boolean(badge && badge > 0) && <b className="nav-badge">{badge}</b>}
@@ -115,7 +142,7 @@ const ResidentDashboard = () => {
         <div className="resident-profile-wrap">
           {showProfileMenu && (
             <div className="profile-menu">
-              <button onClick={() => { setShowProfileMenu(false); navigate('/settings'); }}>
+              <button onClick={() => { setShowProfileMenu(false); setIsMobileSidebarOpen(false); navigate('/settings'); }}>
                 <i className="fa-solid fa-gear" style={{ fontSize: 14 }}></i> Account settings
               </button>
               <button onClick={logout}>
@@ -134,10 +161,14 @@ const ResidentDashboard = () => {
       <main className="resident-main">
         <header className="resident-header">
           <div className="mobile-brand">
-            <img src={logoWhite} alt="FixIt" className="brand-logo-img" style={{ height: '28px' }} />
-            <span className="brand-word" style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a' }}>
-              Fi<span style={{ color: '#f59e0b' }}>xIt</span>
-            </span>
+            <button
+              className="resident-mobile-sidebar-toggle"
+              type="button"
+              onClick={() => setIsMobileSidebarOpen(true)}
+              aria-label="Open navigation menu"
+            >
+              <i className="fa-solid fa-bars" />
+            </button>
           </div>
           <div className="header-actions">
             <button className="new-report-button" onClick={() => setShowReportWizard(true)}>

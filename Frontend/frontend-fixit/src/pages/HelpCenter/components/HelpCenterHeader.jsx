@@ -21,10 +21,6 @@ const HelpCenterHeader = ({
         >
           <i className="fa-solid fa-bars"></i>
         </button>
-        <img src={logoWhite} alt="FixIt" style={{ height: '24px' }} />
-        <span style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a' }}>
-          Fi<span style={{ color: '#f59e0b' }}>xIt</span>
-        </span>
       </div>
 
       <div className="help-header-actions">
