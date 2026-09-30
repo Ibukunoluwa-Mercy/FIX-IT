@@ -14,7 +14,7 @@ const ResetPassword = () => {
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
 
-  /* ── real-time validation ── */
+  
   const validate = () => {
     const e = {};
     if (!form.newPassword) {
@@ -33,7 +33,7 @@ const ResetPassword = () => {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    /* re-validate the changed field instantly */
+    
     setErrors((prev) => {
       const next = { ...prev, [name]: '' };
       if (name === 'newPassword' && value.length > 0 && value.length < 8) {
@@ -81,24 +81,22 @@ const ResetPassword = () => {
 
   return (
     <div className="rp-page">
-      {/* decorative blobs */}
+      
       <div className="rp-blob rp-blob--coral"  aria-hidden="true" />
       <div className="rp-blob rp-blob--mint"   aria-hidden="true" />
 
-      {/* ── Card ── */}
+      
       <div className="rp-card">
 
-        {/* Fixit logo badge */}
+        
         <Link to="/" className="rp-logo-link" aria-label="Fixit Homepage">
           <img src={logo} alt="Fixit logo" className="rp-logo-img" />
         </Link>
 
-        {/* ════════════════════════════════
-            FORM STATE
-            ════════════════════════════════ */}
+        
         {!success ? (
           <>
-            {/* lock icon circle */}
+            
             <div className="rp-lock-badge" aria-hidden="true">
               <i className="fa-solid fa-lock" style={{ fontSize: 26 }}></i>
             </div>
@@ -110,7 +108,7 @@ const ResetPassword = () => {
 
             <form className="rp-form" onSubmit={handleSubmit} noValidate>
 
-              {/* New Password */}
+              
               <div className="rp-field">
                 <label htmlFor="rp-new">New Password</label>
                 <div className={`rp-input-wrap ${errors.newPassword ? 'is-error' : ''}`}>
@@ -141,7 +139,7 @@ const ResetPassword = () => {
                 )}
               </div>
 
-              {/* Confirm Password */}
+              
               <div className="rp-field">
                 <label htmlFor="rp-confirm">Confirm New Password</label>
                 <div className={`rp-input-wrap ${errors.confirmPassword ? 'is-error' : ''}`}>
@@ -176,7 +174,7 @@ const ResetPassword = () => {
                 <div className="rp-error-msg rp-error-msg--form">{errors.form}</div>
               )}
 
-              {/* Submit */}
+              
               <button type="submit" className="rp-submit-btn" disabled={loading}>
                 {loading ? (
                   <><span className="rp-spinner" aria-hidden="true" /> Resetting…</>
@@ -194,11 +192,10 @@ const ResetPassword = () => {
             </div>
           </>
         ) : (
-          /* ════════════════════════════════
-              SUCCESS STATE  –  Password Updated
-              ════════════════════════════════ */
+          
+
           <div className="rp-success">
-            {/* floating sparkle diamonds */}
+            
             <span className="sp sp1" aria-hidden="true">◆</span>
             <span className="sp sp2" aria-hidden="true">✦</span>
             <span className="sp sp3" aria-hidden="true">◆</span>

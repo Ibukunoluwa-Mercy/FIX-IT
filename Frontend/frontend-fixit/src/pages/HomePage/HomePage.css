@@ -1,12 +1,8 @@
-/* ====================================================
-   Home Page Styles
-==================================================== */
 .home-page {
   background-color: var(--bg-dark);
   color: var(--text-light);
 }
 
-/* Hero Section */
 .hero-section {
   padding: 80px 20px 120px;
   text-align: center;
@@ -26,7 +22,6 @@
   line-height: 1.6;
 }
 
-/* Recent Activity Section */
 .recent-activity-section {
   background-color: #ffffff;
   color: #111827;
@@ -53,7 +48,6 @@
   color: var(--primary-amber);
 }
 
-/* How It Works Section */
 .how-it-works-section {
   background-color: #ffffff;
   color: #111827;

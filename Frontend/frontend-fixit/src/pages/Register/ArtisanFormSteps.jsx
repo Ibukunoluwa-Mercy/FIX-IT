@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-// Reusable input component helper
 export const InputField = ({ name, label, iconClass, placeholder, type = 'text', form, errors, updateField, showPassword, setShowPassword, extra = {} }) => (
     <div className="reg-field">
         <label className="reg-label" htmlFor={name}>{label}</label>

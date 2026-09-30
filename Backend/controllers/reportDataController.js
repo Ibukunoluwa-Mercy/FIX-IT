@@ -141,7 +141,7 @@ const getNearbyReports = async (req, res) => {
 		}).select('_id title description category severity status location createdAt resolvedAt confirmedBy images photos imageUrl').lean();
 
 		const toRad = (val) => (val * Math.PI) / 180;
-		const R = 6371e3; // earth radius in meters
+		const R = 6371e3; 
 
 		const nearbyReports = reports.filter(report => {
 			if (report.location?.lat == null || report.location?.lng == null) return false;
@@ -266,7 +266,7 @@ const getMyReport = (req, res) => {
 	if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 	if (!mongoose.Types.ObjectId.isValid(reportId)) return res.status(404).json({ error: 'Report not found' });
 
-	// Scope the lookup to the signed-in reporter so a valid ID alone cannot expose another resident's report.
+	
 	return Report.findOne({ _id: reportId, $or: [{ user: userId }, { createdBy: userId }] }).lean()
 		.then((report) => {
 			if (!report) return null;
@@ -278,7 +278,7 @@ const getMyReport = (req, res) => {
 			const { report, reporter } = result;
 			const images = [...new Set([...(report.images || []), ...(report.photos || []), report.imageUrl].filter(Boolean))];
 			const location = report.location || {};
-			// Return a flat, version-stable contract with canonical lifecycle names and explicit future timestamps.
+			
 			return res.json({
 				id: String(report._id),
 				reportId: report.reportId || '',
@@ -311,81 +311,52 @@ const getMyReport = (req, res) => {
 		});
 };
 
-/**
- * GET /api/reports/:id/comments
- * ------------------------------
- * Returns the activity feed (comments + embedded update events) for a report,
- * ordered oldest-first so the frontend can render a chronological thread.
- *
- * Ownership gate: the report must belong to the requesting user.
- * A stranger cannot poll another resident's report comments by guessing an ID.
- *
- * Two data sources are merged:
- *  1. Comment documents (Comment collection) — messages written by community
- *     members or support staff, stored as separate documents for scalability.
- *  2. Embedded updates array (Report.updates) — system-level events such as
- *     'SUBMITTED' or 'STATUS_CHANGE' written inline on the report document.
- *
- * Both are normalised to the same shape so the frontend only needs one renderer:
- * {
- *   id         : string    — Comment._id.toString() or 'update-{index}'
- *   type       : 'comment' | 'update'
- *   commenter  : { id, name, avatar }
- *   message    : string
- *   timestamp  : ISO date string
- * }
- *
- * POST /reports/:id/comments is NOT built yet (send button removed from UI).
- * When it is added later, it should push a Comment document and return the same
- * shape as one item in the `comments` array so the frontend can optimistically
- * append it without re-fetching.
- *
- * Uses .then()/.catch() chains — no async/await.
- */
+
+
 const getMyReportComments = (req, res) => {
 	const userId = req.user?._id || req.user?.id;
 	const reportId = req.params.id;
 
 	if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
-	// Guard against malformed ObjectIds before the database query so Mongoose
-	// does not throw a CastError and produce a confusing 500 response.
+	
+	
 	if (!mongoose.Types.ObjectId.isValid(reportId)) {
 		return res.status(404).json({ error: 'Report not found' });
 	}
 
-	// Step 1: Confirm the report exists AND belongs to this user.
-	// We intentionally do NOT query comments until ownership is confirmed —
-	// this prevents a user from listing comments on any report just by knowing
-	// its ObjectId.
+	
+	
+	
+	
 	return Report.findOne({
 		_id: reportId,
 		$or: [{ user: userId }, { createdBy: userId }],
 	}).lean()
 		.then((report) => {
-			// null means not found or not owned by this user — same 404 either way.
+			
 			if (!report) return null;
 
-			// Step 2: Fetch Comment documents and the reporter's profile in parallel.
-			// Promise.all() fires both queries simultaneously and waits for both
-			// to resolve, which is faster than chaining them sequentially.
+			
+			
+			
 			return Promise.all([
-				// 2a. All Comment documents for this report, sorted oldest-first.
-				//     Populate `createdBy` with just name + avatarUrl so we can
-				//     render the commenter's identity without a second query.
+				
+				
+				
 				Comment.find({ report: report._id })
 					.populate('createdBy', 'name avatarUrl')
-					.sort({ createdAt: 1 }) // 1 = ascending = oldest first
+					.sort({ createdAt: 1 }) 
 					.lean(),
 
-				// 2b. The report's author profile (used to attribute embedded updates).
-				//     We fetch it here rather than reusing req.user so the name/avatar
-				//     reflects the profile at submission time, not at request time.
+				
+				
+				
 				User.findById(report.createdBy || report.user)
 					.select('name avatarUrl')
 					.lean(),
 			])
-				// Bundle everything together for the next .then() handler.
+				
 				.then(([comments, reporter]) => ({ report, comments, reporter }));
 		})
 		.then((result) => {
@@ -393,15 +364,15 @@ const getMyReportComments = (req, res) => {
 
 			const { report, comments, reporter } = result;
 
-			// Step 3a: Shape Comment documents into the normalised feed item format.
-			// type: 'comment' lets the frontend render these differently from
-			// system update events (e.g. different icon or background colour).
+			
+			
+			
 			const commentItems = comments.map((comment) => ({
 				id:        String(comment._id),
 				type:      'comment',
 				commenter: {
-					// createdBy is populated so it may be a full object; if populate
-					// failed (user deleted) it falls back to the raw ObjectId string.
+					
+					
 					id:     String(comment.createdBy?._id || comment.createdBy || ''),
 					name:   comment.createdBy?.name || 'Community member',
 					avatar: comment.createdBy?.avatarUrl || '',
@@ -410,17 +381,17 @@ const getMyReportComments = (req, res) => {
 				timestamp: comment.createdAt,
 			}));
 
-			// Step 3b: Shape the embedded Report.updates array into the same format.
-			// These are system events (e.g. 'SUBMITTED', 'STATUS_CHANGE') written
-			// directly to the report document rather than as standalone Comment docs.
-			// id uses a synthetic key (update-{index}) since these are not documents.
+			
+			
+			
+			
 			const updateItems = (report.updates || []).map((update, index) => ({
 				id:        `update-${index}`,
 				type:      'update',
 				commenter: {
 					id:     String(report.createdBy || report.user),
-					// update.author is the display name written at event-time.
-					// Fall back to the reporter's current name, then to 'FixIt'.
+					
+					
 					name:   update.author || reporter?.name || 'FixIt',
 					avatar: reporter?.avatarUrl || '',
 				},
@@ -428,29 +399,29 @@ const getMyReportComments = (req, res) => {
 				timestamp: update.timestamp,
 			}));
 
-			// Step 4: Merge, filter, and sort the two item sets.
-			// filter(item => item.message) removes any update entries with blank text
-			// (e.g. a SUBMITTED event with no description) so the UI never renders
-			// an empty bubble. Sorting by timestamp gives a chronological thread
-			// (oldest first) matching the screenshot layout.
+			
+			
+			
+			
+			
 			const allItems = [...commentItems, ...updateItems]
 				.filter((item) => Boolean(item.message))
 				.sort((a, b) => new Date(a.timestamp || 0) - new Date(b.timestamp || 0));
 
-			// Step 5: Return the stable response envelope.
-			// reportId is included so a client that receives this payload out-of-band
-			// (e.g. via a push notification) knows which report it belongs to.
-			// The `comments` key name is kept stable even though the array contains
-			// both comment and update items — the `type` field distinguishes them.
-			// When POST /reports/:id/comments is built later, newly created Comment
-			// documents should be shaped to match one item in this array.
+			
+			
+			
+			
+			
+			
+			
 			return res.json({
 				reportId: String(report._id),
 				comments: allItems,
 			});
 		})
 		.catch((error) => {
-			// Log fully server-side; return a generic message to the client.
+			
 			console.error('Report comments fetch failed:', error);
 			return res.status(500).json({ error: 'Unable to load report comments' });
 		});

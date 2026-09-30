@@ -104,7 +104,7 @@
     display: flex;
   }
 
-  /* Reset horizontal slide animations for stacked mobile layout */
+  
   .login-reveal-hero,
   .login-reveal-card {
     --login-slide-x: 0px;

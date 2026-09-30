@@ -70,7 +70,7 @@ const HelpCenterSidebar = ({
         ))}
       </nav>
 
-      {/* Profile Card / Dropdown */}
+      
       <div className="help-profile-wrap">
         {showProfileMenu && (
           <div className="help-profile-menu" role="menu">

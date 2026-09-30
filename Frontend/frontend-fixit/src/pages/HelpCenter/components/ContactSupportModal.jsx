@@ -1,32 +1,6 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 
-/**
- * ContactSupportModal
- * -------------------
- * Renders the "Contact Support" modal with:
- *  - Static contact info card (email / phone / hours) — unchanged
- *  - Controlled form: Your Name, Email Address, How can we assist you?
- *  - Per-field inline validation error messages (fieldErrors prop)
- *  - A Send button that locks during submission (sendingMessage prop)
- *  - An inline network/server error strip at the bottom of the form (submitError prop)
- *  - A success confirmation banner that replaces the form after a 2xx response (submitSuccess prop)
- *
- * Props
- * -----
- * show           {boolean}   — controls Modal visibility
- * onClose        {function}  — called when the × or Cancel is clicked
- * contactInfo    {object}    — { email, phone, displayPhone, hours }
- * contactForm    {object}    — { name, email, message } — controlled form state
- * onFormChange   {function}  — setter for contactForm (receives the full updated object)
- * onSubmit       {function}  — form onSubmit handler from useHelpCenterData
- * sendingMessage {boolean}   — true while the POST is in-flight
- * fieldErrors    {object}    — { name, email, message } per-field error strings
- * submitError    {string}    — network/server error shown below the form on failure
- * submitSuccess  {boolean}   — true after a successful 2xx response
- * onDismissSuccess {function}— called when the resident clicks "Close" on the banner
- * userName       {string}    — pre-fill placeholder for the Name field
- */
 const ContactSupportModal = ({
   show,
   onClose,
@@ -48,7 +22,7 @@ const ContactSupportModal = ({
       centered
       dialogClassName="help-step-modal"
     >
-      {/* ── Modal header — always visible ─────────────────────────────────── */}
+      
       <div className="help-step-modal-header">
         <div className="help-step-modal-title">
           <div
@@ -58,7 +32,7 @@ const ContactSupportModal = ({
           >
             <i className="fa-solid fa-headset"></i>
           </div>
-          {/* Requirement §4: keep the existing "Contact Support" header */}
+          
           <h5>Contact Support</h5>
         </div>
         <button
@@ -72,7 +46,7 @@ const ContactSupportModal = ({
       </div>
 
       <div className="help-step-modal-body">
-        {/* ── Static contact info block — kept exactly as before (§4) ─────── */}
+        
         <div className="contact-modal-info-card">
           <div className="contact-modal-item">
             <span className="contact-modal-item-left">
@@ -94,9 +68,7 @@ const ContactSupportModal = ({
           </div>
         </div>
 
-        {/* ── Success confirmation banner (replaces form after 2xx) ─────────
-            Shown when submitSuccess === true so the resident gets clear
-            visual feedback without the modal vanishing immediately.       */}
+        
         {submitSuccess ? (
           <div
             style={{
@@ -106,7 +78,7 @@ const ContactSupportModal = ({
             role="status"
             aria-live="polite"
           >
-            {/* Green checkmark circle */}
+            
             <div
               style={{
                 width: 56,
@@ -149,7 +121,7 @@ const ContactSupportModal = ({
               </a>
               .
             </p>
-            {/* Dismiss button — calls onDismissSuccess to reset state + close */}
+            
             <button
               type="button"
               className="help-btn-contact-orange"
@@ -159,12 +131,11 @@ const ContactSupportModal = ({
             </button>
           </div>
         ) : (
-          /* ── Contact form — visible while submitSuccess is false ────────── */
+          
           <form onSubmit={onSubmit} noValidate>
-            {/* noValidate disables the browser's default bubble-tooltips so
-                our custom inline messages are the only validation UI shown.  */}
+            
 
-            {/* ── Your Name ──────────────────────────────────────────────── */}
+            
             <div className="mb-3">
               <label className="contact-form-label" htmlFor="help-contact-name">
                 Your Name
@@ -175,15 +146,15 @@ const ContactSupportModal = ({
                 className="contact-form-input"
                 placeholder={userName || 'Enter your name'}
                 value={contactForm.name}
-                /* Update only the name key; spread keeps the rest intact */
+                
                 onChange={(e) => onFormChange({ ...contactForm, name: e.target.value })}
                 autoComplete="name"
-                /* aria-invalid lets screen-readers announce the error state */
+                
                 aria-invalid={Boolean(fieldErrors.name)}
                 aria-describedby={fieldErrors.name ? 'contact-name-error' : undefined}
                 style={fieldErrors.name ? { borderColor: '#ef4444' } : {}}
               />
-              {/* Per-field inline error — only rendered when there is a message */}
+              
               {fieldErrors.name && (
                 <p
                   id="contact-name-error"
@@ -200,7 +171,7 @@ const ContactSupportModal = ({
               )}
             </div>
 
-            {/* ── Email Address ──────────────────────────────────────────── */}
+            
             <div className="mb-3">
               <label className="contact-form-label" htmlFor="help-contact-email">
                 Email Address
@@ -233,7 +204,7 @@ const ContactSupportModal = ({
               )}
             </div>
 
-            {/* ── How can we assist you? ─────────────────────────────────── */}
+            
             <div className="mb-3">
               <label className="contact-form-label" htmlFor="help-contact-msg">
                 How can we assist you?
@@ -265,9 +236,7 @@ const ContactSupportModal = ({
               )}
             </div>
 
-            {/* ── Inline network/server error strip ─────────────────────────
-                Displayed when the .catch() handler fires. The form stays open
-                so the resident's text is preserved and they can retry.     */}
+            
             {submitError && (
               <div
                 role="alert"
@@ -290,22 +259,20 @@ const ContactSupportModal = ({
               </div>
             )}
 
-            {/* ── Action buttons ─────────────────────────────────────────────
-                Cancel (§4 requirement: behaviour unchanged) sits left of Send.
-                Send uses help-btn-contact-orange — the app's primary orange   */}
+            
             <div className="d-flex justify-content-end gap-2">
-              {/* Requirement §4: Cancel button behaviour unchanged */}
+              
               <button
                 type="button"
                 className="btn btn-sm btn-outline-secondary"
                 onClick={onClose}
-                /* Keep Cancel enabled even while sending so the user can
-                   always bail out (their text stays in state for next open). */
+                
+
               >
                 Cancel
               </button>
 
-              {/* Send button — disabled + label change while in-flight (§3) */}
+              
               <button
                 id="contact-support-send-btn"
                 type="submit"
@@ -315,7 +282,7 @@ const ContactSupportModal = ({
                 style={sendingMessage ? { opacity: 0.7, cursor: 'not-allowed' } : {}}
               >
                 {sendingMessage ? (
-                  /* Loading state: spinner icon + label change */
+                  
                   <>
                     <i
                       className="fa-solid fa-circle-notch fa-spin"

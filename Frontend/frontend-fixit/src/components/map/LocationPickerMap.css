@@ -177,7 +177,7 @@
   padding: 0;
   max-height: 250px;
   overflow-y: auto;
-  z-index: 1050; /* Ensure it stays above the map */
+  z-index: 1050; 
 }
 
 .location-result-item {

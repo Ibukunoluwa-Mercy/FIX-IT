@@ -32,7 +32,7 @@ const HelpCenterHeader = ({
           <i className="fa-solid fa-plus"></i> New Report
         </button>
 
-        {/* Notification Popover */}
+        
         <div style={{ position: 'relative' }}>
           <button
             className="help-header-icon-btn"
@@ -51,7 +51,7 @@ const HelpCenterHeader = ({
           )}
         </div>
 
-        {/* Avatar Button */}
+        
         <button type="button" onClick={onToggleProfileMenu} aria-label="Open profile settings" className="help-header-avatar-button">
           <ResidentAvatar className="help-header-avatar" name={firstName} />
         </button>

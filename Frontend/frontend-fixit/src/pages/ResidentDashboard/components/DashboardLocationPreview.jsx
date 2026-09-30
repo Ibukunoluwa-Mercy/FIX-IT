@@ -18,7 +18,7 @@ const DashboardLocationPreview = ({ onOpen }) => {
           setLocation(savedLocation);
         }
       } catch {
-        /* The placeholder remains when no saved location exists. */
+        
       }
     };
     const loadQuietly = () => {

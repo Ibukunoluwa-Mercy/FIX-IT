@@ -1,10 +1,6 @@
 const SupportTicket = require('../models/SupportTicket');
 const { sendSupportTicketEmail } = require('../services/emailService');
 
-/**
- * Basic HTML escaping helper for sanitizing input strings
- * before storage and notification generation to prevent XSS.
- */
 const sanitizeText = (str) => {
 	if (typeof str !== 'string') return '';
 	return str

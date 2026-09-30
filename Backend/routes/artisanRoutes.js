@@ -4,7 +4,6 @@ const { artisanUpload } = require('../middleware/artisanUpload');
 
 const router = express.Router();
 
-// Custom middleware to handle multer errors gracefully
 const uploadCertificate = (req, res, next) => {
 	const upload = artisanUpload.single('certificate');
 	upload(req, res, (error) => {

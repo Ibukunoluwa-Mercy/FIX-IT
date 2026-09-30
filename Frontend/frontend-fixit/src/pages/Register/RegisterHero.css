@@ -1,10 +1,5 @@
-/* ============================================================
-   Register Hero & Brand Styles
-   ============================================================ */
-
 @import url("https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap");
 
-/* ─── Root Page Shell ─── */
 .register-page {
   min-height: 100vh;
   background-color: #faf8f5;
@@ -16,7 +11,6 @@
   padding: 40px 24px;
 }
 
-/* ─── Logo Bar ─── */
 .register-logo-bar {
   position: absolute;
   top: 24px;
@@ -41,7 +35,6 @@
   transform: scale(1.02);
 }
 
-/* ─── Split Layout Container (Centered) ─── */
 .register-split {
   display: flex;
   width: 100%;
@@ -53,9 +46,6 @@
   gap: 48px;
 }
 
-/* ═══════════════════════════════════════════════
-   LEFT — Hero Section
-   ═══════════════════════════════════════════════ */
 .register-hero {
   flex: 1.1;
   background: transparent;
@@ -93,7 +83,6 @@
   max-width: 440px;
 }
 
-/* Feature Badges */
 .register-badges {
   display: flex;
   gap: 32px;
@@ -134,7 +123,6 @@
   line-height: 1.45;
 }
 
-/* Illustration */
 .register-illustration-wrap {
   width: 100%;
   max-width: 480px;

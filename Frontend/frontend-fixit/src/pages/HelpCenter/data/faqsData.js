@@ -1,4 +1,3 @@
-// Frequently Asked Questions data
 export const faqsList = [
   {
     id: 'faq-1',

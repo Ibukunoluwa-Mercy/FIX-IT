@@ -3,8 +3,6 @@ const fs = require('fs');
 const ArtisanProfile = require('../models/ArtisanProfile');
 const User = require('../models/User');
 
-// GET /api/admin/artisans?status=pending
-// List artisans for review
 const getArtisans = (req, res) => {
 	const status = req.query.status;
 	const filter = status ? { verificationStatus: status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() } : {};
@@ -21,8 +19,6 @@ const getArtisans = (req, res) => {
 		});
 };
 
-// GET /api/admin/artisans/:id/certificate
-// Stream the private certificate file (Admin only)
 const streamArtisanCertificate = (req, res) => {
 	ArtisanProfile.findById(req.params.id)
 		.lean()
@@ -31,7 +27,7 @@ const streamArtisanCertificate = (req, res) => {
 				return res.status(404).json({ message: 'Certificate not found' });
 			}
 
-			// The certificateUrl is stored as e.g. "/private/artisan-certs/filename"
+			
 			const filename = path.basename(profile.certificateUrl);
 			const filePath = path.join(__dirname, '..', 'private', 'artisan-certs', filename);
 
@@ -39,7 +35,7 @@ const streamArtisanCertificate = (req, res) => {
 				if (err) {
 					return res.status(404).json({ message: 'Certificate file missing on server' });
 				}
-				// Stream the file directly to the response
+				
 				return res.sendFile(filePath);
 			});
 		})
@@ -49,8 +45,6 @@ const streamArtisanCertificate = (req, res) => {
 		});
 };
 
-// PATCH /api/admin/artisans/:id/verification
-// Approve or reject an artisan (reason required if rejecting)
 const updateArtisanVerification = (req, res) => {
 	const { status, reason } = req.body;
 	if (!['Approved', 'Rejected'].includes(status)) {

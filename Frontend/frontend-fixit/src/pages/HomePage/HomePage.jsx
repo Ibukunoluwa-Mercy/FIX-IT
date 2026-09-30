@@ -9,7 +9,6 @@ import CommunityImpact from '../../components/CommunityImpact/CommunityImpact';
 import CTABanner from '../../components/CTABanner/CTABanner';
 import ReportCard from '../../components/ReportCard/ReportCard';
 
-// Images
 import img1 from '../../assets/homepage one.jpeg';
 import img2 from '../../assets/homepage two.jpeg';
 import img3 from '../../assets/homepage three.jpeg';
@@ -72,7 +71,7 @@ const HomePage = () => {
 
   return (
     <div>
-      {/* Hero Section */}
+      
       <section className="hero-section">
         <Container>
           <div className="animate-slide-in">
@@ -98,13 +97,13 @@ const HomePage = () => {
         </Container>
       </section>
 
-      {/* Impact Stats */}
+      
       <ImpactCounters data={data.stats} />
 
-      {/* How It Works */}
+      
       <HowItWorks />
 
-      {/* Recent Activity */}
+      
       <section className="recent-activity-section">
         <Container>
           <div className="section-header animate-slide-in delay-200">

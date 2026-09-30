@@ -9,7 +9,7 @@ const categories = ['All Issues', 'Infrastructure', 'Utilities', 'Public Safety'
 
 const CommunityMapPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [mapCenter, setMapCenter] = useState([41.8781, -87.6298]); // Default: Chicago
+  const [mapCenter, setMapCenter] = useState([41.8781, -87.6298]); 
   const [activeCategory, setActiveCategory] = useState('All Issues');
   const [issues, setIssues] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,14 +92,14 @@ const CommunityMapPage = () => {
   return (
     <div className="community-map-page bg-light-gray">
       <Container className="py-5">
-        {/* Header */}
+        
         <div className="map-header mb-4 animate-slide-in">
           <h1 className="page-title">Community Map</h1>
           <p className="page-subtitle">
             Explore reported issues across the community. Click on a marker to view details and track progress.
           </p>
 
-          {/* Search Row */}
+          
           <form onSubmit={handleSearch} className="search-bar-container mt-4 d-flex gap-2 align-items-center">
             <div className="search-input-wrapper map-search-grow position-relative">
               <i className="fa-solid fa-magnifying-glass search-icon" style={{ color: '#9ca3af' }}></i>
@@ -148,7 +148,7 @@ const CommunityMapPage = () => {
             </div>
           )}
 
-          {/* Category Pills */}
+          
           <div className="category-pills mt-3 d-flex flex-wrap gap-2">
             {categories.map(cat => (
               <button
@@ -164,15 +164,15 @@ const CommunityMapPage = () => {
 
         {loadError && <div className="alert alert-warning py-2 small">{loadError}</div>}
 
-        {/* Analytics */}
+        
         <MapAnalytics />
 
-        {/* Map */}
+        
         <div className="map-container-wrapper my-5">
           <InteractiveMap center={mapCenter} issues={filteredIssues} isLoading={isLoading} />
         </div>
 
-        {/* Filters — toggled by the settings button */}
+        
         {showFilters && <MapFilters onClose={() => setShowFilters(false)} />}
 
       </Container>

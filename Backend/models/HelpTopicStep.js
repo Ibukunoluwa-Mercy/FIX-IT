@@ -1,13 +1,5 @@
 const mongoose = require('mongoose');
 
-/**
- * HelpTopicStep Schema
- * Represents an individual numbered step within a HelpTopic walkthrough.
- *
- * Linked via topicId (referencing HelpTopic) and topicSlug for rapid queries.
- * Ordered by the 'order' field (1, 2, 3...) so the frontend modal can render
- * step sequences accurately reflecting the real application workflows.
- */
 const helpTopicStepSchema = new mongoose.Schema(
 	{
 		topicId: {
@@ -50,7 +42,6 @@ const helpTopicStepSchema = new mongoose.Schema(
 	}
 );
 
-// Compound index to guarantee unique ordering per topic and rapid sort operations
 helpTopicStepSchema.index({ topicId: 1, order: 1 });
 helpTopicStepSchema.index({ title: 'text', description: 'text' });
 

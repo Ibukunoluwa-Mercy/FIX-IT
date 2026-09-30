@@ -110,7 +110,7 @@ const ForgotPassword = () => {
 
   return (
     <div className="forgot-password-page">
-      {/* Fixed top bar — only visible on mobile */}
+      
       <div className="forgot-logo-bar">
         <Link to="/" aria-label="Fixit Homepage">
           <img src={logo} alt="Fixit" className="forgot-logo" />

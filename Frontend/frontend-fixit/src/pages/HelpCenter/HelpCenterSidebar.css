@@ -1,5 +1,3 @@
-/* Help Center - Sidebar Styling */
-
 .help-center-page {
   --navy: #101a2b;
   --ink: #0f172a;
@@ -18,7 +16,6 @@
   font-family: "Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* Sidebar reuse */
 .help-sidebar {
   background: var(--navy);
   color: #e2e8f0;
@@ -226,7 +223,6 @@
   color: #0f172a;
 }
 
-/* Sidebar collapsed rules */
 .sidebar-collapsed .help-brand span,
 .sidebar-collapsed .help-nav-link span,
 .sidebar-collapsed .help-profile-copy,

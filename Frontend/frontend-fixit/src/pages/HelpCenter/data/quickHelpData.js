@@ -1,4 +1,3 @@
-// Quick Help Options structured data (4 core options)
 export const quickHelpOptions = [
   {
     id: 'report-an-issue',

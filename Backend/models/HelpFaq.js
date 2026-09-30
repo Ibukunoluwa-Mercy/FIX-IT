@@ -1,10 +1,5 @@
 const mongoose = require('mongoose');
 
-/**
- * HelpFaq Schema
- * Stores Frequently Asked Questions and their comprehensive answers.
- * Sorted by 'order' ascending for predictable presentation in the accordion.
- */
 const helpFaqSchema = new mongoose.Schema(
 	{
 		question: {
@@ -36,7 +31,6 @@ const helpFaqSchema = new mongoose.Schema(
 	}
 );
 
-// Full-text index for FAQ search queries
 helpFaqSchema.index({
 	question: 'text',
 	answer: 'text',

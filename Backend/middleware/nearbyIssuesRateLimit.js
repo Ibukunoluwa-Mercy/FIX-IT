@@ -10,8 +10,8 @@ const rateLimitNearbyIssues = (req, res, next) => {
 
 	const now = Date.now();
 	if (now - lastCleanup >= WINDOW_MS) {
-		// Remove expired user buckets periodically so this per-process limiter does
-		// not retain every account that has ever requested nearby issues.
+		
+		
 		requestsByUser.forEach((timestamps, key) => {
 			const activeTimestamps = timestamps.filter((timestamp) => now - timestamp < WINDOW_MS);
 			if (activeTimestamps.length) requestsByUser.set(key, activeTimestamps);

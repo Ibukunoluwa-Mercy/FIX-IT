@@ -4,7 +4,7 @@ const dns = require('dns');
 try {
 	dns.setServers(['8.8.8.8', '8.8.4.4']);
 } catch (e) {
-	// fallback to default dns if not supported
+	
 }
 
 const getMongoUris = () => {

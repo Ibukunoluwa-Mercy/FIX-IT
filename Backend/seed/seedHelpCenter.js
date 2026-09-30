@@ -4,13 +4,6 @@ const HelpFaq = require('../models/HelpFaq');
 const topicsData = require('./data/helpTopicsData');
 const faqsData = require('./data/helpFaqsData');
 
-/**
- * Seed function executing via .then() / .catch() promise chains.
- *
- * First deletes existing HelpTopic, HelpTopicStep, and HelpFaq documents to ensure
- * idempotency, then inserts all topics, creates step records for topics with hasSteps: true,
- * and populates the FAQ documents.
- */
 const seedHelpCenter = () => {
 	console.log('Seeding Help Center content...');
 
@@ -18,7 +11,7 @@ const seedHelpCenter = () => {
 		.then(() => HelpTopic.deleteMany({}))
 		.then(() => HelpFaq.deleteMany({}))
 		.then(() => {
-			// Insert all topics without steps first
+			
 			const topicsToInsert = topicsData.map((t) => ({
 				slug: t.slug,
 				section: t.section,
@@ -37,7 +30,7 @@ const seedHelpCenter = () => {
 			return HelpTopic.insertMany(topicsToInsert);
 		})
 		.then((insertedTopics) => {
-			// Build step records linked by topicId and topicSlug
+			
 			const topicMap = new Map();
 			insertedTopics.forEach((t) => topicMap.set(t.slug, t._id));
 
@@ -62,7 +55,7 @@ const seedHelpCenter = () => {
 			return HelpTopicStep.insertMany(stepsToInsert);
 		})
 		.then(() => {
-			// Insert FAQs
+			
 			return HelpFaq.insertMany(faqsData);
 		})
 		.then(() => {

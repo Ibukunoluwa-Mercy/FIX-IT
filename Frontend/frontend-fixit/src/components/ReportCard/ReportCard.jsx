@@ -15,7 +15,7 @@ const StatusBadge = ({ status }) => {
 };
 
 const ReportCard = ({ item, report, index = 0 }) => {
-  // Support both 'item' or 'report' prop gracefully
+  
   const data = item || report || {};
 
   return (

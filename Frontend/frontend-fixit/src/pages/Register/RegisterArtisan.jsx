@@ -21,16 +21,16 @@ const RegisterArtisan = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
-    const [success, setSuccess] = useState(false); // Used to show success screen
+    const [success, setSuccess] = useState(false); 
 
-    // Update field state on change
+    
     const updateField = (event) => {
         const { name, value } = event.target;
         setForm((current) => ({ ...current, [name]: value }));
         setErrors((current) => ({ ...current, [name]: '' }));
     };
 
-    // Validate Step 1 - Personal Info
+    
     const validateStep1 = () => {
         const nextErrors = {};
         if (!form.fullName.trim()) nextErrors.fullName = 'Full name is required';
@@ -42,7 +42,7 @@ const RegisterArtisan = () => {
         return nextErrors;
     };
 
-    // Validate Step 2 - Business & Verification
+    
     const validateStep2 = () => {
         const nextErrors = {};
         if (!form.businessName.trim()) nextErrors.businessName = 'Business name is required';
@@ -53,7 +53,7 @@ const RegisterArtisan = () => {
 
     const [lastStepChange, setLastStepChange] = useState(0);
 
-    // Proceed to next step if validation passes
+    
     const goNext = (e) => {
         if (e && e.preventDefault) e.preventDefault();
         const nextErrors = step === 1 ? validateStep1() : validateStep2();
@@ -66,7 +66,7 @@ const RegisterArtisan = () => {
         setErrors({});
     };
 
-    // Handle file selection and validation (must be PDF, JPG, or PNG, max 5MB)
+    
     const acceptFile = (file) => {
         if (!file) return;
         const acceptedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
@@ -93,16 +93,16 @@ const RegisterArtisan = () => {
         if (fileRef.current) fileRef.current.value = '';
     };
 
-    // Submit form to API using promise chaining (no async/await)
+    
     const submit = (event) => {
         if (event && event.preventDefault) event.preventDefault();
         
-        // Prevent ghost clicks and double clicks that happen immediately after step change
+        
         if (Date.now() - lastStepChange < 500) {
             return;
         }
         
-        // Prevent premature submission (e.g. if user hits Enter in an input on Step 1 or 2)
+        
         if (step < 3) {
             goNext();
             return;
@@ -137,7 +137,7 @@ const RegisterArtisan = () => {
             });
     };
 
-    // Common Progress Indicator for Artisan
+    
     const progress = (
         <div className="wizard-progress">
             <button type="button" className="wizard-back" onClick={() => step > 1 ? setStep(step - 1) : navigate('/')} aria-label="Go back">
@@ -158,9 +158,9 @@ const RegisterArtisan = () => {
         </div>
     );
 
-    // Render Success Screen
+    
     if (success) {
-        // Assume API returns verificationEndsAt, otherwise use Date.now() + 2 minutes
+        
         const verificationEndsAt = Date.now() + 2 * 60 * 1000;
         return <RegistrationSuccess email={form.email} verificationEndsAt={verificationEndsAt} />;
     }
@@ -260,4 +260,3 @@ const RegisterArtisan = () => {
 };
 
 export default RegisterArtisan;
-

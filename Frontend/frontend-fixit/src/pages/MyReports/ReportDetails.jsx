@@ -32,18 +32,18 @@ const ReportDetails = () => {
       return () => { active = false; };
     }
 
-    // Fetch through the owner-scoped endpoint; ignore late responses if the user leaves this report.
+    
     const requestOptions = { headers: { Authorization: `Bearer ${token}` } };
     const detailRequest = axios.get(`${API_URL}/api/reports/${id}`, requestOptions);
     const commentsRequest = axios.get(`${API_URL}/api/reports/${id}/comments`, requestOptions)
       .then(({ data }) => data)
       .catch(() => ({ comments: [] }));
 
-    // Keep comments independently optional so an unavailable timeline does not hide the report itself.
+    
     Promise.all([detailRequest, commentsRequest])
       .then(([{ data: report }, commentData]) => {
         if (!active) return;
-        // Compute the configurable NEW window when data arrives rather than reading the clock during render.
+        
         const createdTime = report?.reportedAt || report?.createdAt ? new Date(report.reportedAt || report.createdAt).getTime() : NaN;
         const ageHours = (Date.now() - createdTime) / 3600000;
         setDetail({
@@ -94,7 +94,7 @@ const ReportDetails = () => {
     );
   }
 
-  // Normalize both legacy image fields and the wizard's photo array into one gallery source.
+  
   const photos = getReportImageUrls(report);
   const createdAt = report.reportedAt || report.createdAt;
   const isNew = detail.isNew;
@@ -133,7 +133,7 @@ const ReportDetails = () => {
       </Link>
 
       <div className="report-details-layout">
-        {/* The main column contains the submitted content, saved photos, and read-only activity feed. */}
+        
         <div className="report-details-main-column">
           <section className="report-details-card report-overview-card">
             {photos[0] ? (
@@ -199,7 +199,7 @@ const ReportDetails = () => {
           </section>
         </div>
 
-        {/* Keep progress and map context in a separate desktop rail that stacks below on mobile. */}
+        
         <aside className="report-details-side-column">
           <section className="report-details-card report-status-card">
             <h2>Report Status</h2>

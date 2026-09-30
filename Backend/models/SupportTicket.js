@@ -1,9 +1,5 @@
 const mongoose = require('mongoose');
 
-/**
- * SupportTicket Schema
- * Records user support inquiries, contact submissions, and issue reports.
- */
 const supportTicketSchema = new mongoose.Schema(
 	{
 		userId: {

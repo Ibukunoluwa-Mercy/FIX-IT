@@ -10,7 +10,7 @@ const AboutRoles = () => {
         </div>
 
         <Row className="g-4">
-          {/* Community Members */}
+          
           <Col lg={4}>
             <div className="role-card">
               <div className="role-header">
@@ -30,7 +30,7 @@ const AboutRoles = () => {
             </div>
           </Col>
 
-          {/* Issue Resolvers */}
+          
           <Col lg={4}>
             <div className="role-card">
               <div className="role-header">
@@ -50,7 +50,7 @@ const AboutRoles = () => {
             </div>
           </Col>
 
-          {/* Administrators */}
+          
           <Col lg={4}>
             <div className="role-card">
               <div className="role-header">

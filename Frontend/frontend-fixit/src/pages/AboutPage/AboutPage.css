@@ -1,10 +1,3 @@
-/* ===================================================
-   ABOUT PAGE STYLES (Brand Color Palette System)
-   - Midnight Navy: #0d1b2a / #0b1320
-   - Action Red / Crimson: #e63946
-   - Cool Steel Blue: #457b9d
-=================================================== */
-
 @import './AboutHero.css';
 @import './AboutSections.css';
 @import './AboutRoles.css';

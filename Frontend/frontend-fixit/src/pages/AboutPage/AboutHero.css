@@ -1,4 +1,3 @@
-/* 1. Hero Section */
 .about-hero-section {
   background-color: #0d1b2a;
   background-image: radial-gradient(
@@ -72,7 +71,6 @@
   transform: translateY(-2px);
 }
 
-/* Hero Workflow Indicator Box */
 .hero-workflow-card {
   background: #ffffff0f;
   border: 1px solid #ffffff1f;

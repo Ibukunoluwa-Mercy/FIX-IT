@@ -1,6 +1,3 @@
-/**
- * Seed data for Browse by Category topics.
- */
 const categoryTopicsData = [
 	{
 		slug: 'getting-started',

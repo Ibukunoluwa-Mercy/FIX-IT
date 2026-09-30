@@ -2,7 +2,7 @@ import './ReportDetails.css';
 
 const stages = ['Reported', 'In Progress', 'Resolved', 'Closed'];
 
-// A separate stepper keeps status progression reusable when staff-driven timestamps become available.
+
 const ReportStatusStepper = ({ status = 'reported', timestamps = {} }) => {
   const normalizedStatus = String(status).toLowerCase().replace(/[_-]+/g, ' ').trim();
   const activeStage = normalizedStatus === 'new' || normalizedStatus === 'pending'

@@ -31,8 +31,7 @@ const uploadOfficialId = (req, res, next) => {
 	});
 };
 
-// These counters are keyed by authenticated user id so changing IPs cannot bypass
-// protection around credential changes or destructive account deletion.
+
 const passwordChangeLimiter = createRateLimiter({
 	windowMs: 15 * 60 * 1000,
 	max: 5,

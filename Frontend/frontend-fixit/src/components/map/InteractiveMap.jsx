@@ -69,7 +69,6 @@ const getClusterGroups = (issues) => {
   return groups;
 };
 
-// Smoothly fly to new centre whenever `center` prop changes
 const FlyToLocation = ({ center, zoom }) => {
   const map = useMap();
   const firstRender = useRef(true);
@@ -86,7 +85,6 @@ const FlyToLocation = ({ center, zoom }) => {
   return null;
 };
 
-// Fullscreen helper
 const FullscreenButton = () => {
   const map = useMap();
   const handleFullscreen = () => {

@@ -1,19 +1,12 @@
 const HelpFaq = require('../models/HelpFaq');
 
-/**
- * GET /api/help/faqs
- * Retrieves FAQs sorted by priority order.
- *
- * Supports limiting results (default: 5) for the accordion preview,
- * or returning all FAQs via query parameter (?all=true) or endpoint.
- */
 const getFaqs = (req, res) => {
 	const shouldReturnAll = req.query.all === 'true' || req.query.all === '1' || req.path.endsWith('/all');
 	const limit = parseInt(req.query.limit, 10) || 5;
 
 	let query = HelpFaq.find({}).sort({ order: 1 });
 
-	// If not requesting all FAQs, apply the limit for the initial 5-item display
+	
 	if (!shouldReturnAll) {
 		query = query.limit(limit);
 	}

@@ -58,8 +58,8 @@ const resolveResidentLocation = (req) => {
 		};
 	}
 
-	// The authenticated user is loaded from MongoDB by requireAuth, so this fallback
-	// uses the resident's last saved coordinates without another profile lookup.
+	
+	
 	const savedLocation = req.user?.lastKnownLocation;
 	if (savedLocation?.latitude == null || savedLocation?.longitude == null) {
 		throw makeBadRequest('Provide lat and lng or save a location to your resident profile');
@@ -190,15 +190,15 @@ const buildNearbyPipeline = ({ location, radiusKm, filters, sortBy, page, limit,
 				distanceField: 'distanceMeters',
 				maxDistance: radiusKm * 1000,
 				spherical: true,
-				// $geoNear must be the first stage to use the Report 2dsphere index.
-				// Putting category, severity, status, and date filters in its query keeps
-				// MongoDB from loading distant or ineligible reports into application memory.
+				
+				
+				
 				query: filters,
 			},
 		},
 		{
-			// Both branches use the same geospatially filtered stream: metadata counts all
-			// matches, while the issues branch sorts and returns only the requested page.
+			
+			
 			$facet: {
 				metadata: [{ $count: 'totalCount' }],
 				issues: issueStages,
@@ -227,9 +227,9 @@ const getNearbyIssues = (req, res) => {
 			const totalCount = result.metadata?.[0]?.totalCount || 0;
 			const issues = result.issues || [];
 
-			// An empty geo result is an expected nearby-search outcome, not a failure.
-			// Always return 200 with an empty list so the resident page can show its
-			// dedicated "No nearby issues" state instead of rendering an error.
+			
+			
+			
 			return res.status(200).json({
 				userLocation: request.location,
 				radiusKm: request.radiusKm,

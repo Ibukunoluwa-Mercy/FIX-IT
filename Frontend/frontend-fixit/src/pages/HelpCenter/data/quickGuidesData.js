@@ -1,4 +1,3 @@
-// Quick Guides structured data (4 step-by-step reading guides)
 export const quickGuides = [
   {
     id: 'how-to-report-an-issue',

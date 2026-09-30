@@ -1,6 +1,3 @@
-/* Help Center - Search Bar & Secondary Banner */
-
-/* 2. Search Bar */
 .help-search-wrapper {
   margin-top: 18px;
 }
@@ -71,7 +68,6 @@
   background: #1e293b;
 }
 
-/* Active Search Filter Banner */
 .help-search-status {
   margin-top: 12px;
   padding: 8px 14px;
@@ -95,7 +91,6 @@
   font-size: 12.5px;
 }
 
-/* Secondary Banner Strip */
 .help-secondary-banner {
   margin-top: 18px;
   background: #ffffff;

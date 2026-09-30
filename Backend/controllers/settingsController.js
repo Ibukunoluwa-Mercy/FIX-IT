@@ -163,8 +163,8 @@ const updatePassword = (req, res) => {
 	return User.findById(req.user._id).select('+password')
 		.then((user) => {
 			if (!user) return res.status(404).json({ code: 'ACCOUNT_NOT_FOUND', message: 'Account not found' });
-			// Verify the current hash before setting the new password; the User save hook
-			// hashes the replacement only after this proves the requester knows the old password.
+			
+			
 			return user.matchPassword(currentPassword).then((matches) => {
 				if (!matches) return res.status(401).json({ code: 'CURRENT_PASSWORD_INCORRECT', message: 'Current password is incorrect' });
 				user.password = newPassword;
@@ -237,8 +237,8 @@ const deleteAccount = (req, res) => {
 	return User.findById(req.user._id).select('+password +emailVerificationTokenHash +emailVerificationExpires +resetPasswordToken +resetPasswordExpire')
 		.then((user) => {
 			if (!user) return res.status(404).json({ code: 'ACCOUNT_NOT_FOUND', message: 'Account not found' });
-			// An active JWT proves prior login, not present intent. Rechecking the password
-			// prevents a left-open or stolen session from deleting the resident's account.
+			
+			
 			return user.matchPassword(password).then((matches) => matches ? user : null);
 		})
 		.then((user) => {
@@ -249,8 +249,8 @@ const deleteAccount = (req, res) => {
 				? path.join(uploadDirectory, path.basename(user.avatarUrl))
 				: null;
 
-			// Preserve each report's reference to this now-anonymized account so public
-			// community records remain intact while the resident's profile PII is erased.
+			
+			
 			user.deletedAt = new Date();
 			user.isActive = false;
 			user.name = 'Deleted Resident';

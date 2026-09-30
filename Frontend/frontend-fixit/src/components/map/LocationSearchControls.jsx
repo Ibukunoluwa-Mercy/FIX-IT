@@ -79,7 +79,7 @@ const LocationSearchControls = ({
         </div>
       )}
 
-      {/* Dropdown Results */}
+      
       {showDropdown && results.length > 0 && (
         <ul className="location-results-dropdown shadow-sm">
           {results.map((res) => (
@@ -95,7 +95,7 @@ const LocationSearchControls = ({
         </ul>
       )}
 
-      {/* Empty State Message Inline */}
+      
       {emptyMessage && query.length >= 3 && !isSearching && (
         <div className="location-empty-message d-flex align-items-center justify-content-between gap-2" role="status">
           <span><i className="fa-solid fa-circle-exclamation"></i> {emptyMessage}</span>

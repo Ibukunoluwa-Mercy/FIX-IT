@@ -50,7 +50,7 @@ const AboutImpact = () => {
           </Col>
         </Row>
 
-        {/* Live Impact Counters */}
+        
         <div className="text-center mb-4">
           <h3 className="section-heading-title" style={{ fontSize: '1.45rem' }}>7. Our Impact (Live)</h3>
         </div>

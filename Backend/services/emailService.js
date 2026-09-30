@@ -1,16 +1,7 @@
 const nodemailer = require('nodemailer');
 
-/**
- * escapeHtml
- * ----------
- * Converts the five characters that have special meaning in HTML into their
- * named entity equivalents. This is applied to every piece of user-supplied
- * text before it is embedded in an HTML email body, preventing an attacker
- * from injecting <script> tags or other markup via the contact form fields.
- *
- * Note: we escape the raw string value, not an already-escaped one, so this
- * function should only be called once per value.
- */
+
+
 const escapeHtml = (value) => String(value)
 	.replace(/&/g, '&amp;')
 	.replace(/</g, '&lt;')
@@ -248,26 +239,26 @@ const sendSupportTicketEmail = ({ name, email, subject, message, ticketId }) => 
 	// Step 4: Build and send the email, returning a promise.
 	return transporter.sendMail({
 		// FROM: the app's own sending address so SPF/DKIM pass on our domain.
-		// This is set in MAIL_FROM (or falls back to SMTP_USER if not specified).
+		
 		from: process.env.MAIL_FROM || process.env.SMTP_USER,
 
-		// TO: the support team's inbox. Read from SUPPORT_EMAIL env var — never
-		// hardcoded so it can be changed without touching source code.
+		
+		
 		to: supportTargetEmail,
 
-		// REPLY-TO: the submitting user's email address.
-		// When a support agent clicks "Reply" in their mail client, the response
-		// will be addressed to the resident, not back to the app's noreply address.
-		// This is the key UX improvement over omitting the header entirely.
+		
+		
+		
+		
 		replyTo: email,
 
-		// SUBJECT: clearly identifies the ticket and includes the resident's name
-		// so the support agent sees who sent it at a glance in their inbox.
+		
+		
 		subject: `New Support Request from ${name}${ticketId ? ` [Ticket #${ticketId}]` : ''}`,
 
-		// Plain-text fallback for mail clients that do not render HTML.
-		// Raw (unescaped) values are safe here because plain-text clients
-		// do not parse or execute HTML or JavaScript.
+		
+		
+		
 		text: [
 			`New Support Request`,
 			`${'─'.repeat(40)}`,
@@ -283,8 +274,8 @@ const sendSupportTicketEmail = ({ name, email, subject, message, ticketId }) => 
 			`Reply directly to this email to respond to the resident.`,
 		].filter(Boolean).join('\n'),
 
-		// HTML body: clearly formatted with labelled fields.
-		// All user-supplied content has already been escaped above.
+		
+		
 		html: `
 <!DOCTYPE html>
 <html lang="en">

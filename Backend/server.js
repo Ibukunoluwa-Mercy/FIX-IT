@@ -79,17 +79,17 @@ app.use('/api/support', supportRoutes);
 
 const startServer = async () => {
 	const server = app.listen(port, () => console.log(`Server running on port ${port}`));
-	// Start accepting requests before database retries finish so local clients get
-	// a useful API response instead of a browser-level network error.
+	
+	
 	const connected = await connectDB();
 	if (!connected) {
 		console.error('Database unavailable. API started, but database-backed requests will return an error until MongoDB reconnects.');
 	} else {
-		// Verify SMTP credentials once at startup so email problems surface
-		// immediately in the server log (not silently on the first registration).
+		
+		
 		verifySmtpConnection();
 
-		// Verify and seed help content if empty
+		
 		HelpTopic.countDocuments()
 			.then((count) => {
 				if (count === 0) {

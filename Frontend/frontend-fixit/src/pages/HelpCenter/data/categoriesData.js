@@ -1,4 +1,3 @@
-// Browse by Category structured data (8 categories)
 export const categoriesList = [
   {
     id: 'getting-started',

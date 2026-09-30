@@ -1,4 +1,3 @@
-// Support contact details matching requested replacement
 export const contactInfo = {
   email: 'ibukunojedapo2022@gmail.com',
   phone: '09134640553',

@@ -93,8 +93,8 @@ const buildMapQuery = ({ category, status, search, bbox }) => {
 	const query = {};
 	const filters = [];
 
-	// Apply the indexed viewport constraint first so MongoDB can discard distant reports early.
-	// Category, status, and text conditions then operate on the smaller candidate set.
+	
+	
 	if (bbox) {
 		const geoBox = {
 			'location.geo': { $geoWithin: { $box: [[bbox.minLng, bbox.minLat], [bbox.maxLng, bbox.maxLat]] } },
@@ -187,8 +187,8 @@ const getMapClusters = (req, res) => {
 	}
 	return getMapIssues(params)
 		.then((issues) => {
-			// A grid is deterministic and cheap at map scale; increasing cell size at low zoom
-			// keeps thousands of points server-aggregated before the browser renders markers.
+			
+			
 			const cellSize = 360 / (Math.pow(2, zoom) * 4);
 			const cells = new Map();
 			issues.forEach((issue) => {

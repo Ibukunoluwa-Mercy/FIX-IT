@@ -36,14 +36,14 @@ const navGroups = [
 const HelpCenter = () => {
   const navigate = useNavigate();
 
-  // Layout & UI states
+  
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showReportWizard, setShowReportWizard] = useState(false);
 
-  // Current resident info
+  
   const user = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem('fixitUser') || '{}');
@@ -54,7 +54,7 @@ const HelpCenter = () => {
   const userName = user.name || user.fullName || 'Resident';
   const firstName = userName.split(' ')[0];
 
-  // Hook for topic/faq data, search, filtering, and modals
+  
   const {
     searchQuery,
     setSearchQuery,
@@ -85,7 +85,7 @@ const HelpCenter = () => {
     handleContactSubmit,
   } = useHelpCenterData(user);
 
-  // Navigation click
+  
   const handleNavClick = (item) => {
     if (item.path) {
       navigate(item.path);
@@ -96,7 +96,7 @@ const HelpCenter = () => {
     }
   };
 
-  // Sign out
+  
   const handleSignOut = () => {
     localStorage.removeItem('fixitToken');
     localStorage.removeItem('token');
@@ -106,7 +106,7 @@ const HelpCenter = () => {
 
   return (
     <div className={`help-center-page ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
-      {/* 1. Sidebar Navigation */}
+      
       <HelpCenterSidebar
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
@@ -125,7 +125,7 @@ const HelpCenter = () => {
         }}
       />
 
-      {/* 2. Main Page Layout */}
+      
       <main className="help-main">
         <HelpCenterHeader
           onToggleSidebar={() => {
@@ -185,7 +185,7 @@ const HelpCenter = () => {
         </div>
       </main>
 
-      {/* 3. Numbered Step-by-Step Modal */}
+      
       <HelpStepModal
         show={showStepModal}
         onClose={() => {
@@ -196,7 +196,7 @@ const HelpCenter = () => {
         isLoading={loadingTopicDetail}
       />
 
-      {/* 4. Contact Support Modal */}
+      
       <ContactSupportModal
         show={showContactModal}
         onClose={() => setShowContactModal(false)}
@@ -209,15 +209,15 @@ const HelpCenter = () => {
         submitError={contactError}
         submitSuccess={submitSuccess}
         onDismissSuccess={() => {
-          // When the resident clicks "Close" on the success banner,
-          // reset the success flag and close the modal cleanly.
+          
+          
           setSubmitSuccess(false);
           setShowContactModal(false);
         }}
         userName={userName}
       />
 
-      {/* 5. Report Wizard Modal */}
+      
       {showReportWizard && (
         <ReportWizard
           onClose={() => setShowReportWizard(false)}

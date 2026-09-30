@@ -205,7 +205,7 @@
     grid-template-columns: unset;
   }
 
-  /* Left/hero branding section — always on top on mobile */
+  
   .login-branding {
     display: flex;
     flex-direction: column;
@@ -215,7 +215,7 @@
   }
 
   .login-branding .brand-row {
-    display: none; /* Logo is fixed on top bar */
+    display: none; 
   }
 
   .login-copy-block {
@@ -265,7 +265,7 @@
     border-radius: 20px;
   }
 
-  /* Right form card — always below branding on mobile */
+  
   .login-card-wrap {
     width: 100%;
     flex: 1 1 auto;
@@ -353,4 +353,3 @@
     padding: 22px 16px;
   }
 }
-

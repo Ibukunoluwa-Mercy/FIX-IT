@@ -26,7 +26,7 @@ const Login = () => {
 
   const [countdown, setCountdown] = useState(null);
   
-  // Optional: Update countdown live if it's set
+  
   useEffect(() => {
       if (countdown !== null && countdown > 0) {
           const timer = setInterval(() => setCountdown(c => c - 1), 1000);
@@ -34,7 +34,7 @@ const Login = () => {
       }
   }, [countdown]);
 
-  // Pre-fill email if passed from Registration success screen
+  
   useEffect(() => {
       if (location.state?.email && !form.email) {
           setForm(prev => ({ ...prev, email: location.state.email }));
@@ -53,8 +53,8 @@ const Login = () => {
     setError('');
     setCountdown(null);
 
-    // 1. Submit with fetch using .then()/.catch() promise chaining (no async/await)
-    // 2. Include credentials to store httpOnly cookies securely
+    
+    
     fetch(`${API_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -65,22 +65,22 @@ const Login = () => {
       }),
     })
       .then((response) => {
-        // We need to parse JSON to see error codes/messages
+        
         return response.json().then((data) => ({ status: response.status, data }));
       })
       .then(({ status, data }) => {
         setLoading(false);
 
-        // 3. Handle responses by status code as requested
+        
         if (status === 200) {
-          localStorage.setItem('fixitToken', data.token); // Optional: if using bearer fallback
+          localStorage.setItem('fixitToken', data.token); 
           localStorage.setItem('fixitUser', JSON.stringify(data.user || {}));
           localStorage.setItem('fixitDashboardGreeting', 'welcome-back');
 
           const firstName = data.user?.name?.split(' ')[0] || 'there';
           toast.success(`Welcome back, ${firstName}!`);
           
-          // Redirect by role
+          
           const role = data.user?.role?.toLowerCase() || 'resident';
           if (role === 'admin' || role === 'official') {
               navigate('/dashboard/official');
@@ -90,7 +90,7 @@ const Login = () => {
               navigate('/dashboard/resident');
           }
         } else if (status === 403 && data.code === 'ACCOUNT_VERIFYING') {
-          // Do NOT show a red error. Show a friendly notice with a live countdown
+          
           setCountdown(data.secondsRemaining || 300);
         } else if (status === 401) {
           setError('Invalid email or password.');

@@ -22,7 +22,6 @@ import './dashboard-theme.css'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// Auth-only routes that should render without the Navbar/Footer shell
 const AUTH_ROUTES = ['/register', '/login', '/forgot-password', '/reset-password', '/signup/artisan'];
 const DASHBOARD_ROUTES = ['/dashboard', '/dashboard/resident', '/dashboard/official', '/dashboard/artisan', '/reports', '/my-reports', '/help-center', '/settings'];
 const LOCATION_ROUTES = ['/map'];

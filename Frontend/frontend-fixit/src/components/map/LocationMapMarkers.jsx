@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
-// Custom marker icon
 export const defaultIcon = L.divIcon({
   className: 'custom-leaflet-marker',
   html: `
@@ -14,7 +13,6 @@ export const defaultIcon = L.divIcon({
   iconAnchor: [17, 34],
 });
 
-// Nearby report icon
 export const nearbyIcon = L.divIcon({
   className: 'custom-leaflet-marker',
   html: `
@@ -27,7 +25,6 @@ export const nearbyIcon = L.divIcon({
   popupAnchor: [0, -32],
 });
 
-// Component to handle smooth flying to new locations
 export const MapFlyTo = ({ center, zoom }) => {
   const map = useMap();
   useEffect(() => {
@@ -38,7 +35,6 @@ export const MapFlyTo = ({ center, zoom }) => {
   return null;
 };
 
-// Component to capture map clicks and update marker
 export const MapClickCapture = ({ onLocationSelected }) => {
   const map = useMap();
   useEffect(() => {
@@ -54,7 +50,6 @@ export const MapClickCapture = ({ onLocationSelected }) => {
   return null;
 };
 
-// Draggable Marker Component
 export const DraggableMarker = ({ position, onDragEnd }) => {
   const markerRef = useRef(null);
   const eventHandlers = React.useMemo(

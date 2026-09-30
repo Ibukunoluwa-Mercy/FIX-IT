@@ -1,15 +1,5 @@
 const mongoose = require('mongoose');
 
-/**
- * HelpTopic Schema
- * Defines help center topics across three core sections:
- * - 'quick_help': Primary onboarding and core flow topics
- * - 'category': Browse by Category items
- * - 'guide': Step-by-step reading guides with read times
- *
- * Each topic either contains structured interactive steps (hasSteps: true)
- * linked to HelpTopicStep records, or plain explanatory written copy (body/content).
- */
 const helpTopicSchema = new mongoose.Schema(
 	{
 		slug: {
@@ -53,7 +43,7 @@ const helpTopicSchema = new mongoose.Schema(
 		readTime: {
 			type: String,
 			trim: true,
-			default: null, // Nullable, primarily for 'guide' section
+			default: null, 
 		},
 		hasSteps: {
 			type: Boolean,
@@ -61,11 +51,11 @@ const helpTopicSchema = new mongoose.Schema(
 		},
 		body: {
 			type: String,
-			default: null, // Explanatory text for non-step topics
+			default: null, 
 		},
 		content: {
 			type: [String],
-			default: [], // Paragraphs or bullet points for rich display
+			default: [], 
 		},
 		order: {
 			type: Number,
@@ -86,7 +76,6 @@ const helpTopicSchema = new mongoose.Schema(
 	}
 );
 
-// Full-text index for keyword searching across topic metadata and content
 helpTopicSchema.index({
 	title: 'text',
 	description: 'text',

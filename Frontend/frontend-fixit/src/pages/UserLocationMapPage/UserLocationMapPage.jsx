@@ -114,7 +114,7 @@ const UserLocationMapPage = () => {
         setLocationMessage('Using your saved location.');
         return true;
       }
-    } catch { /* The location notice offers a retry when no saved location exists. */ }
+    } catch {  }
     return false;
   }, [token]);
 

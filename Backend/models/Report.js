@@ -50,7 +50,7 @@ const reportSchema = new mongoose.Schema(
 reportSchema.index({ 'location.geo': '2dsphere' });
 
 reportSchema.pre('validate', function normalizeLegacyStatus() {
-	// Translate stored legacy labels before validation so editing an older report won't violate the new enum.
+	
 	const legacyStatuses = {
 		new: 'reported',
 		pending: 'reported',

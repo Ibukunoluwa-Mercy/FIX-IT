@@ -1,4 +1,3 @@
-/* --- Redesigned Recent Reports & Recent Updates Layout & Empty States --- */
 .dashboard-panels-stacked {
   display: flex;
   flex-direction: column;
@@ -28,7 +27,6 @@
   color: #c2410c;
 }
 
-/* Recent Reports Empty State */
 .empty-state-reports {
   display: flex;
   flex-direction: column;
@@ -78,7 +76,6 @@
   box-shadow: 0 3px 6px #f9731626;
 }
 
-/* Recent Updates Empty State */
 .empty-state-updates {
   display: flex;
   align-items: center;

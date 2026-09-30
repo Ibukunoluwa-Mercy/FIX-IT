@@ -1,6 +1,3 @@
-/**
- * Seed data for Quick Guides section topics.
- */
 const guideTopicsData = [
 	{
 		slug: 'how-to-report-an-issue',

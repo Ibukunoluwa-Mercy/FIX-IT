@@ -104,7 +104,7 @@ const ExploreIssuesPage = () => {
     setSearchInput('');
   };
 
-  // Optimistic confirmation/upvote handling
+  
   const handleConfirm = (issueId) => {
     setConfirmedIssues(prev => {
       const isCurrentlyConfirmed = !!prev[issueId];
@@ -112,7 +112,7 @@ const ExploreIssuesPage = () => {
     });
   };
 
-  // Filter local data based on queries for client-side preview
+  
   const filteredIssues = useMemo(() => {
     return issuesData.filter(issue => {
       const matchesSearch = !currentSearch || 

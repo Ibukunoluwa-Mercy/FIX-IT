@@ -6,7 +6,7 @@ const { rateLimitNearbyIssues } = require('../middleware/nearbyIssuesRateLimit')
 
 const router = express.Router();
 
-// Register the specific map paths before /:id so Express never treats them as issue ids.
+
 router.get('/nearby', requireAuth, rateLimitNearbyIssues, getNearbyIssues);
 router.get('/map/clusters', getMapClusters);
 router.get('/map', getMap);

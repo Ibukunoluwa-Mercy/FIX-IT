@@ -18,14 +18,14 @@ export const useLocationPickerSearch = (initialAddress, onSelectLocation) => {
     setIsSearching(true);
     setEmptyMessage('');
 
-    // Keep the typed text intact in the request; only URL-encode it for safe transport.
+    
     fetch(`${API_URL}/api/geocode/search?q=${encodeURIComponent(searchQuery)}`, { headers: getAuthHeaders() })
       .then((response) => {
         if (!response.ok) throw new Error('Network response was not ok');
         return response.json();
       })
       .then((data) => {
-        // A slow response for an older query must never replace the newest query's results.
+        
         if (requestVersion !== requestId.current) return;
         const matches = Array.isArray(data) ? data : [];
         setResults(matches);
@@ -65,7 +65,7 @@ export const useLocationPickerSearch = (initialAddress, onSelectLocation) => {
 
   const handleInputChange = (e) => {
     const val = e.target.value;
-    // Invalidate in-flight results immediately, not after the debounce, so older responses cannot flash over new typing.
+    
     const requestVersion = ++requestId.current;
     setQuery(val);
     setResults([]);
@@ -73,14 +73,14 @@ export const useLocationPickerSearch = (initialAddress, onSelectLocation) => {
     setEmptyMessage('');
     setIsSearching(false);
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    // Capture the complete current field value; a later keystroke replaces this timer with its own full query.
+    
     debounceTimer.current = setTimeout(() => {
       searchNominatim(val, requestVersion);
     }, 500);
   };
 
   const retrySearch = () => {
-    // Retry the visible query immediately while giving its response a fresh version token.
+    
     const requestVersion = ++requestId.current;
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
     searchNominatim(query, requestVersion);

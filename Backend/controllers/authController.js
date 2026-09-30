@@ -62,7 +62,7 @@ const register = async (req, res) => {
 
 		const verificationBaseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 		
-		// Send verification & welcome emails in the background (non-blocking)
+		
 		setImmediate(async () => {
 			try {
 				const resVerify = await sendVerificationEmail({
@@ -166,7 +166,7 @@ const registerOfficial = async (req, res) => {
 			throw profileError;
 		}
 
-		// Send verification & welcome emails in the background (non-blocking)
+		
 		setImmediate(async () => {
 			try {
 				await sendVerificationEmail({
@@ -211,7 +211,6 @@ const registerOfficial = async (req, res) => {
 	}
 };
 
-
 const verifyEmail = async (req, res) => {
 	const rawToken = normalizeText(req.query.token);
 	if (!rawToken) return res.status(400).json({ message: 'Verification token is required' });
@@ -251,7 +250,6 @@ const createAdmin = async (req, res) => {
 	}
 };
 
-// Login with Promise Chaining, accountStatus checking, and httpOnly cookie setup
 const login = (req, res) => {
 	const email = normalizeText(req.body.email).toLowerCase();
 	const password = typeof req.body.password === 'string' ? req.body.password : '';
@@ -269,7 +267,7 @@ const login = (req, res) => {
 				return res.status(401).json({ message: 'Invalid email or password' });
 			}
 
-			// Password is correct, now check accountStatus
+			
 			const now = new Date();
 			if (user.accountStatus === 'suspended') {
 				return res.status(403).json({ code: 'ACCOUNT_SUSPENDED', message: 'This account is not active. Contact support.' });
@@ -280,23 +278,23 @@ const login = (req, res) => {
 					const secondsRemaining = Math.ceil((user.verificationEndsAt.getTime() - now.getTime()) / 1000);
 					return res.status(403).json({ code: 'ACCOUNT_VERIFYING', secondsRemaining, message: 'We are still verifying your information.' });
 				} else {
-					// Lazy activation
+					
 					user.accountStatus = 'active';
 					user.activatedAt = now;
 					user.save().catch(err => console.error('Failed to lazy-activate user:', err));
 				}
 			}
 
-			// Sign JWT and set it in httpOnly cookie
+			
 			const token = createToken(user);
 			res.cookie('token', token, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
 				sameSite: 'lax',
-				maxAge: 3600000 // 1 hour
+				maxAge: 3600000 
 			});
 
-			// Send login notification in background (non-blocking)
+			
 			setImmediate(() => {
 				sendLoginEmail({ email: user.email, fullName: user.name || user.email })
 					.then(resLogin => {
@@ -308,7 +306,7 @@ const login = (req, res) => {
 
 			return res.status(200).json({
 				message: 'Login successful',
-				token, // Return token for localStorage fallback
+				token, 
 				user: {
 					id: user._id,
 					fullName: user.name,
@@ -326,7 +324,7 @@ const login = (req, res) => {
 };
 
 const getMe = (req, res) => {
-	// authMiddleware guarantees req.user is populated
+	
 	return res.status(200).json({ user: req.user.toSafeProfile() });
 };
 

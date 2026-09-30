@@ -4,7 +4,6 @@ const { requireAuth, requireRole } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// All routes in this file require admin authentication
 router.use(requireAuth, requireRole('admin'));
 
 router.get('/artisans', getArtisans);

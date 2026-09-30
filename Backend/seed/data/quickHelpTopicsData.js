@@ -1,6 +1,3 @@
-/**
- * Seed data for Quick Help section topics.
- */
 const quickHelpTopicsData = [
 	{
 		slug: 'report-an-issue',

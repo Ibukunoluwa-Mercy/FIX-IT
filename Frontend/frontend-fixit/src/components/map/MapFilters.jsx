@@ -31,7 +31,7 @@ const MapFilters = () => {
         </div>
 
         <Row className="g-4">
-          {/* Date Reported */}
+          
           <Col lg={2} md={6}>
             <div className="fw-semibold small mb-3">Date Reported</div>
             <div className="input-group">
@@ -44,7 +44,7 @@ const MapFilters = () => {
             </div>
           </Col>
 
-          {/* Issue Status */}
+          
           <Col lg={2} md={6}>
             <div className="fw-semibold small mb-3">Issue Status</div>
             {Object.entries({ Verified: 'Verified', InProgress: 'In Progress', Resolved: 'Resolved', Pending: 'Pending' }).map(([key, label]) => (
@@ -59,7 +59,7 @@ const MapFilters = () => {
             ))}
           </Col>
 
-          {/* Severity */}
+          
           <Col lg={2} md={6}>
             <div className="fw-semibold small mb-3">Severity</div>
             {['High', 'Medium', 'Low'].map(sev => (
@@ -74,7 +74,7 @@ const MapFilters = () => {
             ))}
           </Col>
 
-          {/* Categories */}
+          
           <Col lg={3} md={6}>
             <div className="fw-semibold small mb-3">Categories</div>
             <div className="row g-2">
@@ -92,7 +92,7 @@ const MapFilters = () => {
             </div>
           </Col>
 
-          {/* Sort & View */}
+          
           <Col lg={3} md={6}>
             <div>
               <div className="fw-semibold small mb-2">Sort By</div>

@@ -1,6 +1,3 @@
-/**
- * Seed data for Help Center Frequently Asked Questions.
- */
 const helpFaqsData = [
 	{
 		order: 1,

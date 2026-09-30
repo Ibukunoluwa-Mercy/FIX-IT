@@ -25,7 +25,7 @@ const providerRequest = async (path, params) => {
 		const responseBody = await response.text().catch(() => '');
 		const error = new Error(`Geocoding provider returned ${response.status}`);
 		error.status = response.status;
-		// Retain a bounded provider response for diagnostics without allowing oversized error bodies into logs.
+		
 		error.responseBody = responseBody.slice(0, 500);
 		throw error;
 	}
@@ -63,7 +63,7 @@ const reverseGeocode = async (req, res) => {
 
 const fallbackSearch = (query) => {
 	const url = new URL(process.env.GEOCODING_FALLBACK_URL || 'https://photon.komoot.io/api/');
-	// Photon has no country-code parameter, so request Nigeria explicitly and verify the returned country.
+	
 	url.searchParams.set('q', `${query}, Nigeria`);
 	url.searchParams.set('limit', '5');
 	url.searchParams.set('lang', 'en');
@@ -102,7 +102,7 @@ const searchGeocode = (req, res) => {
 	const cached = searchCache.get(key);
 	if (cached && cached.expiresAt > Date.now()) return res.json(cached.value);
 	if (cached) searchCache.delete(key);
-	// Search all of Nigeria with the exact text received; the former Lagos suffix and viewbox biased results away from other states.
+	
 	const primaryRequest = providerRequest('/search', {
 		format: 'jsonv2', addressdetails: 1, limit: 5, countrycodes: 'ng', q: query,
 	});

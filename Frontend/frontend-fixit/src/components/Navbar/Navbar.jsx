@@ -17,7 +17,7 @@ const Navbar = () => {
   return (
     <BootstrapNavbar expand="lg" className="custom-navbar">
       <Container>
-        {/* Brand / Logo */}
+        
         <BootstrapNavbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2">
           <img src={logo} height="40" alt="FixIt Logo" className="d-inline-block align-top" />
           <span className="navbar-brand-text">
@@ -27,7 +27,7 @@ const Navbar = () => {
 
         <BootstrapNavbar.Toggle aria-controls="main-nav" />
 
-        {/* Centre Links */}
+        
         <BootstrapNavbar.Collapse id="main-nav" className="justify-content-center">
           <Nav>
             {links.map(({ to, label }) => (
@@ -43,7 +43,7 @@ const Navbar = () => {
           </Nav>
         </BootstrapNavbar.Collapse>
 
-        {/* Right side — Report button */}
+        
         <div className="d-none d-lg-flex align-items-center">
           <Link to="/register" className="btn btn-amber btn-sm fw-semibold px-4 py-2 rounded-3">
             Report a Problem
