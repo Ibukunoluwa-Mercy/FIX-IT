@@ -162,7 +162,7 @@ const AccountInfoCard = ({
             </div>
           ))}
         </div>
-        {(account.isOfficial || account.role === 'admin') && (
+        {(account.isOfficial || account.role === 'admin') && !account.isArtisan && account.role !== 'artisan' && (
           <OfficialInfoSection
             account={account}
             editingAccount={editingAccount}
