@@ -66,7 +66,7 @@ const ArtisanDashboard = () => {
         setIsLoadingStats(true);
         setStatsError(false);
 
-        fetch(`${API_URL}/api/artisan/dashboard/summary`, {
+        fetch(`${API_URL}/api/artisans/dashboard/summary`, {
             method: 'GET',
             credentials: 'include',
             cache: 'no-store',
