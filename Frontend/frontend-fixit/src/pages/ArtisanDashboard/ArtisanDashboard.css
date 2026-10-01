@@ -387,9 +387,11 @@
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
     gap: 16px;
     position: relative;
-    overflow: hidden;
     border: 1px solid #f1f5f9;
 }
 
@@ -433,6 +435,9 @@
 .stat-info {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    width: 100%;
 }
 
 .stat-number {
@@ -440,6 +445,7 @@
     font-weight: 700;
     color: #0f172a;
     margin: 0 0 4px 0;
+    text-align: left;
 }
 
 .stat-title {
@@ -447,11 +453,46 @@
     font-weight: 500;
     color: #475569;
     margin-bottom: 4px;
+    text-align: left;
 }
 
 .stat-sub {
     font-size: 12px;
     color: #94a3b8;
+    text-align: left;
+    line-height: 1.4;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.stats-error-banner {
+    grid-column: 1 / -1;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 12px 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.retry-btn {
+    background-color: #ef4444;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.retry-btn:hover {
+    background-color: #dc2626;
 }
 
 /* Recent Activity */

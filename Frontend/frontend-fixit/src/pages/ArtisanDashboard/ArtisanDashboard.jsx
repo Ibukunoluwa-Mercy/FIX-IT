@@ -64,42 +64,68 @@ const ArtisanDashboard = () => {
     // Fetch dashboard summary (stats, recent activity)
     const fetchDashboardSummary = () => {
         setIsLoadingStats(true);
+        setStatsError(false);
+
         fetch(`${API_URL}/api/artisan/dashboard/summary`, {
             method: 'GET',
+            credentials: 'include',
+            cache: 'no-store',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('fixitToken')}`,
                 'Content-Type': 'application/json'
             },
         })
         .then((response) => {
-            if (!response.ok) throw new Error('Failed to fetch summary');
+            if (response.status === 401) {
+                // Redirect to login on 401 Unauthorized
+                localStorage.removeItem('fixitToken');
+                localStorage.removeItem('fixitUser');
+                navigate('/login');
+                throw new Error('Unauthorized');
+            }
+            if (response.status === 403 || response.status === 500 || !response.ok) {
+                return response.json().then((errData) => {
+                    throw new Error(errData.message || `Server returned status ${response.status}`);
+                }).catch((jsonErr) => {
+                    throw new Error(jsonErr.message || `Request failed with status ${response.status}`);
+                });
+            }
             return response.json();
         })
         .then((data) => {
-            // Update stats and recent activity from API response
-            setStats({
-                totalReports: data.stats?.totalReports || 0,
-                totalEarnings: data.stats?.totalEarnings || 0,
-                totalReviews: data.stats?.totalReviews || 0,
-                unreadMessages: data.stats?.unreadMessages || 0,
-            });
+            // Dev-only logging to verify API field path matching
+            if (process.env.NODE_ENV !== 'production') {
+                console.log('[Dev Debug] Raw Artisan Dashboard Summary API Response:', data);
+                console.log('[Dev Debug] Field data.stats.totalReports:', data.stats?.totalReports);
+            }
+
+            // Replace stats and activity state directly from server response (no default 0 hiding errors)
+            if (data && data.stats) {
+                setStats({
+                    totalReports: data.stats.totalReports ?? 0,
+                    totalEarnings: data.stats.totalEarnings ?? 0,
+                    totalReviews: data.stats.totalReviews ?? 0,
+                    unreadMessages: data.stats.unreadMessages ?? 0,
+                });
+            }
             setRecentActivity(data.recentActivity || []);
             setIsLoadingStats(false);
             setStatsError(false);
         })
         .catch((err) => {
-            console.error('Summary fetch error:', err);
+            console.error('Artisan dashboard summary fetch failed:', err.message);
             setIsLoadingStats(false);
-            setStatsError(true);
+            // Set error message for user retry state (never reset stats to fake 0)
+            setStatsError(err.message || 'Could not load summary');
         });
     };
 
-    // Set up polling for real-time-ish updates (every 30s) and visibility change
+    // Set up polling for real-time updates (every 30s) and refresh on browser tab focus
     useEffect(() => {
         // Initial fetch
         fetchDashboardSummary();
 
-        // Interval every 30 seconds
+        // Polling interval every 30 seconds
         const intervalId = setInterval(() => {
             fetchDashboardSummary();
         }, 30000);
@@ -117,7 +143,7 @@ const ArtisanDashboard = () => {
             clearInterval(intervalId);
             document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
-    }, [API_URL]);
+    }, [API_URL, navigate]);
 
     // Logout function
     const handleLogout = () => {
@@ -336,7 +362,7 @@ const ArtisanDashboard = () => {
                                     <h2 className="stat-number">{stats.totalReports}</h2>
                                 )}
                                 <span className="stat-title">Reports</span>
-                                <span className="stat-sub">Total completed reports</span>
+                                <span className="stat-sub">Total reports submitted</span>
                             </div>
                         </div>
 
@@ -389,7 +415,15 @@ const ArtisanDashboard = () => {
                                 <span className="stat-sub">From customers</span>
                             </div>
                         </div>
-                        {statsError && <div className="stats-error">Failed to load stats. <button onClick={fetchDashboardSummary}>Retry</button></div>}
+
+                        {statsError && (
+                            <div className="stats-error-banner">
+                                <span><i className="fa-solid fa-triangle-exclamation ms-1"></i> {typeof statsError === 'string' ? statsError : 'Could not load dashboard stats'}</span>
+                                <button onClick={fetchDashboardSummary} className="retry-btn">
+                                    <i className="fa-solid fa-rotate-right ms-1"></i> Retry
+                                </button>
+                            </div>
+                        )}
                     </section>
 
                     {/* Recent Activity Card */}
@@ -426,7 +460,7 @@ const ArtisanDashboard = () => {
                                 /* Empty State */
                                 <div className="empty-state">
                                     <div className="empty-illustration">
-                                        <i className="fa-solid fa-file-magnifying-glass illustration-icon"></i>
+                                        <i className="fa-solid fa-magnifying-glass illustration-icon"></i>
                                     </div>
                                     <h3>No recent activity yet</h3>
                                     <p>Your latest reports, updates and activities will appear here.</p>

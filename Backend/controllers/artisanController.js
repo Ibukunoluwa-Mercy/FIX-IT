@@ -118,43 +118,51 @@ const registerArtisan = (req, res) => {
 };
 
 const Report = require('../models/Report');
+const mongoose = require('mongoose');
 
-// Dummy functions as requested
+// Helper promises for placeholder artisan metrics
 const getTotalEarnings = () => Promise.resolve(0);
 const getTotalReviews = () => Promise.resolve(0);
 const getUnreadMessages = () => Promise.resolve(0);
 const getUnreadNotifications = () => Promise.resolve(0);
 
 const getDashboardSummary = (req, res) => {
+	// Set Cache-Control header so browser never caches stale summary response
+	res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+	res.setHeader('Pragma', 'no-cache');
+	res.setHeader('Expires', '0');
+
 	const user = req.user;
 	
-	// Ensure we only process if user is authenticated (handled by requireAuth, but safe check)
-	if (!user) return res.status(401).json({ message: 'Authentication required' });
+	// Ensure user is attached by auth middleware
+	if (!user) {
+		return res.status(401).json({ message: 'Authentication required' });
+	}
 
-	// 1. Fetch Artisan Profile to check verification status
+	// 1. Fetch Artisan Profile to verify identity and check verification status
 	ArtisanProfile.findOne({ user: user._id }).lean()
 		.then((profile) => {
 			if (!profile) {
 				return res.status(404).json({ message: 'Artisan profile not found' });
 			}
 
-			// 2. Fetch the total reports count unconditionally (visible to all artisans)
-			const countPromise = Report.countDocuments();
+			// 2. Count ALL reports without any restrictive filter using Report.countDocuments({})
+			const countPromise = Report.countDocuments({});
 			
-			// 3. Dummy stats promises
+			// 3. Additional stats promises
 			const earningsPromise = getTotalEarnings();
 			const reviewsPromise = getTotalReviews();
 			const messagesPromise = getUnreadMessages();
 			const notifsPromise = getUnreadNotifications();
 
-			// 4. If approved, fetch recent reports, otherwise resolve to empty array
-			const isApproved = profile.verificationStatus === 'approved' || profile.verificationStatus === 'Approved';
+			// 4. Check if artisan account is approved to fetch recent activity
+			const isApproved = String(profile.verificationStatus || '').toLowerCase() === 'approved';
 			
 			const recentActivityPromise = isApproved 
-				? Report.find().sort({ createdAt: -1 }).limit(5).select('_id title category location createdAt').lean()
+				? Report.find({}).sort({ createdAt: -1 }).limit(5).select('_id title category location createdAt').lean()
 				: Promise.resolve([]);
 
-			// 5. Run everything in parallel
+			// 5. Execute all queries in parallel with Promise.all
 			return Promise.all([
 				countPromise,
 				earningsPromise,
@@ -164,17 +172,17 @@ const getDashboardSummary = (req, res) => {
 				recentActivityPromise
 			]).then(([totalReports, totalEarnings, totalReviews, unreadMessages, unreadNotifications, recentReports]) => {
 				
-				// Map recent reports to fit requested structure
-				const recentActivity = recentReports.map(r => ({
+				// Map recent activity items cleanly
+				const recentActivity = (recentReports || []).map((r) => ({
 					id: r._id,
-					title: r.title,
-					category: r.category,
+					title: r.title || r.category || 'Report',
+					category: r.category || 'General',
 					neighborhood: r.location?.address || r.location?.addressText || '',
 					createdAt: r.createdAt
 				}));
 
-				// Build the summary response object
-				const summary = {
+				// Return full structured JSON object
+				return res.status(200).json({
 					artisan: {
 						fullName: user.name,
 						avatarUrl: user.avatarUrl || '',
@@ -189,15 +197,42 @@ const getDashboardSummary = (req, res) => {
 					},
 					unreadNotifications,
 					recentActivity
-				};
-
-				return res.status(200).json(summary);
+				});
 			});
 		})
 		.catch((error) => {
-			console.error('Error fetching dashboard summary:', error.message);
-			return res.status(500).json({ message: 'Unable to fetch dashboard summary' });
+			// On database/server failure, log error and return 500 status (never return fake 0)
+			console.error('Error in getDashboardSummary:', error.message);
+			return res.status(500).json({ message: 'Unable to fetch dashboard summary', error: error.message });
 		});
 };
 
-module.exports = { registerArtisan, getDashboardSummary };
+// Dev-only debug endpoint to inspect database collections and document counts
+const getDebugCounts = (req, res) => {
+	const db = mongoose.connection.db;
+	if (!db) {
+		return res.status(500).json({ message: 'Database connection not initialized' });
+	}
+
+	db.listCollections().toArray()
+		.then((collections) => {
+			const countPromises = collections.map((col) => {
+				return db.collection(col.name).countDocuments()
+					.then((count) => ({ collectionName: col.name, count }));
+			});
+
+			return Promise.all(countPromises)
+				.then((counts) => {
+					return res.status(200).json({
+						databaseName: db.databaseName,
+						reportModelCollection: Report.collection.name,
+						collections: counts
+					});
+				});
+		})
+		.catch((err) => {
+			return res.status(500).json({ message: 'Debug count query failed', error: err.message });
+		});
+};
+
+module.exports = { registerArtisan, getDashboardSummary, getDebugCounts };
