@@ -113,9 +113,10 @@ const Register = () => {
                 setReviewed(false);
                 setErrors({});
                 setShowPassword(false);
+                setSuccess(true);
+            } else {
+                navigate('/dashboard');
             }
-
-            setSuccess(true);
         } catch (error) {
             const message = error.response?.data?.message || (error instanceof TypeError && error.message.toLowerCase().includes('fetch')
                 ? 'Unable to reach the Fixit server. Start the backend and check its MongoDB connection.'

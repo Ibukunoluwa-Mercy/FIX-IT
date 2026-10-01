@@ -15,7 +15,7 @@ const Navbar = () => {
   ];
 
   return (
-    <BootstrapNavbar expand="lg" className="custom-navbar">
+    <BootstrapNavbar expand="lg" className="custom-navbar" variant="dark" data-bs-theme="dark">
       <Container>
         
         <BootstrapNavbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2">
