@@ -1,0 +1,97 @@
+/* ArtisanSettingsPage.css */
+
+.artisan-content.settings-page-content {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.settings-page-header {
+  margin-bottom: 8px;
+}
+
+.settings-page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.settings-page-header p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.settings-main-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.settings-section-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 8px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.settings-section-tab {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.settings-section-tab:hover {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.settings-section-tab.active {
+  background-color: #fff7ed;
+  color: #f97316;
+  font-weight: 600;
+}
+
+.settings-section-tab i {
+  font-size: 16px;
+  width: 20px;
+}
+
+.settings-section-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (max-width: 992px) {
+  .settings-main-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-section-tabs {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 6px;
+  }
+
+  .settings-section-tab {
+    white-space: nowrap;
+  }
+}

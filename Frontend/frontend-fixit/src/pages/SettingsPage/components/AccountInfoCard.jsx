@@ -1,5 +1,6 @@
 import { Button, Form, Spinner } from 'react-bootstrap';
 import OfficialInfoSection from './OfficialInfoSection';
+import ArtisanInfoSection from './ArtisanInfoSection';
 import '../OfficialSettings.css';
 
 const AccountInfoCard = ({
@@ -163,6 +164,21 @@ const AccountInfoCard = ({
         </div>
         {(account.isOfficial || account.role === 'admin') && (
           <OfficialInfoSection
+            account={account}
+            editingAccount={editingAccount}
+            accountForm={accountForm}
+            setAccountForm={setAccountForm}
+            officialIdInput={officialIdInput}
+            onOfficialIdSelect={onOfficialIdSelect}
+            officialIdFile={officialIdFile}
+            uploadingOfficialId={uploadingOfficialId}
+            uploadOfficialId={uploadOfficialId}
+            cancelOfficialId={cancelOfficialId}
+            apiUrl={apiUrl}
+          />
+        )}
+        {(account.isArtisan || account.role === 'artisan') && (
+          <ArtisanInfoSection
             account={account}
             editingAccount={editingAccount}
             accountForm={accountForm}

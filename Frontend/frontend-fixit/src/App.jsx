@@ -13,6 +13,7 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
 import ResetPassword from './pages/ResetPassword/ResetPassword'
 import ResidentDashboard from './pages/ResidentDashboard/ResidentDashboard'
 import ArtisanDashboard from './pages/ArtisanDashboard/ArtisanDashboard'
+import ArtisanSettingsPage from './pages/ArtisanSettingsPage/ArtisanSettingsPage'
 import MyReports from './pages/MyReports/MyReports'
 import UserLocationMapPage from './pages/UserLocationMapPage/UserLocationMapPage'
 import HelpCenter from './pages/HelpCenter/HelpCenter'
@@ -24,14 +25,14 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const AUTH_ROUTES = ['/register', '/login', '/forgot-password', '/reset-password', '/signup/artisan'];
-const DASHBOARD_ROUTES = ['/dashboard', '/dashboard/resident', '/dashboard/official', '/dashboard/artisan', '/reports', '/my-reports', '/help-center', '/settings'];
+const DASHBOARD_ROUTES = ['/dashboard', '/dashboard/resident', '/dashboard/official', '/dashboard/artisan', '/dashboard/artisan/settings', '/reports', '/my-reports', '/help-center', '/settings'];
 const LOCATION_ROUTES = ['/map'];
 
 function AppShell() {
   const location = useLocation();
   const pathname = location.pathname.replace(/\/+$/, '') || '/';
   const isAuthPage = AUTH_ROUTES.includes(pathname);
-  const isDashboard = DASHBOARD_ROUTES.includes(pathname) || pathname.startsWith('/my-reports/');
+  const isDashboard = DASHBOARD_ROUTES.includes(pathname) || pathname.startsWith('/my-reports/') || pathname.startsWith('/dashboard/artisan');
   const isLocationPage = LOCATION_ROUTES.includes(pathname);
 
   useEffect(() => {
@@ -76,6 +77,7 @@ function AppShell() {
           <Route path="/dashboard" element={<ResidentDashboard />} />
           <Route path="/dashboard/resident" element={<ResidentDashboard />} />
           <Route path="/dashboard/official" element={<ResidentDashboard />} />
+          <Route path="/dashboard/artisan/settings" element={<ArtisanSettingsPage />} />
           <Route path="/dashboard/artisan/*" element={<ArtisanDashboard />} />
           <Route path="/my-reports" element={<MyReports />} />
           <Route path="/my-reports/:id" element={<MyReports />} />

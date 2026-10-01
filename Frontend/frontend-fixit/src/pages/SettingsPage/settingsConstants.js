@@ -45,6 +45,7 @@ export const officialOptions = {
 export const emptyAccount = {
   fullName: '', email: '', phone: '', location: '', avatarUrl: '', emailVerified: false,
   isOfficial: false, office: '', position: '', lga: '', staffId: '', idDocumentUrl: '', officialIdName: '', verificationStatus: 'Pending',
+  isArtisan: false, businessName: '', certificateUrl: '', certificateName: '',
   notifications: { issueUpdates: true, communityMessages: true, promotionsNews: false },
 };
 
@@ -61,11 +62,21 @@ export const normalizeSettingsAccount = (data = {}) => {
     profile.position ||
     profile.lga
   );
+  const isArtisan = Boolean(
+    data.isArtisan ||
+    data.role === 'artisan' ||
+    data.businessName ||
+    data.certificateUrl
+  );
 
   return {
     ...emptyAccount,
     ...data,
     isOfficial,
+    isArtisan,
+    businessName: data.businessName || '',
+    certificateUrl: data.certificateUrl || '',
+    certificateName: data.certificateName || (data.certificateUrl ? data.certificateUrl.split('/').pop() : ''),
     office: data.office || data.department || profile.office || profile.department || '',
     position: data.position || profile.position || '',
     lga: data.lga || profile.lga || data.location || '',

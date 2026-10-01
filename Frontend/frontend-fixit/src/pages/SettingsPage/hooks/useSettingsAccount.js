@@ -18,7 +18,7 @@ export const useSettingsAccount = (token, navigate) => {
   const [accountError, setAccountError] = useState('');
   const [editingAccount, setEditingAccount] = useState(false);
   const [accountForm, setAccountForm] = useState({
-    fullName: '', email: '', phone: '', location: '', office: '', position: '', lga: '', staffId: '',
+    fullName: '', email: '', phone: '', location: '', office: '', position: '', lga: '', staffId: '', businessName: '',
   });
   const [savingAccount, setSavingAccount] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);

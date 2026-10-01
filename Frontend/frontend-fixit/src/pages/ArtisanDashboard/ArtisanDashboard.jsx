@@ -108,6 +108,13 @@ const ArtisanDashboard = () => {
                     unreadMessages: data.stats.unreadMessages ?? 0,
                 });
             }
+            if (data && data.artisan && data.artisan.avatarUrl) {
+                setUser((prev) => ({
+                    ...prev,
+                    avatarUrl: data.artisan.avatarUrl,
+                    profilePhoto: data.artisan.avatarUrl,
+                }));
+            }
             setRecentActivity(data.recentActivity || []);
             setIsLoadingStats(false);
             setStatsError(false);
@@ -309,8 +316,12 @@ const ArtisanDashboard = () => {
                                 aria-expanded={isProfileMenuOpen}
                                 aria-haspopup="true"
                             >
-                                {user.profilePhoto ? (
-                                    <img src={user.profilePhoto} alt="Profile" className="avatar-img" />
+                                {user.avatarUrl || user.profilePhoto ? (
+                                    <img 
+                                        src={(user.avatarUrl || user.profilePhoto).startsWith('/uploads/') ? `${API_URL}${user.avatarUrl || user.profilePhoto}` : (user.avatarUrl || user.profilePhoto)} 
+                                        alt="Profile" 
+                                        className="avatar-img" 
+                                    />
                                 ) : (
                                     <div className="avatar-initials">{getInitials(user.fullName || user.name)}</div>
                                 )}
