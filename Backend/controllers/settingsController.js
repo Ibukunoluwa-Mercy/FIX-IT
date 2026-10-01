@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const ResidentProfile = require('../models/ResidentProfile');
 const OfficialProfile = require('../models/OfficialProfile');
+const ArtisanProfile = require('../models/ArtisanProfile');
 const { uploadDirectory } = require('../middleware/avatarUpload');
 const { sendVerificationEmail, sendAccountDeletionEmail } = require('../services/emailService');
 

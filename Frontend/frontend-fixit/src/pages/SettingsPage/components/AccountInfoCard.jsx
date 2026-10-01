@@ -7,11 +7,16 @@ const AccountInfoCard = ({
   account,
   editingAccount,
   setEditingAccount,
+  editingOfficialAccount,
+  setEditingOfficialAccount,
   accountForm,
   setAccountForm,
   savingAccount,
+  savingOfficialAccount,
   onSaveAccount,
   onBeginEdit,
+  onSaveOfficialAccount,
+  onBeginOfficialEdit,
   avatarSource,
   userName,
   userInitial,
@@ -180,9 +185,13 @@ const AccountInfoCard = ({
         {(account.isArtisan || account.role === 'artisan') && (
           <ArtisanInfoSection
             account={account}
-            editingAccount={editingAccount}
+            editingAccount={editingOfficialAccount}
+            setEditingAccount={setEditingOfficialAccount}
             accountForm={accountForm}
             setAccountForm={setAccountForm}
+            savingAccount={savingOfficialAccount}
+            onSaveAccount={onSaveOfficialAccount}
+            onBeginEdit={onBeginOfficialEdit}
             officialIdInput={officialIdInput}
             onOfficialIdSelect={onOfficialIdSelect}
             officialIdFile={officialIdFile}

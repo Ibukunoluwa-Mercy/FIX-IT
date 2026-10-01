@@ -39,9 +39,12 @@ const ArtisanSettingsPage = () => {
     accountError,
     editingAccount,
     setEditingAccount,
+    editingOfficialAccount,
+    setEditingOfficialAccount,
     accountForm,
     setAccountForm,
     savingAccount,
+    savingOfficialAccount,
     avatarFile,
     avatarPreview,
     uploadingAvatar,
@@ -60,6 +63,8 @@ const ArtisanSettingsPage = () => {
     deletingAccount,
     beginAccountEdit,
     saveAccount,
+    beginOfficialEdit,
+    saveOfficialAccount,
     handleAvatarSelect,
     uploadAvatar,
     cancelAvatar,
@@ -106,11 +111,16 @@ const ArtisanSettingsPage = () => {
           account={account}
           editingAccount={editingAccount}
           setEditingAccount={setEditingAccount}
+          editingOfficialAccount={editingOfficialAccount}
+          setEditingOfficialAccount={setEditingOfficialAccount}
           accountForm={accountForm}
           setAccountForm={setAccountForm}
           savingAccount={savingAccount}
+          savingOfficialAccount={savingOfficialAccount}
           onSaveAccount={saveAccount}
           onBeginEdit={beginAccountEdit}
+          onSaveOfficialAccount={saveOfficialAccount}
+          onBeginOfficialEdit={beginOfficialEdit}
           avatarSource={avatarSource}
           userName={userName}
           userInitial={userInitial}
@@ -152,7 +162,7 @@ const ArtisanSettingsPage = () => {
             passwordError={passwordError}
             setPasswordError={setPasswordError}
             changingPassword={changingPassword}
-            onChangePassword={changePassword}
+            onSubmitPassword={changePassword}
           />
           <section className="settings-card settings-danger-zone">
             <h2>Danger Zone</h2>

@@ -51,7 +51,7 @@ export const useSettingsAccount = (token, navigate) => {
         setAccountForm({
           fullName: nextAccount.fullName, email: nextAccount.email, phone: nextAccount.phone,
           location: nextAccount.location, office: nextAccount.office, position: nextAccount.position,
-          lga: nextAccount.lga, staffId: nextAccount.staffId,
+          lga: nextAccount.lga, staffId: nextAccount.staffId, businessName: nextAccount.businessName || '',
         });
         setAccountError('');
       })
@@ -79,13 +79,72 @@ export const useSettingsAccount = (token, navigate) => {
     setAccountForm({
       fullName: account.fullName, email: account.email, phone: account.phone,
       location: account.location, office: account.office, position: account.position,
-      lga: account.lga, staffId: account.staffId,
+      lga: account.lga, staffId: account.staffId, businessName: account.businessName || '',
     });
     setEditingAccount(true);
   };
 
+  const [editingOfficialAccount, setEditingOfficialAccount] = useState(false);
+  const [savingOfficialAccount, setSavingOfficialAccount] = useState(false);
+
+  const beginOfficialEdit = () => {
+    setAccountForm({
+      fullName: account.fullName, email: account.email, phone: account.phone,
+      location: account.location, office: account.office, position: account.position,
+      lga: account.lga, staffId: account.staffId, businessName: account.businessName || '',
+    });
+    setEditingOfficialAccount(true);
+  };
+
+  const saveOfficialAccount = async (event) => {
+    if (event) {
+      if (event.preventDefault) event.preventDefault();
+      if (event.stopPropagation) event.stopPropagation();
+    }
+    setSavingOfficialAccount(true);
+    try {
+      if (officialIdFile) {
+        const formData = new FormData();
+        formData.append('officialIdFile', officialIdFile);
+        const { data: uploadData } = await axios.post(`${API_URL}/api/settings/account/official-id`, formData, authConfig);
+        setAccount((current) => ({
+          ...current,
+          idDocumentUrl: uploadData.idDocumentUrl,
+          certificateUrl: uploadData.certificateUrl || uploadData.idDocumentUrl,
+          officialIdName: uploadData.officialIdName || officialIdFile.name,
+          certificateName: uploadData.certificateName || officialIdFile.name,
+        }));
+        setOfficialIdFile(null);
+      }
+
+      const changedFields = Object.fromEntries(Object.entries(accountForm).filter(([key, value]) => value !== account[key]));
+      if (changedFields.lga && !changedFields.location && !accountForm.location) {
+        changedFields.location = changedFields.lga;
+      }
+      if (!changedFields.businessName && accountForm.businessName) {
+        changedFields.businessName = accountForm.businessName;
+      }
+      if (Object.keys(changedFields).length) {
+        const { data } = await axios.patch(`${API_URL}/api/settings/account`, changedFields, authConfig);
+        const updatedAccount = normalizeSettingsAccount(data);
+        setAccount((current) => ({ ...current, ...updatedAccount }));
+        setAccountForm({
+          fullName: updatedAccount.fullName, email: updatedAccount.email, phone: updatedAccount.phone,
+          location: updatedAccount.location, office: updatedAccount.office, position: updatedAccount.position,
+          lga: updatedAccount.lga, staffId: updatedAccount.staffId, businessName: updatedAccount.businessName || '',
+        });
+      }
+      setEditingOfficialAccount(false);
+      toast.success('Official information updated.');
+    } catch (error) {
+      toast.error(getErrorMessage(error, 'Unable to update official information.'));
+    } finally {
+      setSavingOfficialAccount(false);
+    }
+  };
+
   const saveAccount = async (event) => {
-    event.preventDefault();
+    if (event && event.preventDefault) event.preventDefault();
     const changedFields = Object.fromEntries(Object.entries(accountForm).filter(([key, value]) => value !== account[key]));
     if (changedFields.lga && !changedFields.location && !accountForm.location) {
       changedFields.location = changedFields.lga;
@@ -102,13 +161,13 @@ export const useSettingsAccount = (token, navigate) => {
       setAccountForm({
         fullName: updatedAccount.fullName, email: updatedAccount.email, phone: updatedAccount.phone,
         location: updatedAccount.location, office: updatedAccount.office, position: updatedAccount.position,
-        lga: updatedAccount.lga, staffId: updatedAccount.staffId,
+        lga: updatedAccount.lga, staffId: updatedAccount.staffId, businessName: updatedAccount.businessName || '',
       });
       setEditingAccount(false);
       if (changedFields.email) toast.info('Check your new email address for a verification link.');
-      else toast.success('Account information updated.');
+      else toast.success('Personal account information updated.');
     } catch (error) {
-      toast.error(getErrorMessage(error, 'Unable to update account information.'));
+      toast.error(getErrorMessage(error, 'Unable to update personal account information.'));
     } finally {
       setSavingAccount(false);
     }
@@ -179,7 +238,9 @@ export const useSettingsAccount = (token, navigate) => {
       setAccount((current) => ({
         ...current,
         idDocumentUrl: data.idDocumentUrl,
+        certificateUrl: data.certificateUrl || data.idDocumentUrl,
         officialIdName: data.officialIdName || officialIdFile.name,
+        certificateName: data.certificateName || officialIdFile.name,
       }));
       setOfficialIdFile(null);
       toast.success('Official ID document updated.');
@@ -257,9 +318,12 @@ export const useSettingsAccount = (token, navigate) => {
     accountError,
     editingAccount,
     setEditingAccount,
+    editingOfficialAccount,
+    setEditingOfficialAccount,
     accountForm,
     setAccountForm,
     savingAccount,
+    savingOfficialAccount,
     avatarFile,
     avatarPreview,
     uploadingAvatar,
@@ -271,6 +335,7 @@ export const useSettingsAccount = (token, navigate) => {
     setPasswordError,
     changingPassword, savingNotification, showDeleteModal, setShowDeleteModal,
     deletePassword, setDeletePassword, deletingAccount, beginAccountEdit, saveAccount,
+    beginOfficialEdit, saveOfficialAccount,
     handleAvatarSelect, uploadAvatar, cancelAvatar,
     officialIdInput, officialIdFile, uploadingOfficialId,
     handleOfficialIdSelect, uploadOfficialId, cancelOfficialId,
