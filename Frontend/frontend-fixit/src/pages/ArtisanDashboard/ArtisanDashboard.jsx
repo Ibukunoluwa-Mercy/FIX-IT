@@ -190,7 +190,7 @@ const ArtisanDashboard = () => {
     }
 
     return (
-        <div className="artisan-layout">
+        <div className="artisan-layout artisan-dashboard">
             {/* Dark Navy Sidebar */}
             {/* Backdrop for mobile to close sidebar */}
             {isSidebarOpen && (
