@@ -20,6 +20,20 @@ const uploadCertificate = (req, res, next) => {
 	});
 };
 
+const rateLimit = require('express-rate-limit');
+const { requireAuth, requireRole } = require('../middleware/authMiddleware');
+const { getDashboardSummary } = require('../controllers/artisanController');
+
+// Rate limiter for dashboard summary endpoint
+const summaryRateLimiter = rateLimit({
+	windowMs: 60 * 1000, // 1 minute
+	max: 10, // Limit each IP to 10 requests per windowMs
+	message: 'Too many requests from this IP, please try again after a minute'
+});
+
 router.post('/register', uploadCertificate, registerArtisan);
+
+// Dashboard summary route
+router.get('/dashboard/summary', requireAuth, requireRole('artisan'), summaryRateLimiter, getDashboardSummary);
 
 module.exports = router;

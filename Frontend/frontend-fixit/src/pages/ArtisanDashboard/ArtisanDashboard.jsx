@@ -293,7 +293,7 @@ const ArtisanDashboard = () => {
                             </button>
                             
                             {isProfileMenuOpen && (
-                                <div className="profile-menu">
+                                <div className="artisan-profile-menu">
                                     <button onClick={() => { setIsProfileMenuOpen(false); navigate('/dashboard/artisan/settings'); }}>
                                         Profile
                                     </button>

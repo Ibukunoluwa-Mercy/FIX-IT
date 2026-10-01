@@ -117,4 +117,87 @@ const registerArtisan = (req, res) => {
 		});
 };
 
-module.exports = { registerArtisan };
+const Report = require('../models/Report');
+
+// Dummy functions as requested
+const getTotalEarnings = () => Promise.resolve(0);
+const getTotalReviews = () => Promise.resolve(0);
+const getUnreadMessages = () => Promise.resolve(0);
+const getUnreadNotifications = () => Promise.resolve(0);
+
+const getDashboardSummary = (req, res) => {
+	const user = req.user;
+	
+	// Ensure we only process if user is authenticated (handled by requireAuth, but safe check)
+	if (!user) return res.status(401).json({ message: 'Authentication required' });
+
+	// 1. Fetch Artisan Profile to check verification status
+	ArtisanProfile.findOne({ user: user._id }).lean()
+		.then((profile) => {
+			if (!profile) {
+				return res.status(404).json({ message: 'Artisan profile not found' });
+			}
+
+			// 2. Fetch the total reports count unconditionally (visible to all artisans)
+			const countPromise = Report.countDocuments();
+			
+			// 3. Dummy stats promises
+			const earningsPromise = getTotalEarnings();
+			const reviewsPromise = getTotalReviews();
+			const messagesPromise = getUnreadMessages();
+			const notifsPromise = getUnreadNotifications();
+
+			// 4. If approved, fetch recent reports, otherwise resolve to empty array
+			const isApproved = profile.verificationStatus === 'approved' || profile.verificationStatus === 'Approved';
+			
+			const recentActivityPromise = isApproved 
+				? Report.find().sort({ createdAt: -1 }).limit(5).select('_id title category location createdAt').lean()
+				: Promise.resolve([]);
+
+			// 5. Run everything in parallel
+			return Promise.all([
+				countPromise,
+				earningsPromise,
+				reviewsPromise,
+				messagesPromise,
+				notifsPromise,
+				recentActivityPromise
+			]).then(([totalReports, totalEarnings, totalReviews, unreadMessages, unreadNotifications, recentReports]) => {
+				
+				// Map recent reports to fit requested structure
+				const recentActivity = recentReports.map(r => ({
+					id: r._id,
+					title: r.title,
+					category: r.category,
+					neighborhood: r.location?.address || r.location?.addressText || '',
+					createdAt: r.createdAt
+				}));
+
+				// Build the summary response object
+				const summary = {
+					artisan: {
+						fullName: user.name,
+						avatarUrl: user.avatarUrl || '',
+						verificationStatus: profile.verificationStatus,
+						rejectionReason: profile.rejectionReason || ''
+					},
+					stats: {
+						totalReports,
+						totalEarnings,
+						totalReviews,
+						unreadMessages
+					},
+					unreadNotifications,
+					recentActivity
+				};
+
+				return res.status(200).json(summary);
+			});
+		})
+		.catch((error) => {
+			console.error('Error fetching dashboard summary:', error.message);
+			return res.status(500).json({ message: 'Unable to fetch dashboard summary' });
+		});
+};
+
+module.exports = { registerArtisan, getDashboardSummary };

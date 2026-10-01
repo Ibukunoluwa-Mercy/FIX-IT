@@ -8,7 +8,7 @@ const reportSchema = new mongoose.Schema(
 		description: { type: String, default: '', maxlength: 500, trim: true },
 		category: { type: String, required: true, trim: true, default: 'Other' },
 		severity: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Medium' },
-		status: { type: String, enum: ['reported', 'in_progress', 'resolved', 'closed'], default: 'reported' },
+		status: { type: String, enum: ['open', 'reported', 'in_progress', 'resolved', 'closed', 'completed'], default: 'open' },
 		reportedAt: { type: Date, default: Date.now },
 		inProgressAt: { type: Date, default: null },
 		resolvedAt: { type: Date, default: null },
@@ -48,19 +48,12 @@ const reportSchema = new mongoose.Schema(
 );
 
 reportSchema.index({ 'location.geo': '2dsphere' });
+reportSchema.index({ createdAt: -1 });
+reportSchema.index({ status: 1 });
 
 reportSchema.pre('validate', function normalizeLegacyStatus() {
 	
-	const legacyStatuses = {
-		new: 'reported',
-		pending: 'reported',
-		reported: 'reported',
-		'in progress': 'in_progress',
-		in_progress: 'in_progress',
-		resolved: 'resolved',
-		closed: 'closed',
-		rejected: 'closed',
-	};
+	const legacyStatuses = { new: 'open', pending: 'open', reported: 'open', 'in progress': 'in_progress', in_progress: 'in_progress', resolved: 'completed', closed: 'completed', rejected: 'completed', open: 'open', completed: 'completed' };
 	const normalizedStatus = legacyStatuses[String(this.status || '').toLowerCase().trim()];
 	if (normalizedStatus) this.status = normalizedStatus;
 });
