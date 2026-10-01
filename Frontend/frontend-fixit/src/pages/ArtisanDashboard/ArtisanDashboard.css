@@ -374,13 +374,13 @@
 }
 
 /* Stat Cards */
-.stats-grid {
+.artisan-dashboard .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 24px;
 }
 
-.stat-card {
+.artisan-dashboard .stat-card {
     background: white;
     border-radius: 12px;
     padding: 24px;
@@ -394,10 +394,11 @@
 }
 
 /* Colored Cards */
-.reports-card { }
-.earnings-card { background-color: #f0fdf4; }
-.reviews-card { }
-.messages-card { }
+
+.earnings-card {
+    background-color: #f0fdf4;
+}
+
 
 .stat-icon-wrapper {
     width: 48px;
@@ -409,10 +410,25 @@
     font-size: 24px;
 }
 
-.reports-card .stat-icon-wrapper { background-color: #eff6ff; color: #3b82f6; }
-.earnings-card .stat-icon-wrapper { background-color: #d1fae5; color: #10b981; }
-.reviews-card .stat-icon-wrapper { background-color: #faf5ff; color: #a855f7; }
-.messages-card .stat-icon-wrapper { background-color: #fff7ed; color: #f97316; }
+.reports-card .stat-icon-wrapper {
+    background-color: #eff6ff;
+    color: #3b82f6;
+}
+
+.earnings-card .stat-icon-wrapper {
+    background-color: #d1fae5;
+    color: #10b981;
+}
+
+.reviews-card .stat-icon-wrapper {
+    background-color: #faf5ff;
+    color: #a855f7;
+}
+
+.messages-card .stat-icon-wrapper {
+    background-color: #fff7ed;
+    color: #f97316;
+}
 
 .stat-info {
     display: flex;
@@ -584,9 +600,17 @@
 }
 
 @keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 
 .stats-error {
@@ -613,7 +637,7 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-    .stats-grid {
+    .artisan-dashboard .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
@@ -665,7 +689,7 @@
 }
 
 @media (max-width: 480px) {
-    .stats-grid {
+    .artisan-dashboard .stats-grid {
         grid-template-columns: 1fr;
     }
 }

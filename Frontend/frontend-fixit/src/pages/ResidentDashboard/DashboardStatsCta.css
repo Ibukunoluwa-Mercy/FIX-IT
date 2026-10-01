@@ -1,5 +1,13 @@
-.stat-card {
+.resident-dashboard .stats-grid {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  margin-left: -0.75rem;
+  margin-right: -0.75rem;
+}
+
+.resident-dashboard .stat-card {
   height: 164px;
+  width: 100%;
   border-radius: 9px;
   padding: 17px 15px;
   display: flex;
