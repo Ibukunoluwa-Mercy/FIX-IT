@@ -12,6 +12,7 @@ import Login from './pages/Login/Login'
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
 import ResetPassword from './pages/ResetPassword/ResetPassword'
 import ResidentDashboard from './pages/ResidentDashboard/ResidentDashboard'
+import ArtisanDashboard from './pages/ArtisanDashboard/ArtisanDashboard'
 import MyReports from './pages/MyReports/MyReports'
 import UserLocationMapPage from './pages/UserLocationMapPage/UserLocationMapPage'
 import HelpCenter from './pages/HelpCenter/HelpCenter'
@@ -75,7 +76,7 @@ function AppShell() {
           <Route path="/dashboard" element={<ResidentDashboard />} />
           <Route path="/dashboard/resident" element={<ResidentDashboard />} />
           <Route path="/dashboard/official" element={<ResidentDashboard />} />
-          <Route path="/dashboard/artisan" element={<ResidentDashboard />} />
+          <Route path="/dashboard/artisan/*" element={<ArtisanDashboard />} />
           <Route path="/my-reports" element={<MyReports />} />
           <Route path="/my-reports/:id" element={<MyReports />} />
           <Route path="/reports" element={<MyReports />} />
