@@ -1,0 +1,417 @@
+/* ==========================================================================
+   Global Theme System - CSS Custom Properties
+   Provides Light, Dark, and System Theme Switching across the entire FixIt App
+   ========================================================================== */
+
+:root {
+  /* Common Brand Colors */
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --accent-color: #f59e0b;
+  --accent-hover: #d97706;
+  --orange: #f97316;
+  --orange-hover: #ea580c;
+  --success-color: #10b981;
+  --danger-color: #ef4444;
+  --danger-hover: #dc2626;
+
+  /* Light Theme (Default) Tokens */
+  --bg-color: #f8fafc;
+  --bg-alt: #f1f5f9;
+  --card-bg: #ffffff;
+  --card-bg-raised: #ffffff;
+  --card-border: #e2e8f0;
+  --border-color: #e2e8f0;
+  --border-light: #f1f5f9;
+
+  --text-color: #0f172a;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --text-subtle: #94a3b8;
+
+  --sidebar-bg: #031525;
+  --sidebar-text: #ffffff;
+  --sidebar-text-muted: #cbd5e1;
+  --sidebar-nav-hover: rgba(255, 255, 255, 0.07);
+  --sidebar-nav-active: #f97316;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+
+  --topbar-bg: #ffffff;
+  --topbar-border: #e2e8f0;
+
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --input-text: #0f172a;
+  --input-placeholder: #94a3b8;
+
+  --dropdown-bg: #ffffff;
+  --dropdown-border: #e2e8f0;
+  --dropdown-hover: #f1f5f9;
+  --dropdown-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+  --badge-bg: #eff6ff;
+  --badge-text: #2563eb;
+  --skeleton-bg: #e2e8f0;
+
+  /* Backward compatibility aliases */
+  --dashboard-bg: var(--bg-color);
+  --dashboard-surface: var(--card-bg);
+  --dashboard-surface-raised: var(--bg-alt);
+  --dashboard-text: var(--text-color);
+  --dashboard-muted: var(--text-muted);
+  --dashboard-line: var(--border-color);
+  --dashboard-input: var(--input-bg);
+}
+
+/* Explicit Light Mode */
+html[data-theme="light"],
+html[data-dashboard-theme="light"] {
+  color-scheme: light;
+  --bg-color: #f8fafc;
+  --bg-alt: #f1f5f9;
+  --card-bg: #ffffff;
+  --card-bg-raised: #ffffff;
+  --card-border: #e2e8f0;
+  --border-color: #e2e8f0;
+  --border-light: #f1f5f9;
+
+  --text-color: #0f172a;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --text-subtle: #94a3b8;
+
+  --sidebar-bg: #031525;
+  --sidebar-text: #ffffff;
+  --sidebar-text-muted: #cbd5e1;
+  --sidebar-nav-hover: rgba(255, 255, 255, 0.07);
+  --sidebar-nav-active: #f97316;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+
+  --topbar-bg: #ffffff;
+  --topbar-border: #e2e8f0;
+
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --input-text: #0f172a;
+  --input-placeholder: #94a3b8;
+
+  --dropdown-bg: #ffffff;
+  --dropdown-border: #e2e8f0;
+  --dropdown-hover: #f1f5f9;
+  --dropdown-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+  --badge-bg: #eff6ff;
+  --badge-text: #2563eb;
+  --skeleton-bg: #e2e8f0;
+}
+
+/* Dark Mode (Active when data-theme="dark" OR data-dashboard-theme="dark") */
+html[data-theme="dark"],
+html[data-dashboard-theme="dark"] {
+  color-scheme: dark;
+  --bg-color: #0b1220;
+  --bg-alt: #101a2b;
+  --card-bg: #152238;
+  --card-bg-raised: #1b2b42;
+  --card-border: #24354d;
+  --border-color: #24354d;
+  --border-light: #1b2b42;
+
+  --text-color: #f1f5f9;
+  --text-main: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
+
+  --sidebar-bg: #070e18;
+  --sidebar-text: #f8fafc;
+  --sidebar-text-muted: #94a3b8;
+  --sidebar-nav-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-nav-active: #f97316;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+
+  --topbar-bg: #111c2e;
+  --topbar-border: #24354d;
+
+  --input-bg: #0e1726;
+  --input-border: #2a3d58;
+  --input-text: #f1f5f9;
+  --input-placeholder: #64748b;
+
+  --dropdown-bg: #152238;
+  --dropdown-border: #24354d;
+  --dropdown-hover: #1f304c;
+  --dropdown-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+
+  --badge-bg: #1e3a5f;
+  --badge-text: #60a5fa;
+  --skeleton-bg: #1b2b42;
+
+  /* Backward compatibility aliases */
+  --dashboard-bg: #0b1220;
+  --dashboard-surface: #152238;
+  --dashboard-surface-raised: #1b2b42;
+  --dashboard-text: #e5edf7;
+  --dashboard-muted: #a3b2c6;
+  --dashboard-line: #34465e;
+  --dashboard-input: #101a2b;
+}
+
+/* ==========================================================================
+   Artisan Dashboard Comprehensive Dark Theme Overrides
+   ========================================================================== */
+
+html[data-theme="dark"] body,
+html[data-dashboard-theme="dark"] body {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+}
+
+/* Artisan Layout & Containers */
+html[data-theme="dark"] .artisan-layout,
+html[data-dashboard-theme="dark"] .artisan-layout {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+}
+
+html[data-theme="dark"] .artisan-sidebar,
+html[data-dashboard-theme="dark"] .artisan-sidebar {
+  background-color: var(--sidebar-bg) !important;
+  border-right: 1px solid var(--sidebar-border) !important;
+}
+
+html[data-theme="dark"] .artisan-topbar,
+html[data-dashboard-theme="dark"] .artisan-topbar {
+  background-color: var(--topbar-bg) !important;
+  border-bottom: 1px solid var(--topbar-border) !important;
+}
+
+html[data-theme="dark"] .profile-name,
+html[data-dashboard-theme="dark"] .profile-name {
+  color: var(--text-color) !important;
+}
+
+html[data-theme="dark"] .hamburger-btn,
+html[data-dashboard-theme="dark"] .hamburger-btn {
+  color: var(--text-color) !important;
+}
+
+html[data-theme="dark"] .notification-btn,
+html[data-dashboard-theme="dark"] .notification-btn {
+  color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] .dropdown-icon,
+html[data-dashboard-theme="dark"] .dropdown-icon {
+  color: var(--text-muted) !important;
+}
+
+/* Artisan Dropdown Profile Menu */
+html[data-theme="dark"] .artisan-profile-menu,
+html[data-dashboard-theme="dark"] .artisan-profile-menu {
+  background: var(--dropdown-bg) !important;
+  border-color: var(--dropdown-border) !important;
+  box-shadow: var(--dropdown-shadow) !important;
+}
+
+html[data-theme="dark"] .artisan-profile-menu button,
+html[data-dashboard-theme="dark"] .artisan-profile-menu button {
+  color: var(--text-color) !important;
+}
+
+html[data-theme="dark"] .artisan-profile-menu button:hover,
+html[data-dashboard-theme="dark"] .artisan-profile-menu button:hover {
+  background-color: var(--dropdown-hover) !important;
+}
+
+html[data-theme="dark"] .logout-btn,
+html[data-dashboard-theme="dark"] .logout-btn {
+  border-top-color: var(--dropdown-border) !important;
+}
+
+/* Headings & Text */
+html[data-theme="dark"] .welcome-text h1,
+html[data-dashboard-theme="dark"] .welcome-text h1,
+html[data-theme="dark"] .settings-page-header h1,
+html[data-dashboard-theme="dark"] .settings-page-header h1,
+html[data-theme="dark"] .card-header h2,
+html[data-dashboard-theme="dark"] .card-header h2,
+html[data-theme="dark"] .stat-number,
+html[data-dashboard-theme="dark"] .stat-number,
+html[data-theme="dark"] .empty-state h3,
+html[data-dashboard-theme="dark"] .empty-state h3 {
+  color: var(--text-color) !important;
+}
+
+html[data-theme="dark"] .welcome-text p,
+html[data-dashboard-theme="dark"] .welcome-text p,
+html[data-theme="dark"] .settings-page-header p,
+html[data-dashboard-theme="dark"] .settings-page-header p,
+html[data-theme="dark"] .stat-title,
+html[data-dashboard-theme="dark"] .stat-title,
+html[data-theme="dark"] .stat-sub,
+html[data-dashboard-theme="dark"] .stat-sub,
+html[data-theme="dark"] .activity-details span,
+html[data-dashboard-theme="dark"] .activity-details span,
+html[data-theme="dark"] .activity-time,
+html[data-dashboard-theme="dark"] .activity-time,
+html[data-theme="dark"] .empty-state p,
+html[data-dashboard-theme="dark"] .empty-state p {
+  color: var(--text-muted) !important;
+}
+
+/* Stat Cards & Panels */
+html[data-theme="dark"] .artisan-dashboard .stat-card,
+html[data-dashboard-theme="dark"] .artisan-dashboard .stat-card,
+html[data-theme="dark"] .recent-activity-card,
+html[data-dashboard-theme="dark"] .recent-activity-card,
+html[data-theme="dark"] .settings-section-tabs,
+html[data-dashboard-theme="dark"] .settings-section-tabs,
+html[data-theme="dark"] .settings-card,
+html[data-dashboard-theme="dark"] .settings-card {
+  background: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+  color: var(--text-color) !important;
+}
+
+/* Colored Cards in Dark Mode */
+html[data-theme="dark"] .earnings-card,
+html[data-dashboard-theme="dark"] .earnings-card {
+  background: #064e3b2e !important;
+  border-color: #05966944 !important;
+}
+
+html[data-theme="dark"] .reports-card .stat-icon-wrapper,
+html[data-dashboard-theme="dark"] .reports-card .stat-icon-wrapper {
+  background-color: #1e3a5f !important;
+  color: #60a5fa !important;
+}
+
+html[data-theme="dark"] .earnings-card .stat-icon-wrapper,
+html[data-dashboard-theme="dark"] .earnings-card .stat-icon-wrapper {
+  background-color: #064e3b !important;
+  color: #34d399 !important;
+}
+
+html[data-theme="dark"] .reviews-card .stat-icon-wrapper,
+html[data-dashboard-theme="dark"] .reviews-card .stat-icon-wrapper {
+  background-color: #3b1d60 !important;
+  color: #c084fc !important;
+}
+
+html[data-theme="dark"] .messages-card .stat-icon-wrapper,
+html[data-dashboard-theme="dark"] .messages-card .stat-icon-wrapper {
+  background-color: #431407 !important;
+  color: #fb923c !important;
+}
+
+/* Activity Items */
+html[data-theme="dark"] .activity-item,
+html[data-dashboard-theme="dark"] .activity-item {
+  border-bottom-color: var(--border-color) !important;
+}
+
+html[data-theme="dark"] .activity-details strong,
+html[data-dashboard-theme="dark"] .activity-details strong {
+  color: var(--text-color) !important;
+}
+
+html[data-theme="dark"] .empty-illustration,
+html[data-dashboard-theme="dark"] .empty-illustration {
+  background-color: var(--bg-alt) !important;
+}
+
+/* Skeleton Loaders */
+html[data-theme="dark"] .skeleton,
+html[data-dashboard-theme="dark"] .skeleton {
+  background-color: var(--skeleton-bg) !important;
+}
+
+/* Settings Tabs */
+html[data-theme="dark"] .settings-section-tab,
+html[data-dashboard-theme="dark"] .settings-section-tab {
+  color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] .settings-section-tab:hover,
+html[data-dashboard-theme="dark"] .settings-section-tab:hover {
+  background-color: var(--bg-alt) !important;
+  color: var(--text-color) !important;
+}
+
+html[data-theme="dark"] .settings-section-tab.active,
+html[data-dashboard-theme="dark"] .settings-section-tab.active {
+  background-color: #451a03 !important;
+  color: #fb923c !important;
+}
+
+/* Settings Form Controls, Modals, Inputs */
+html[data-theme="dark"] .settings-card input,
+html[data-dashboard-theme="dark"] .settings-card input,
+html[data-theme="dark"] .settings-card select,
+html[data-dashboard-theme="dark"] .settings-card select,
+html[data-theme="dark"] .settings-card textarea,
+html[data-dashboard-theme="dark"] .settings-card textarea,
+html[data-theme="dark"] .form-select,
+html[data-dashboard-theme="dark"] .form-select,
+html[data-theme="dark"] .form-control,
+html[data-dashboard-theme="dark"] .form-control {
+  background-color: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+  color: var(--input-text) !important;
+}
+
+html[data-theme="dark"] .settings-card input::placeholder,
+html[data-dashboard-theme="dark"] .settings-card input::placeholder,
+html[data-theme="dark"] .form-control::placeholder,
+html[data-dashboard-theme="dark"] .form-control::placeholder {
+  color: var(--input-placeholder) !important;
+}
+
+html[data-theme="dark"] .settings-card-heading h2,
+html[data-dashboard-theme="dark"] .settings-card-heading h2,
+html[data-theme="dark"] .settings-card p,
+html[data-dashboard-theme="dark"] .settings-card p,
+html[data-theme="dark"] .settings-account-field strong,
+html[data-dashboard-theme="dark"] .settings-account-field strong {
+  color: var(--text-color) !important;
+}
+
+html[data-theme="dark"] .settings-card p,
+html[data-dashboard-theme="dark"] .settings-card p,
+html[data-theme="dark"] .settings-account-field span,
+html[data-dashboard-theme="dark"] .settings-account-field span,
+html[data-theme="dark"] .settings-password-fields .form-label,
+html[data-dashboard-theme="dark"] .settings-password-fields .form-label {
+  color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] .settings-location-value,
+html[data-dashboard-theme="dark"] .settings-location-value {
+  background-color: var(--bg-alt) !important;
+  border-color: var(--border-color) !important;
+}
+
+html[data-theme="dark"] .settings-notification-row,
+html[data-dashboard-theme="dark"] .settings-notification-row {
+  border-color: var(--border-color) !important;
+}
+
+/* Modals (Bootstrap & Custom) */
+html[data-theme="dark"] .modal-content,
+html[data-dashboard-theme="dark"] .modal-content {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+  color: var(--text-color) !important;
+}
+
+html[data-theme="dark"] .modal-header,
+html[data-dashboard-theme="dark"] .modal-header,
+html[data-theme="dark"] .modal-footer,
+html[data-dashboard-theme="dark"] .modal-footer {
+  border-color: var(--border-color) !important;
+}
+
+html[data-theme="dark"] .btn-close,
+html[data-dashboard-theme="dark"] .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}

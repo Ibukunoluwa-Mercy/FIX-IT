@@ -11,6 +11,7 @@ import DeleteAccountModal from './components/DeleteAccountModal';
 import { LocationTab, AppearanceTab, HelpTab } from './components/SettingsSimpleTabs';
 import { navGroups, settingsSections } from './settingsConstants';
 import { useSettingsAccount } from './hooks/useSettingsAccount';
+import { useTheme } from '../../context/ThemeContext';
 import '../ResidentDashboard/ResidentDashboard.css';
 import './SettingsPage.css';
 
@@ -24,7 +25,7 @@ const SettingsPage = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showHeaderProfileMenu, setShowHeaderProfileMenu] = useState(false);
-  const [appearance, setAppearance] = useState(() => localStorage.getItem('fixitTheme') || 'system');
+  const { theme, setTheme } = useTheme();
 
   const {
     avatarInput,
@@ -73,13 +74,7 @@ const SettingsPage = () => {
   const avatarSource = avatarPreview || (account.avatarUrl?.startsWith('/uploads/') ? `${API_URL}${account.avatarUrl}` : account.avatarUrl);
 
   const saveAppearance = (preference) => {
-    const resolvedTheme = preference === 'system'
-      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-      : preference;
-    setAppearance(preference);
-    localStorage.setItem('fixitTheme', preference);
-    document.documentElement.dataset.dashboardTheme = resolvedTheme;
-    window.dispatchEvent(new Event('fixit-theme-change'));
+    setTheme(preference);
     toast.success('Appearance preference saved.');
   };
 
@@ -185,12 +180,12 @@ const SettingsPage = () => {
     }
 
     if (activeSection === 'Location') return <LocationTab location={account.location} onEditAccount={beginAccountEdit} />;
-    if (activeSection === 'Appearance') return <AppearanceTab appearance={appearance} onSaveAppearance={saveAppearance} />;
+    if (activeSection === 'Appearance') return <AppearanceTab appearance={theme} onSaveAppearance={saveAppearance} />;
     return <HelpTab onOpenHelpCenter={() => navigate('/help-center')} />;
   };
 
   return (
-    <div className={`resident-dashboard settings-dashboard ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`} data-settings-theme={appearance}>
+    <div className={`resident-dashboard settings-dashboard ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`} data-settings-theme={theme}>
       <SettingsSidebar
         isSidebarCollapsed={isSidebarCollapsed}
         setIsSidebarCollapsed={setIsSidebarCollapsed}

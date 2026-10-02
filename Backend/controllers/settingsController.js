@@ -26,6 +26,7 @@ const formatAccount = (user, officialProfile = null) => {
 			communityMessages: user.notificationPrefs?.communityMessages ?? user.notificationPreferences?.communityMessages ?? true,
 			promotions: user.notificationPrefs?.promotions ?? user.notificationPreferences?.promotionsNews ?? false,
 		},
+		appearancePreference: user.appearancePreference || 'system',
 	};
 	if (officialProfile || user.role === 'admin') {
 		const docUrl = officialProfile?.idDocumentUrl || '';
@@ -202,6 +203,21 @@ const updateNotifications = (req, res) => {
 		});
 };
 
+const updateAppearance = (req, res) => {
+	const theme = req.body?.theme || req.body?.appearance;
+	if (!theme || !['system', 'light', 'dark'].includes(theme)) {
+		return res.status(400).json({ code: 'INVALID_THEME', message: 'Theme must be one of: system, light, dark' });
+	}
+
+	return User.findByIdAndUpdate(req.user._id, { $set: { appearancePreference: theme } }, { new: true })
+		.lean()
+		.then((user) => user ? res.json({ appearance: user.appearancePreference || theme, message: 'Appearance preference saved' }) : res.status(404).json({ message: 'Account not found' }))
+		.catch((error) => {
+			console.error('Settings appearance update failed:', error);
+			return res.status(500).json({ code: 'APPEARANCE_UPDATE_FAILED', message: 'Unable to update appearance preference' });
+		});
+};
+
 const uploadAvatar = (req, res) => {
 	if (!req.file) return res.status(400).json({ message: 'Choose a PNG, JPEG, or WebP image to upload' });
 	const avatarUrl = `/uploads/avatars/${req.file.filename}`;
@@ -288,4 +304,4 @@ const deleteAccount = (req, res) => {
 		});
 };
 
-module.exports = { getAccount, updateAccount, updatePassword, updateNotifications, uploadAvatar, uploadOfficialIdDocument, deleteAccount, formatAccount };
+module.exports = { getAccount, updateAccount, updatePassword, updateNotifications, updateAppearance, uploadAvatar, uploadOfficialIdDocument, deleteAccount, formatAccount };

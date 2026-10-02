@@ -8,6 +8,7 @@ const {
 	updateAccount,
 	updatePassword,
 	updateNotifications,
+	updateAppearance,
 	uploadAvatar,
 	uploadOfficialIdDocument,
 	deleteAccount,
@@ -51,6 +52,7 @@ router.patch('/account', updateAccount);
 router.post('/account/change-password', passwordChangeLimiter, updatePassword);
 router.patch('/password', passwordChangeLimiter, updatePassword);
 router.patch('/notifications', updateNotifications);
+router.patch('/appearance', updateAppearance);
 router.post('/account/avatar', avatarUpload.single('avatar'), uploadAvatar);
 router.post('/avatar', avatarUpload.single('avatar'), uploadAvatar);
 router.post('/account/official-id', uploadOfficialId, uploadOfficialIdDocument);

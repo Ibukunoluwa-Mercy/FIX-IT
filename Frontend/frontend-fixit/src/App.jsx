@@ -19,6 +19,8 @@ import UserLocationMapPage from './pages/UserLocationMapPage/UserLocationMapPage
 import HelpCenter from './pages/HelpCenter/HelpCenter'
 import SettingsPage from './pages/SettingsPage/SettingsPage'
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
+import { ThemeProvider } from './context/ThemeContext'
+import './theme.css'
 import './dashboard-theme.css'
 
 import { ToastContainer } from 'react-toastify';
@@ -111,21 +113,23 @@ function AppShell() {
 
 function App() {
   return (
-    <Router>
-      <AppShell />
-      <ToastContainer
-        position="top-right"
-        autoClose={4000}
-        hideProgressBar={true}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <AppShell />
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={true}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+      </Router>
+    </ThemeProvider>
   );
 }
 

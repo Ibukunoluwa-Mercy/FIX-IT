@@ -9,6 +9,7 @@ import DeleteAccountModal from '../SettingsPage/components/DeleteAccountModal';
 import { LocationTab, AppearanceTab, HelpTab } from '../SettingsPage/components/SettingsSimpleTabs';
 import { settingsSections } from '../SettingsPage/settingsConstants';
 import { useSettingsAccount } from '../SettingsPage/hooks/useSettingsAccount';
+import { useTheme } from '../../context/ThemeContext';
 import logoWhite from '../../assets/fixit-white-logo.png';
 import '../ArtisanDashboard/ArtisanDashboard.css';
 import '../SettingsPage/SettingsPage.css';
@@ -30,7 +31,7 @@ const ArtisanSettingsPage = () => {
   const [activeSection, setActiveSection] = useState('Account');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [appearance, setAppearance] = useState(() => localStorage.getItem('fixitTheme') || 'system');
+  const { theme, setTheme } = useTheme();
 
   const {
     avatarInput,
@@ -84,13 +85,7 @@ const ArtisanSettingsPage = () => {
   const avatarSource = avatarPreview || (account.avatarUrl?.startsWith('/uploads/') ? `${API_URL}${account.avatarUrl}` : account.avatarUrl);
 
   const saveAppearance = (preference) => {
-    const resolvedTheme = preference === 'system'
-      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-      : preference;
-    setAppearance(preference);
-    localStorage.setItem('fixitTheme', preference);
-    document.documentElement.dataset.dashboardTheme = resolvedTheme;
-    window.dispatchEvent(new Event('fixit-theme-change'));
+    setTheme(preference);
     toast.success('Appearance preference saved.');
   };
 
@@ -175,7 +170,7 @@ const ArtisanSettingsPage = () => {
       );
     }
 
-    if (activeSection === 'Appearance') return <AppearanceTab appearance={appearance} saveAppearance={saveAppearance} />;
+    if (activeSection === 'Appearance') return <AppearanceTab appearance={theme} onSaveAppearance={saveAppearance} />;
     if (activeSection === 'Location') return <LocationTab account={account} onBeginEdit={() => { setActiveSection('Account'); beginAccountEdit(); }} />;
     if (activeSection === 'Help & Support') return <HelpTab navigate={navigate} />;
 
@@ -183,7 +178,7 @@ const ArtisanSettingsPage = () => {
   };
 
   return (
-    <div className="artisan-layout artisan-dashboard">
+    <div className="artisan-layout artisan-dashboard" data-settings-theme={theme}>
       {/* Mobile Sidebar Backdrop */}
       {isSidebarOpen && (
         <div 

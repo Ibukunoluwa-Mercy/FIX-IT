@@ -23,25 +23,28 @@ export const LocationTab = ({ location, onEditAccount }) => (
   </section>
 );
 
-export const AppearanceTab = ({ appearance, onSaveAppearance }) => (
-  <section className="settings-card">
-    <div className="settings-card-heading">
-      <div>
-        <h2>Appearance</h2>
-        <p>Choose how FixIt looks on this device.</p>
+export const AppearanceTab = ({ appearance, onSaveAppearance, saveAppearance }) => {
+  const handleSave = onSaveAppearance || saveAppearance;
+  return (
+    <section className="settings-card">
+      <div className="settings-card-heading">
+        <div>
+          <h2>Appearance</h2>
+          <p>Choose how FixIt looks on this device.</p>
+        </div>
       </div>
-    </div>
-    <Form.Select
-      aria-label="Theme"
-      value={appearance}
-      onChange={(event) => onSaveAppearance(event.target.value)}
-    >
-      <option value="system">Use device setting</option>
-      <option value="light">Light</option>
-      <option value="dark">Dark</option>
-    </Form.Select>
-  </section>
-);
+      <Form.Select
+        aria-label="Theme"
+        value={appearance}
+        onChange={(event) => handleSave && handleSave(event.target.value)}
+      >
+        <option value="system">Use device setting</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </Form.Select>
+    </section>
+  );
+};
 
 export const HelpTab = ({ onOpenHelpCenter }) => (
   <section className="settings-card">

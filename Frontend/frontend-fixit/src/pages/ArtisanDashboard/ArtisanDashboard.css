@@ -3,16 +3,16 @@
 .artisan-layout {
     display: flex;
     min-height: 100vh;
-    background-color: #f8fafc;
+    background-color: var(--bg-color, #f8fafc);
     font-family: 'Inter', sans-serif;
-    color: #1e293b;
+    color: var(--text-main, #1e293b);
 }
 
 /* Sidebar */
 .artisan-sidebar {
     width: 260px;
-    background-color: #031525;
-    color: #ffffff;
+    background-color: var(--sidebar-bg, #031525);
+    color: var(--sidebar-text, #ffffff);
     display: flex;
     flex-direction: column;
     transition: transform 0.3s ease;
@@ -174,8 +174,8 @@
 /* Topbar */
 .artisan-topbar {
     height: 72px;
-    background-color: #ffffff;
-    border-bottom: 1px solid #e2e8f0;
+    background-color: var(--topbar-bg, #ffffff);
+    border-bottom: 1px solid var(--topbar-border, #e2e8f0);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -261,22 +261,22 @@
 .profile-name {
     font-weight: 600;
     font-size: 14px;
-    color: #0f172a;
+    color: var(--text-color, #0f172a);
 }
 
 .dropdown-icon {
     font-size: 12px;
-    color: #64748b;
+    color: var(--text-muted, #64748b);
 }
 
 .artisan-profile-menu {
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
-    background: #ffffff;
+    background: var(--dropdown-bg, #ffffff);
     border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    border: 1px solid #e2e8f0;
+    box-shadow: var(--dropdown-shadow, 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06));
+    border: 1px solid var(--dropdown-border, #e2e8f0);
     min-width: 160px;
     display: flex;
     flex-direction: column;
@@ -290,19 +290,19 @@
     text-align: left;
     padding: 8px 16px;
     font-size: 14px;
-    color: #334155;
+    color: var(--text-main, #334155);
     cursor: pointer;
     transition: background 0.2s;
     width: 100%;
 }
 
 .artisan-profile-menu button:hover {
-    background-color: #f1f5f9;
+    background-color: var(--dropdown-hover, #f1f5f9);
 }
 
 .logout-btn {
     color: #ef4444 !important;
-    border-top: 1px solid #e2e8f0 !important;
+    border-top: 1px solid var(--dropdown-border, #e2e8f0) !important;
     margin-top: 4px;
     padding-top: 12px !important;
 }
@@ -326,13 +326,13 @@
 .welcome-text h1 {
     font-size: 24px;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--text-color, #0f172a);
     margin: 0 0 8px 0;
 }
 
 .welcome-text p {
     font-size: 14px;
-    color: #64748b;
+    color: var(--text-muted, #64748b);
     margin: 0;
 }
 
@@ -381,7 +381,7 @@
 }
 
 .artisan-dashboard .stat-card {
-    background: white;
+    background: var(--card-bg, #ffffff);
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
@@ -392,13 +392,13 @@
     text-align: left;
     gap: 16px;
     position: relative;
-    border: 1px solid #f1f5f9;
+    border: 1px solid var(--border-color, #f1f5f9);
 }
 
 /* Colored Cards */
 
 .earnings-card {
-    background-color: #f0fdf4;
+    background-color: var(--card-bg, #f0fdf4);
 }
 
 
@@ -443,7 +443,7 @@
 .stat-number {
     font-size: 28px;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--text-color, #0f172a);
     margin: 0 0 4px 0;
     text-align: left;
 }
@@ -451,14 +451,14 @@
 .stat-title {
     font-size: 14px;
     font-weight: 500;
-    color: #475569;
+    color: var(--text-muted, #475569);
     margin-bottom: 4px;
     text-align: left;
 }
 
 .stat-sub {
     font-size: 12px;
-    color: #94a3b8;
+    color: var(--text-subtle, #94a3b8);
     text-align: left;
     line-height: 1.4;
     white-space: normal;
@@ -497,11 +497,11 @@
 
 /* Recent Activity */
 .recent-activity-card {
-    background: white;
+    background: var(--card-bg, white);
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    border: 1px solid #f1f5f9;
+    border: 1px solid var(--border-color, #f1f5f9);
 }
 
 .card-header {
@@ -525,7 +525,7 @@
 .card-header h2 {
     font-size: 18px;
     font-weight: 600;
-    color: #0f172a;
+    color: var(--text-color, #0f172a);
     margin: 0;
 }
 
@@ -553,7 +553,7 @@
     justify-content: space-between;
     align-items: flex-start;
     padding-bottom: 16px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border-color, #f1f5f9);
 }
 
 .activity-item:last-child {
@@ -569,12 +569,12 @@
 
 .activity-details strong {
     font-size: 14px;
-    color: #1e293b;
+    color: var(--text-color, #1e293b);
 }
 
 .activity-details span {
     font-size: 13px;
-    color: #64748b;
+    color: var(--text-muted, #64748b);
 }
 
 .activity-time {
@@ -594,7 +594,7 @@
 .empty-illustration {
     width: 80px;
     height: 80px;
-    background-color: #f1f5f9;
+    background-color: var(--bg-alt, #f1f5f9);
     border-radius: 16px;
     display: flex;
     align-items: center;
@@ -610,20 +610,20 @@
 .empty-state h3 {
     font-size: 16px;
     font-weight: 600;
-    color: #0f172a;
+    color: var(--text-color, #0f172a);
     margin: 0 0 8px 0;
 }
 
 .empty-state p {
     font-size: 14px;
-    color: #64748b;
+    color: var(--text-muted, #64748b);
     max-width: 300px;
     margin: 0;
 }
 
 /* Skeletons */
 .skeleton {
-    background-color: #e2e8f0;
+    background-color: var(--skeleton-bg, #e2e8f0);
     border-radius: 4px;
     animation: pulse 1.5s infinite ease-in-out;
 }

@@ -32,6 +32,11 @@ const userSchema = new mongoose.Schema(
 			communityMessages: { type: Boolean, default: true },
 			promotions: { type: Boolean, default: false },
 		},
+		appearancePreference: {
+			type: String,
+			enum: ['system', 'light', 'dark'],
+			default: 'system',
+		},
 		lastKnownLocation: {
 			latitude: { type: Number, min: -90, max: 90 },
 			longitude: { type: Number, min: -180, max: 180 },
