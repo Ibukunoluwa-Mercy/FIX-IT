@@ -32,6 +32,13 @@ const userSchema = new mongoose.Schema(
 			communityMessages: { type: Boolean, default: true },
 			promotions: { type: Boolean, default: false },
 		},
+		appearance: {
+			theme: {
+				type: String,
+				enum: ['light', 'dark', 'system'],
+				default: 'system',
+			},
+		},
 		appearancePreference: {
 			type: String,
 			enum: ['system', 'light', 'dark'],

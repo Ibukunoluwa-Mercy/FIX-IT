@@ -79,12 +79,12 @@ export const ThemeProvider = ({ children }) => {
     if (!token) return;
 
     let isMounted = true;
-    axios.get(`${API_URL}/api/settings/account`, {
+    axios.get(`${API_URL}/api/settings/appearance`, {
       headers: { Authorization: `Bearer ${token}` }
     })
     .then((response) => {
       if (!isMounted) return;
-      const backendPref = response.data?.appearancePreference;
+      const backendPref = response.data?.theme || response.data?.appearancePreference;
       if (backendPref && ['system', 'light', 'dark'].includes(backendPref)) {
         const localPref = localStorage.getItem(THEME_STORAGE_KEY);
         // If backend preference is different, reconcile
@@ -97,7 +97,24 @@ export const ThemeProvider = ({ children }) => {
       }
     })
     .catch(() => {
-      // Offline or request failure: localStorage preference remains authoritative
+      // Fallback: try account endpoint if appearance route had an issue
+      axios.get(`${API_URL}/api/settings/account`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then((accountRes) => {
+        if (!isMounted) return;
+        const pref = accountRes.data?.appearance?.theme || accountRes.data?.appearancePreference;
+        if (pref && ['system', 'light', 'dark'].includes(pref)) {
+          const localPref = localStorage.getItem(THEME_STORAGE_KEY);
+          if (pref !== localPref) {
+            localStorage.setItem(THEME_STORAGE_KEY, pref);
+            setThemeState(pref);
+            applyThemeToDom(pref);
+            window.dispatchEvent(new Event('fixit-theme-change'));
+          }
+        }
+      })
+      .catch(() => {});
     });
 
     return () => {

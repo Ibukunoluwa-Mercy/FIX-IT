@@ -26,7 +26,10 @@ const formatAccount = (user, officialProfile = null) => {
 			communityMessages: user.notificationPrefs?.communityMessages ?? user.notificationPreferences?.communityMessages ?? true,
 			promotions: user.notificationPrefs?.promotions ?? user.notificationPreferences?.promotionsNews ?? false,
 		},
-		appearancePreference: user.appearancePreference || 'system',
+		appearance: {
+			theme: user.appearance?.theme || user.appearancePreference || 'system',
+		},
+		appearancePreference: user.appearance?.theme || user.appearancePreference || 'system',
 	};
 	if (officialProfile || user.role === 'admin') {
 		const docUrl = officialProfile?.idDocumentUrl || '';
@@ -203,18 +206,71 @@ const updateNotifications = (req, res) => {
 		});
 };
 
+/**
+ * GET /api/settings/appearance
+ * Auth required. Returns the user's currently saved theme preference.
+ * Defaults to 'system' if never explicitly set on the user record so that
+ * the frontend never has to handle an undefined or null theme state.
+ */
+const getAppearance = (req, res) => {
+	// Re-verify target user record exists in the database
+	return User.findById(req.user._id)
+		.select('appearance appearancePreference')
+		.lean()
+		.then((user) => {
+			if (!user) {
+				return res.status(404).json({ error: 'User not found' });
+			}
+			// Default to 'system' if never set (never return null or undefined)
+			const theme = user.appearance?.theme || user.appearancePreference || 'system';
+			return res.json({ theme });
+		})
+		.catch((err) => {
+			console.error('Appearance fetch failed:', err);
+			return res.status(500).json({ error: 'Unable to retrieve appearance setting' });
+		});
+};
+
+/**
+ * PATCH /api/settings/appearance
+ * Auth required (Artisans, Residents, Officials, Admins).
+ * Body: { theme: 'light' | 'dark' | 'system' }
+ * Re-checks auth, validates theme, updates MongoDB user record, and returns { theme }.
+ */
 const updateAppearance = (req, res) => {
 	const theme = req.body?.theme || req.body?.appearance;
-	if (!theme || !['system', 'light', 'dark'].includes(theme)) {
-		return res.status(400).json({ code: 'INVALID_THEME', message: 'Theme must be one of: system, light, dark' });
+	const allowedThemes = ['light', 'dark', 'system'];
+
+	// Reject invalid values up front — this is cheap to check and avoids
+	// ever storing a theme value the frontend's switch logic doesn't
+	// recognize, which would otherwise silently break theme rendering.
+	if (!theme || !allowedThemes.includes(theme)) {
+		return res.status(400).json({ error: 'Invalid theme value' });
 	}
 
-	return User.findByIdAndUpdate(req.user._id, { $set: { appearancePreference: theme } }, { new: true })
+	// Persist both appearance.theme subdocument and appearancePreference
+	// to ensure full backward compatibility across all modules and queries.
+	return User.findByIdAndUpdate(
+		req.user._id,
+		{ 
+			$set: { 
+				'appearance.theme': theme,
+				appearancePreference: theme,
+			} 
+		},
+		{ new: true } // Return updated document, not the pre-update one
+	)
 		.lean()
-		.then((user) => user ? res.json({ appearance: user.appearancePreference || theme, message: 'Appearance preference saved' }) : res.status(404).json({ message: 'Account not found' }))
-		.catch((error) => {
-			console.error('Settings appearance update failed:', error);
-			return res.status(500).json({ code: 'APPEARANCE_UPDATE_FAILED', message: 'Unable to update appearance preference' });
+		.then((user) => {
+			if (!user) {
+				return res.status(404).json({ error: 'User not found' });
+			}
+			const savedTheme = user.appearance?.theme || user.appearancePreference || theme;
+			return res.json({ theme: savedTheme });
+		})
+		.catch((err) => {
+			console.error('Appearance update failed:', err);
+			return res.status(500).json({ error: 'Unable to update appearance setting' });
 		});
 };
 
@@ -304,4 +360,4 @@ const deleteAccount = (req, res) => {
 		});
 };
 
-module.exports = { getAccount, updateAccount, updatePassword, updateNotifications, updateAppearance, uploadAvatar, uploadOfficialIdDocument, deleteAccount, formatAccount };
+module.exports = { getAccount, updateAccount, updatePassword, updateNotifications, getAppearance, updateAppearance, uploadAvatar, uploadOfficialIdDocument, deleteAccount, formatAccount };
