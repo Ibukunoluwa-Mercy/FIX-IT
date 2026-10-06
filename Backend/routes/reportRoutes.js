@@ -28,6 +28,7 @@ router.get('/me/:id', requireAuth, getMyReport);
 router.get('/me', requireAuth, getReportsByMe);
 router.get('/:id/comments', requireAuth, getMyReportComments);
 router.post('/:id/message-artisan', requireAuth, sendMessageToArtisan);
+router.post('/:id/message', requireAuth, sendMessageToArtisan);
 router.post('/:id/review', requireAuth, submitReportReview);
 router.get('/:id', requireAuth, getMyReport);
 router.post('/submit', requireAuth, submitWizardReport);

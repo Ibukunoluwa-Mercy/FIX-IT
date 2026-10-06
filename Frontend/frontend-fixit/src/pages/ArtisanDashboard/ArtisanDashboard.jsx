@@ -358,7 +358,7 @@ const ArtisanDashboard = () => {
                             <section className="welcome-section">
                         <div className="welcome-text">
                             {/* Greeting using static Welcome */}
-                            <h1>Welcome, {user.fullName ? user.fullName.split(' ')[0] : user.name}!</h1>
+                            <h1>Welcome {user.fullName ? user.fullName.split(' ')[0] : user.name}👋</h1>
                             <p>Welcome to your artisan dashboard. Stay on top of your jobs, track your progress and manage your profile.</p>
                         </div>
                         <div className="welcome-badge-wrapper">

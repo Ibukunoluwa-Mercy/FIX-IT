@@ -211,6 +211,53 @@ const getDashboardSummary = (req, res) => {
 			console.error('Error in getDashboardSummary:', error.message);
 			return res.status(500).json({ message: 'Unable to fetch dashboard summary', error: error.message });
 		});
+/**
+ * getArtisanDashboardStats
+ * ------------------------
+ * GET /api/artisan/dashboard/stats
+ * Auth: artisan role
+ * Returns: { totalReports, totalEarnings, reviewCount, newMessageCount }
+ * Uses .then()/.catch() promise chaining.
+ */
+const getArtisanDashboardStats = (req, res) => {
+	const userId = req.user?._id || req.user?.id;
+	if (!userId) {
+		return res.status(401).json({ error: 'Authentication required' });
+	}
+
+	const Message = require('../models/Message');
+	const Review = require('../models/Review');
+
+	// 1. Total reports system/zone-wide count (unaffected by claims)
+	const totalReportsPromise = Report.countDocuments({});
+
+	// 2. Review count for this artisan (or read from denormalized User.reviewCount)
+	const reviewCountPromise = Review.countDocuments({ artisanId: userId });
+
+	// 3. New message count for this artisan
+	const newMessageCountPromise = Message.countDocuments({ toArtisanId: userId });
+
+	// 4. Total earnings
+	const totalEarningsPromise = Promise.resolve(0);
+
+	return Promise.all([
+		totalReportsPromise,
+		totalEarningsPromise,
+		reviewCountPromise,
+		newMessageCountPromise,
+	])
+		.then(([totalReports, totalEarnings, reviewCount, newMessageCount]) => {
+			return res.status(200).json({
+				totalReports,
+				totalEarnings,
+				reviewCount,
+				newMessageCount,
+			});
+		})
+		.catch((error) => {
+			console.error('getArtisanDashboardStats failed:', error);
+			return res.status(500).json({ error: 'Unable to load artisan dashboard stats' });
+		});
 };
 
 /**
@@ -570,8 +617,10 @@ const getDebugCounts = (req, res) => {
 module.exports = {
 	registerArtisan,
 	getDashboardSummary,
+	getArtisanDashboardStats,
 	getDebugCounts,
 	getArtisanReports,
 	applyForReport,
+	updateReportStatus,
 	resolveReport,
 };
