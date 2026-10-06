@@ -1,6 +1,51 @@
+import { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
+import axios from 'axios';
 
 const AboutImpact = () => {
+  const [metrics, setMetrics] = useState({
+    totalReports: null,
+    resolvedCount: null,
+    membersCount: null,
+    activeIssues: null,
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchImpactData = async () => {
+      try {
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5100';
+        const response = await axios.get(`${apiBaseUrl}/api/reports/home-data`);
+        if (isMounted && response?.data?.heroMetrics) {
+          const hm = response.data.heroMetrics;
+          setMetrics({
+            totalReports: typeof hm.totalReports === 'number' ? hm.totalReports : null,
+            resolvedCount: typeof hm.resolvedCount === 'number' ? hm.resolvedCount : null,
+            membersCount: typeof hm.membersCount === 'number' ? hm.membersCount : null,
+            activeIssues: typeof hm.activeIssues === 'number' ? hm.activeIssues : null,
+          });
+        }
+      } catch (error) {
+        console.warn('Unable to load live impact metrics, using defaults:', error);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchImpactData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const formatNumber = (num, fallback) => {
+    if (num === null || num === undefined) return fallback;
+    return Number(num).toLocaleString();
+  };
+
   return (
     <section className="about-section bg-white border-top border-bottom">
       <Container>
@@ -63,7 +108,9 @@ const AboutImpact = () => {
                   <i className="fa-solid fa-file-lines" style={{ fontSize: 20 }}></i>
                 </div>
                 <div>
-                  <div className="impact-num">12,458+</div>
+                  <div className="impact-num">
+                    {formatNumber(metrics.totalReports, isLoading ? '...' : '0')}
+                  </div>
                   <div className="impact-desc">Problems Reported</div>
                 </div>
               </div>
@@ -75,7 +122,9 @@ const AboutImpact = () => {
                   <i className="fa-solid fa-circle-check" style={{ fontSize: 20 }}></i>
                 </div>
                 <div>
-                  <div className="impact-num">8,374+</div>
+                  <div className="impact-num">
+                    {formatNumber(metrics.resolvedCount, isLoading ? '...' : '0')}
+                  </div>
                   <div className="impact-desc">Problems Resolved</div>
                 </div>
               </div>
@@ -87,7 +136,9 @@ const AboutImpact = () => {
                   <i className="fa-solid fa-users" style={{ fontSize: 20 }}></i>
                 </div>
                 <div>
-                  <div className="impact-num">24,682+</div>
+                  <div className="impact-num">
+                    {formatNumber(metrics.membersCount, isLoading ? '...' : '0')}
+                  </div>
                   <div className="impact-desc">Community Members</div>
                 </div>
               </div>
@@ -99,7 +150,9 @@ const AboutImpact = () => {
                   <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: 20 }}></i>
                 </div>
                 <div>
-                  <div className="impact-num">4,084+</div>
+                  <div className="impact-num">
+                    {formatNumber(metrics.activeIssues, isLoading ? '...' : '0')}
+                  </div>
                   <div className="impact-desc">Active Issues</div>
                 </div>
               </div>

@@ -162,32 +162,134 @@ const getMapReports = async (req, res) => {
 	}
 };
 
-const getHomeData = async (req, res) => {
-	try {
-		const startOfMonth = getStartOfCurrentMonth();
-		const [resolvedCount, membersCount, neighborhoods, recentReports, reportedThisMonth, resolvedThisMonth, currentlyInProgress, resolvedReports] = await Promise.all([
-			Report.countDocuments({ status: 'Resolved' }), User.countDocuments(), Report.distinct('location.address', { 'location.address': { $nin: ['', null] } }),
-			Report.find().sort({ createdAt: -1 }).limit(3).populate('createdBy', 'name firstName lastName').lean(),
-			Report.countDocuments({ createdAt: { $gte: startOfMonth } }), Report.countDocuments({ status: 'Resolved', updatedAt: { $gte: startOfMonth } }),
-			Report.countDocuments({ status: 'In Progress' }), Report.find({ status: 'Resolved' }).select('createdAt resolvedAt completedAt updatedAt').lean(),
-		]);
-		const recentActivity = recentReports.map((report) => {
-			const author = getAuthorName(report.createdBy);
-			return { _id: report._id, title: report.title || 'Untitled report', description: report.description || '', locationTag: report.location?.address || 'Location unavailable', status: report.status || 'Reported', image: report.images?.[0] || null, author, initials: getInitials(author), timeAgo: getTimeAgo(report.createdAt) };
+const getHomeData = (req, res) => {
+	const startOfMonth = getStartOfCurrentMonth();
+
+	// Resolved & closed issues count
+	const resolvedCountPromise = Report.countDocuments({
+		status: { $in: ['resolved', 'Resolved', 'closed', 'Closed'] },
+	});
+
+	// Total active users
+	const membersCountPromise = User.countDocuments({ isActive: { $ne: false } });
+
+	// Distinct neighborhoods with reports
+	const neighborhoodsPromise = Report.distinct('location.address', { 'location.address': { $nin: ['', null] } });
+
+	// Recent 3 reports
+	const recentReportsPromise = Report.find()
+		.sort({ createdAt: -1 })
+		.limit(3)
+		.populate('createdBy', 'name firstName lastName')
+		.lean();
+
+	// Reports created this month
+	const reportedThisMonthPromise = Report.countDocuments({ createdAt: { $gte: startOfMonth } });
+
+	// Reports resolved this month
+	const resolvedThisMonthPromise = Report.countDocuments({
+		status: { $in: ['resolved', 'Resolved', 'closed', 'Closed'] },
+		$or: [
+			{ resolvedAt: { $gte: startOfMonth } },
+			{ updatedAt: { $gte: startOfMonth } },
+		],
+	});
+
+	// Currently active / in progress issues
+	const currentlyInProgressPromise = Report.countDocuments({
+		status: { $in: ['in_progress', 'In Progress', 'in progress'] },
+	});
+
+	// Active issues overall (reported or in_progress)
+	const activeIssuesPromise = Report.countDocuments({
+		status: { $in: ['reported', 'in_progress', 'Reported', 'In Progress'] },
+	});
+
+	// Total problems reported all-time
+	const totalReportsPromise = Report.countDocuments({});
+
+	// Resolved reports for average duration calculation
+	const resolvedReportsPromise = Report.find({
+		status: { $in: ['resolved', 'Resolved', 'closed', 'Closed'] },
+	})
+		.select('createdAt resolvedAt completedAt updatedAt')
+		.lean();
+
+	return Promise.all([
+		resolvedCountPromise,
+		membersCountPromise,
+		neighborhoodsPromise,
+		recentReportsPromise,
+		reportedThisMonthPromise,
+		resolvedThisMonthPromise,
+		currentlyInProgressPromise,
+		activeIssuesPromise,
+		totalReportsPromise,
+		resolvedReportsPromise,
+	])
+		.then(([
+			resolvedCount,
+			membersCount,
+			neighborhoods,
+			recentReports,
+			reportedThisMonth,
+			resolvedThisMonth,
+			currentlyInProgress,
+			activeIssues,
+			totalReports,
+			resolvedReports,
+		]) => {
+			const recentActivity = recentReports.map((report) => {
+				const author = getAuthorName(report.createdBy);
+				return {
+					_id: report._id,
+					title: report.title || report.category || 'Untitled report',
+					description: report.description || '',
+					locationTag: report.location?.addressText || report.location?.address || 'Location unavailable',
+					status: report.status || 'reported',
+					image: report.images?.[0] || report.photos?.[0] || report.imageUrl || null,
+					author,
+					initials: getInitials(author),
+					timeAgo: getTimeAgo(report.createdAt),
+				};
+			});
+
+			const durations = resolvedReports
+				.map((report) => {
+					const completionDate = report.resolvedAt || report.completedAt || report.updatedAt;
+					return report.createdAt && completionDate
+						? (new Date(completionDate) - new Date(report.createdAt)) / 86400000
+						: null;
+				})
+				.filter((duration) => Number.isFinite(duration) && duration >= 0);
+
+			const avgResolutionTimeDays = durations.length
+				? Number((durations.reduce((sum, duration) => sum + duration, 0) / durations.length).toFixed(1))
+				: 0;
+
+			return res.status(200).json({
+				heroMetrics: {
+					totalReports: totalReports || 0,
+					resolvedCount: resolvedCount || 0,
+					membersCount: membersCount || 0,
+					neighborhoodsCount: neighborhoods.length || 0,
+					activeIssues: activeIssues || 0,
+				},
+				recentActivity,
+				communityImpact: {
+					issuesReportedThisMonth: reportedThisMonth || 0,
+					issuesResolvedThisMonth: resolvedThisMonth || 0,
+					resolutionRate: reportedThisMonth ? Math.round((resolvedThisMonth / reportedThisMonth) * 100) : (totalReports ? Math.round((resolvedCount / totalReports) * 100) : 0),
+					currentlyInProgress: currentlyInProgress || 0,
+					activeIssues: activeIssues || 0,
+					avgResolutionTimeDays,
+				},
+			});
+		})
+		.catch((error) => {
+			console.error('getHomeData failed:', error);
+			return res.status(500).json({ message: 'Unable to load homepage data', error: error.message });
 		});
-		const durations = resolvedReports.map((report) => {
-			const completionDate = report.resolvedAt || report.completedAt || report.updatedAt;
-			return report.createdAt && completionDate ? (new Date(completionDate) - new Date(report.createdAt)) / 86400000 : null;
-		}).filter((duration) => Number.isFinite(duration) && duration >= 0);
-		const avgResolutionTimeDays = durations.length ? Number((durations.reduce((sum, duration) => sum + duration, 0) / durations.length).toFixed(1)) : 0;
-		return res.json({
-			heroMetrics: { resolvedCount: resolvedCount || 0, membersCount: membersCount || 0, neighborhoodsCount: neighborhoods.length || 0 },
-			recentActivity,
-			communityImpact: { issuesReportedThisMonth: reportedThisMonth || 0, issuesResolvedThisMonth: resolvedThisMonth || 0, resolutionRate: reportedThisMonth ? Math.round((resolvedThisMonth / reportedThisMonth) * 100) : 0, currentlyInProgress: currentlyInProgress || 0, avgResolutionTimeDays },
-		});
-	} catch (error) {
-		return res.status(500).json({ message: 'Unable to load homepage data', error: error.message });
-	}
 };
 
 const getNearbyReports = async (req, res) => {
