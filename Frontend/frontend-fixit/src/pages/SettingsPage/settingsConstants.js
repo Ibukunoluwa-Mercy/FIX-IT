@@ -47,7 +47,7 @@ export const emptyAccount = {
   isOfficial: false, office: '', position: '', lga: '', staffId: '', idDocumentUrl: '', officialIdName: '', verificationStatus: 'Pending',
   isArtisan: false, businessName: '', certificateUrl: '', certificateName: '',
   notifications: { issueUpdates: true, communityMessages: true, promotionsNews: false },
-  appearancePreference: 'system',
+  appearancePreference: 'light',
 };
 
 export const normalizeSettingsAccount = (data = {}) => {
@@ -95,7 +95,7 @@ export const normalizeSettingsAccount = (data = {}) => {
         promotionsNews: data.notificationPrefs.promotions ?? data.notificationPrefs.promotionsNews,
       } : {}),
     },
-    appearancePreference: data.appearancePreference || data.appearance || 'system',
+    appearancePreference: data.appearancePreference || data.appearance || 'light',
   };
 };
 

@@ -46,7 +46,7 @@ function AppShell() {
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const applyTheme = () => {
-      const preference = localStorage.getItem('fixitTheme') || 'system';
+      const preference = localStorage.getItem('fixitTheme') || 'light';
       const resolvedTheme = preference === 'system' ? (mediaQuery.matches ? 'dark' : 'light') : preference;
       root.dataset.dashboardTheme = resolvedTheme;
     };

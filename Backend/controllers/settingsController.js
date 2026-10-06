@@ -27,9 +27,9 @@ const formatAccount = (user, officialProfile = null) => {
 			promotions: user.notificationPrefs?.promotions ?? user.notificationPreferences?.promotionsNews ?? false,
 		},
 		appearance: {
-			theme: user.appearance?.theme || user.appearancePreference || 'system',
+			theme: user.appearance?.theme || user.appearancePreference || 'light',
 		},
-		appearancePreference: user.appearance?.theme || user.appearancePreference || 'system',
+		appearancePreference: user.appearance?.theme || user.appearancePreference || 'light',
 	};
 	if (officialProfile || user.role === 'admin') {
 		const docUrl = officialProfile?.idDocumentUrl || '';
@@ -221,8 +221,8 @@ const getAppearance = (req, res) => {
 			if (!user) {
 				return res.status(404).json({ error: 'User not found' });
 			}
-			// Default to 'system' if never set (never return null or undefined)
-			const theme = user.appearance?.theme || user.appearancePreference || 'system';
+			// Default to 'light' if never set (never return null or undefined)
+			const theme = user.appearance?.theme || user.appearancePreference || 'light';
 			return res.json({ theme });
 		})
 		.catch((err) => {

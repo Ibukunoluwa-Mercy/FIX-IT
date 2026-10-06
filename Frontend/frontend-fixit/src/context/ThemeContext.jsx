@@ -5,7 +5,7 @@ const THEME_STORAGE_KEY = 'fixitTheme';
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100';
 
 const ThemeContext = createContext({
-  theme: 'system',
+  theme: 'light',
   resolvedTheme: 'light',
   setTheme: () => {},
 });
@@ -17,7 +17,7 @@ export const getSystemTheme = () => {
 
 export const applyThemeToDom = (preference) => {
   if (typeof document === 'undefined') return 'light';
-  const resolved = preference === 'system' ? getSystemTheme() : preference;
+  const resolved = preference === 'system' ? getSystemTheme() : (preference || 'light');
   const root = document.documentElement;
 
   // Set data-theme on html element (standard)
@@ -39,7 +39,7 @@ export const ThemeProvider = ({ children }) => {
     } catch {
       // Ignore localStorage errors
     }
-    return 'system';
+    return 'light';
   });
 
   const [systemPreference, setSystemPreference] = useState(getSystemTheme);

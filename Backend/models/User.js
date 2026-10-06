@@ -83,13 +83,13 @@ const userSchema = new mongoose.Schema(
 			theme: {
 				type: String,
 				enum: ['light', 'dark', 'system'],
-				default: 'system',
+				default: 'light',
 			},
 		},
 		appearancePreference: {
 			type: String,
-			enum: ['system', 'light', 'dark'],
-			default: 'system',
+			enum: ['light', 'dark', 'system'],
+			default: 'light',
 		},
 		lastKnownLocation: {
 			latitude: { type: Number, min: -90, max: 90 },

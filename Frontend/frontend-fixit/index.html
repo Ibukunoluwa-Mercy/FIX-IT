@@ -12,7 +12,7 @@
     <script>
       (function() {
         try {
-          var pref = localStorage.getItem('fixitTheme') || 'system';
+          var pref = localStorage.getItem('fixitTheme') || 'light';
           var resolved = pref;
           if (pref === 'system') {
             resolved = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
