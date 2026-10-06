@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { getReportImageUrls, normalizeReportImageUrl } from '../../utils/reportImages';
 import ReportStatusStepper from './ReportStatusStepper';
+import SeeDetailsModal from './SeeDetailsModal';
+import ReviewModal from './ReviewModal';
 import './ReportDetails.css';
 
 const API_URL = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5100').replace(/\/$/, '');
@@ -23,27 +25,28 @@ const ReportDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [detail, setDetail] = useState({ id: null, report: null, reporter: null, comments: [], loading: true, error: '', isNew: false });
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
   const token = localStorage.getItem('fixitToken');
 
-  useEffect(() => {
-    let active = true;
+  const fetchDetail = useCallback((isSilent = false) => {
     if (!token) {
       navigate('/login');
-      return () => { active = false; };
+      return;
     }
 
-    
+    if (!isSilent) {
+      setDetail((prev) => ({ ...prev, loading: prev.report ? false : true }));
+    }
+
     const requestOptions = { headers: { Authorization: `Bearer ${token}` } };
     const detailRequest = axios.get(`${API_URL}/api/reports/${id}`, requestOptions);
     const commentsRequest = axios.get(`${API_URL}/api/reports/${id}/comments`, requestOptions)
       .then(({ data }) => data)
       .catch(() => ({ comments: [] }));
 
-    
     Promise.all([detailRequest, commentsRequest])
       .then(([{ data: report }, commentData]) => {
-        if (!active) return;
-        
         const createdTime = report?.reportedAt || report?.createdAt ? new Date(report.reportedAt || report.createdAt).getTime() : NaN;
         const ageHours = (Date.now() - createdTime) / 3600000;
         setDetail({
@@ -57,25 +60,35 @@ const ReportDetails = () => {
         });
       })
       .catch((requestError) => {
-        if (!active) return;
         if (requestError.response?.status === 401) {
           localStorage.removeItem('fixitToken');
           navigate('/login');
           return;
         }
-        setDetail({
-          id,
-          report: null,
-          reporter: null,
-          comments: [],
-          loading: false,
-          error: requestError.response?.data?.error || 'Unable to load this report.',
-          isNew: false,
-        });
+        if (!isSilent) {
+          setDetail({
+            id,
+            report: null,
+            reporter: null,
+            comments: [],
+            loading: false,
+            error: requestError.response?.data?.error || 'Unable to load this report.',
+            isNew: false,
+          });
+        }
       });
-
-    return () => { active = false; };
   }, [id, navigate, token]);
+
+  useEffect(() => {
+    fetchDetail();
+
+    // Short polling interval (every 20s) while report detail is open
+    const pollInterval = setInterval(() => {
+      fetchDetail(true);
+    }, 20000);
+
+    return () => clearInterval(pollInterval);
+  }, [fetchDetail]);
 
   const isCurrentDetail = detail.id === id;
   const loading = !isCurrentDetail || detail.loading;
@@ -202,7 +215,18 @@ const ReportDetails = () => {
         
         <aside className="report-details-side-column">
           <section className="report-details-card report-status-card">
-            <h2>Report Status</h2>
+            <div className="status-header-row">
+              <h2>Report Status</h2>
+              {(report.status === 'in_progress' || report.status === 'resolved' || report.status === 'closed') && (
+                <button
+                  type="button"
+                  className="btn-see-details-trigger"
+                  onClick={() => setShowDetailsModal(true)}
+                >
+                  <i className="fa-solid fa-circle-info me-1"></i> See Details
+                </button>
+              )}
+            </div>
             <ReportStatusStepper
               status={report.status}
               timestamps={{
@@ -212,6 +236,41 @@ const ReportDetails = () => {
                 Closed: report.closedAt,
               }}
             />
+
+            {/* Leave a Review Prompt: appears when status is Resolved and not yet reviewed */}
+            {report.status === 'resolved' && !report.review?.rating && (
+              <div className="review-action-banner mt-3">
+                <div className="review-banner-text">
+                  <strong>Issue Resolved!</strong>
+                  <span>Please rate the resolution to help keep community standards high and close this report.</span>
+                </div>
+                <button
+                  type="button"
+                  className="btn-leave-review"
+                  onClick={() => setShowReviewModal(true)}
+                >
+                  <i className="fa-solid fa-star me-1"></i> Leave a Review
+                </button>
+              </div>
+            )}
+
+            {/* If already reviewed, display the review summary */}
+            {report.review?.rating && (
+              <div className="reviewed-summary-badge mt-3">
+                <div className="d-flex align-items-center gap-1 text-warning mb-1">
+                  {[...Array(report.review.rating)].map((_, i) => (
+                    <i className="fa-solid fa-star" key={i}></i>
+                  ))}
+                  <strong className="ms-1 text-dark" style={{ fontSize: '13px' }}>{report.review.rating}/5 Stars</strong>
+                </div>
+                {report.review.comment && (
+                  <p className="mb-0 text-muted" style={{ fontSize: '13px', fontStyle: 'italic' }}>
+                    &ldquo;{report.review.comment}&rdquo;
+                  </p>
+                )}
+                <small className="text-secondary d-block mt-1">Reviewed by you • Report Closed</small>
+              </div>
+            )}
           </section>
           <section className="report-details-card report-location-card">
             <h2>Location</h2>
@@ -228,6 +287,26 @@ const ReportDetails = () => {
           </section>
         </aside>
       </div>
+
+      {/* SEE DETAILS MODAL */}
+      {showDetailsModal && (
+        <SeeDetailsModal
+          report={report}
+          onClose={() => setShowDetailsModal(false)}
+          onRefresh={() => fetchDetail(true)}
+        />
+      )}
+
+      {/* LEAVE A REVIEW MODAL */}
+      {showReviewModal && (
+        <ReviewModal
+          report={report}
+          onClose={() => setShowReviewModal(false)}
+          onReviewed={(updatedReport) => {
+            fetchDetail(true);
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -1,5 +1,15 @@
 const express = require('express');
-const { getHomeData, getCommunityOverview, getMapReports, getNearbyReports, getReportsByMe, getMyReport, getMyReportComments } = require('../controllers/reportDataController');
+const {
+	getHomeData,
+	getCommunityOverview,
+	getMapReports,
+	getNearbyReports,
+	getReportsByMe,
+	getMyReport,
+	getMyReportComments,
+	sendMessageToArtisan,
+	submitReportReview,
+} = require('../controllers/reportDataController');
 const { submitReport, submitWizardReport, uploadReportPhotos, geocodeReportLocation } = require('../controllers/dashboardController');
 const { getExploreData, toggleConfirmReport } = require('../controllers/exploreController');
 const { reportPhotosUpload } = require('../middleware/reportUpload');
@@ -17,6 +27,8 @@ router.post('/upload-photos', requireAuth, reportPhotosUpload, uploadReportPhoto
 router.get('/me/:id', requireAuth, getMyReport);
 router.get('/me', requireAuth, getReportsByMe);
 router.get('/:id/comments', requireAuth, getMyReportComments);
+router.post('/:id/message-artisan', requireAuth, sendMessageToArtisan);
+router.post('/:id/review', requireAuth, submitReportReview);
 router.get('/:id', requireAuth, getMyReport);
 router.post('/submit', requireAuth, submitWizardReport);
 router.post('/', requireAuth, submitReport);

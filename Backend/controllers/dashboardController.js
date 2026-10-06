@@ -110,17 +110,17 @@ const getOverview = async (req, res) => {
 		startOfMonth.setDate(1);
 		startOfMonth.setHours(0, 0, 0, 0);
 		const [totalActiveReports, resolvedThisMonth, recentReports, recentUpdates, mapReports] = await Promise.all([
-			Report.countDocuments({ ...userReportFilter, status: { $ne: 'Resolved' } }),
-			Report.countDocuments({ ...userReportFilter, status: 'Resolved', updatedAt: { $gte: startOfMonth } }),
+			Report.countDocuments({ ...userReportFilter, status: { $nin: ['resolved', 'Resolved', 'closed', 'Closed', 'completed'] } }),
+			Report.countDocuments({ ...userReportFilter, status: { $in: ['resolved', 'Resolved', 'closed', 'Closed', 'completed'] }, updatedAt: { $gte: startOfMonth } }),
 			Report.find(userReportFilter).sort({ createdAt: -1 }).limit(5).lean(),
 			Report.aggregate([
-				{ $match: { ...userReportFilter, status: { $ne: 'Resolved' } } },
+				{ $match: { ...userReportFilter, status: { $nin: ['resolved', 'Resolved', 'closed', 'Closed', 'completed'] } } },
 				{ $unwind: '$updates' },
 				{ $sort: { 'updates.timestamp': -1 } },
 				{ $limit: 5 },
 				{ $replaceRoot: { newRoot: '$updates' } },
 			]),
-			Report.find({ status: { $ne: 'Resolved' } }).select('_id title location status').lean(),
+			Report.find({ status: { $nin: ['resolved', 'Resolved', 'closed', 'Closed', 'completed'] } }).select('_id title location status').lean(),
 		]);
 
 		return res.json({

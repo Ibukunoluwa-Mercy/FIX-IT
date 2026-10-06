@@ -120,9 +120,15 @@ const registerArtisan = (req, res) => {
 const Report = require('../models/Report');
 const mongoose = require('mongoose');
 
-// Helper promises for placeholder artisan metrics
+// Helper promises for artisan metrics
 const getTotalEarnings = () => Promise.resolve(0);
-const getTotalReviews = () => Promise.resolve(0);
+const getTotalReviews = (userId) => {
+	if (!userId) return Promise.resolve(0);
+	return Report.countDocuments({
+		assignedArtisan: userId,
+		'review.rating': { $exists: true, $ne: null }
+	});
+};
 const getUnreadMessages = () => Promise.resolve(0);
 const getUnreadNotifications = () => Promise.resolve(0);
 
@@ -151,7 +157,7 @@ const getDashboardSummary = (req, res) => {
 			
 			// 3. Additional stats promises
 			const earningsPromise = getTotalEarnings();
-			const reviewsPromise = getTotalReviews();
+			const reviewsPromise = getTotalReviews(user._id);
 			const messagesPromise = getUnreadMessages();
 			const notifsPromise = getUnreadNotifications();
 
@@ -207,6 +213,227 @@ const getDashboardSummary = (req, res) => {
 		});
 };
 
+/**
+ * getArtisanReports
+ * Returns all reports for the artisan feed with claim status flags:
+ * - isClaimedByMe: true if assignedArtisan equals current user
+ * - isClaimedByOther: true if assignedArtisan exists and is not current user
+ * - isUnclaimed: true if no assignedArtisan and status is reported
+ */
+const getArtisanReports = async (req, res) => {
+	try {
+		const userId = req.user?._id;
+		if (!userId) return res.status(401).json({ message: 'Authentication required' });
+
+		const { filter = 'all', page = 1, limit = 15 } = req.query;
+		const pageNum = parseInt(page, 10) || 1;
+		const limitNum = parseInt(limit, 10) || 15;
+
+		const query = {};
+		if (filter === 'unclaimed') {
+			query.assignedArtisan = null;
+			query.status = 'reported';
+		} else if (filter === 'my_jobs') {
+			query.assignedArtisan = userId;
+		} else if (filter === 'resolved') {
+			query.assignedArtisan = userId;
+			query.status = { $in: ['resolved', 'closed'] };
+		}
+
+		const total = await Report.countDocuments(query);
+		const totalAllReports = await Report.countDocuments({});
+		const reports = await Report.find(query)
+			.sort({ createdAt: -1 })
+			.skip((pageNum - 1) * limitNum)
+			.limit(limitNum)
+			.lean();
+
+		const mappedReports = reports.map((r) => {
+			const assignedId = r.assignedArtisan ? String(r.assignedArtisan) : null;
+			const isClaimedByMe = assignedId === String(userId);
+			const isClaimedByOther = assignedId !== null && !isClaimedByMe;
+			const isUnclaimed = !assignedId && r.status === 'reported';
+
+			return {
+				id: String(r._id),
+				reportId: r.reportId || `#CF-${String(r._id).slice(-6).toUpperCase()}`,
+				title: r.title || r.category || 'Report',
+				description: r.description || '',
+				category: r.category || 'General',
+				severity: r.severity || 'Medium',
+				status: r.status,
+				location: {
+					address: r.location?.addressText || r.location?.address || 'Location unavailable',
+					lat: r.location?.lat,
+					lng: r.location?.lng,
+				},
+				reportedAt: r.reportedAt || r.createdAt,
+				inProgressAt: r.inProgressAt,
+				resolvedAt: r.resolvedAt,
+				closedAt: r.closedAt,
+				images: [...new Set([...(r.images || []), ...(r.photos || []), r.imageUrl].filter(Boolean))],
+				isClaimedByMe,
+				isClaimedByOther,
+				isUnclaimed,
+				review: r.review || null,
+			};
+		});
+
+		return res.status(200).json({
+			success: true,
+			reports: mappedReports,
+			totalAllReports,
+			pagination: {
+				page: pageNum,
+				limit: limitNum,
+				total,
+				totalPages: Math.ceil(total / limitNum),
+			},
+		});
+	} catch (error) {
+		console.error('getArtisanReports failed:', error);
+		return res.status(500).json({ message: 'Unable to load reports feed', error: error.message });
+	}
+};
+
+/**
+ * applyForReport
+ * Atomically claims an unclaimed report for this artisan.
+ * If report is already claimed, rejects with 409 and "Already claimed".
+ */
+const applyForReport = async (req, res) => {
+	try {
+		const userId = req.user?._id;
+		const reportId = req.params.id;
+
+		if (!userId) return res.status(401).json({ message: 'Authentication required' });
+		if (!mongoose.Types.ObjectId.isValid(reportId)) {
+			return res.status(400).json({ message: 'Invalid report ID' });
+		}
+
+		const now = new Date();
+		// Atomic findOneAndUpdate ensuring only 1 artisan can claim
+		const updatedReport = await Report.findOneAndUpdate(
+			{
+				_id: reportId,
+				assignedArtisan: null,
+				status: 'reported',
+			},
+			{
+				$set: {
+					assignedArtisan: userId,
+					assignedAt: now,
+					status: 'in_progress',
+					inProgressAt: now,
+				},
+				$push: {
+					updates: {
+						type: 'STATUS_CHANGE',
+						text: `Artisan ${req.user.name || 'assigned'} claimed this report and started resolution.`,
+						author: req.user.name || 'Artisan',
+						timestamp: now,
+					},
+				},
+			},
+			{ new: true }
+		).lean();
+
+		if (!updatedReport) {
+			// Check if report exists and was claimed by someone else
+			const existing = await Report.findById(reportId).select('assignedArtisan status').lean();
+			if (!existing) {
+				return res.status(404).json({ message: 'Report not found' });
+			}
+			if (existing.assignedArtisan) {
+				return res.status(409).json({ message: 'This report has already been claimed by another artisan.' });
+			}
+			return res.status(400).json({ message: 'This report is not available for claim.' });
+		}
+
+		return res.status(200).json({
+			success: true,
+			message: 'Report claimed successfully. Status updated to In Progress.',
+			report: {
+				id: String(updatedReport._id),
+				status: updatedReport.status,
+				inProgressAt: updatedReport.inProgressAt,
+				isClaimedByMe: true,
+				isClaimedByOther: false,
+				isUnclaimed: false,
+			},
+		});
+	} catch (error) {
+		console.error('applyForReport error:', error);
+		return res.status(500).json({ message: 'Failed to claim report', error: error.message });
+	}
+};
+
+/**
+ * resolveReport
+ * Marks a claimed report as Resolved by the assigned artisan.
+ */
+const resolveReport = async (req, res) => {
+	try {
+		const userId = req.user?._id;
+		const reportId = req.params.id;
+
+		if (!userId) return res.status(401).json({ message: 'Authentication required' });
+		if (!mongoose.Types.ObjectId.isValid(reportId)) {
+			return res.status(400).json({ message: 'Invalid report ID' });
+		}
+
+		const now = new Date();
+		const updatedReport = await Report.findOneAndUpdate(
+			{
+				_id: reportId,
+				assignedArtisan: userId,
+				status: 'in_progress',
+			},
+			{
+				$set: {
+					status: 'resolved',
+					resolvedAt: now,
+					completedAt: now,
+				},
+				$push: {
+					updates: {
+						type: 'STATUS_CHANGE',
+						text: `Job marked as resolved by artisan ${req.user.name || ''}.`,
+						author: req.user.name || 'Artisan',
+						timestamp: now,
+					},
+				},
+			},
+			{ new: true }
+		).lean();
+
+		if (!updatedReport) {
+			const existing = await Report.findById(reportId).lean();
+			if (!existing) return res.status(404).json({ message: 'Report not found' });
+			if (String(existing.assignedArtisan) !== String(userId)) {
+				return res.status(403).json({ message: 'You can only resolve reports assigned to you.' });
+			}
+			if (existing.status === 'resolved' || existing.status === 'closed') {
+				return res.status(400).json({ message: 'Report is already marked as resolved or closed.' });
+			}
+			return res.status(400).json({ message: 'Cannot mark this report as resolved in its current state.' });
+		}
+
+		return res.status(200).json({
+			success: true,
+			message: 'Job marked as resolved successfully.',
+			report: {
+				id: String(updatedReport._id),
+				status: updatedReport.status,
+				resolvedAt: updatedReport.resolvedAt,
+			},
+		});
+	} catch (error) {
+		console.error('resolveReport error:', error);
+		return res.status(500).json({ message: 'Failed to resolve report', error: error.message });
+	}
+};
+
 // Dev-only debug endpoint to inspect database collections and document counts
 const getDebugCounts = (req, res) => {
 	const db = mongoose.connection.db;
@@ -235,4 +462,11 @@ const getDebugCounts = (req, res) => {
 		});
 };
 
-module.exports = { registerArtisan, getDashboardSummary, getDebugCounts };
+module.exports = {
+	registerArtisan,
+	getDashboardSummary,
+	getDebugCounts,
+	getArtisanReports,
+	applyForReport,
+	resolveReport,
+};

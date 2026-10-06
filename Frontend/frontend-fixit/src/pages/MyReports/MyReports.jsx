@@ -4,6 +4,7 @@ import { Link, useNavigate, useLocation, useParams } from 'react-router-dom';
 import ResidentAvatar from '../../components/ResidentAvatar';
 import { normalizeReportImageUrl } from '../../utils/reportImages';
 import ReportDetails from './ReportDetails';
+import SeeDetailsModal from './SeeDetailsModal';
 import logoWhite from '../../assets/fixit-white-logo.png';
 import './MyReports.css';
 
@@ -36,6 +37,7 @@ const MyReports = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [seeDetailsReport, setSeeDetailsReport] = useState(null);
   
   const token = localStorage.getItem('fixitToken');
   const user = useMemo(() => {
@@ -259,9 +261,25 @@ const MyReports = () => {
                         <p style={{ margin: '0 0 5px 0', fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '400px' }}>{report.description}</p>
                         <small style={{ color: '#999' }}>Reported on {formatDate(report.createdAt)}</small>
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between', gap: '8px' }}>
                         <span className={`status-badge ${statusClass(report.status)}`} style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '12px', background: '#eee' }}>{report.status}</span>
-                        <Link to={`/my-reports/${report.id}`} style={{ color: '#2563eb', textDecoration: 'none', fontSize: '14px' }}>View Details</Link>
+                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                          {(report.status === 'in_progress' || report.status === 'resolved' || report.status === 'closed') && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                // Fetch full details to open modal
+                                axios.get(`${API_URL}/api/reports/${report.id}`, { headers: { Authorization: `Bearer ${token}` } })
+                                  .then((res) => setSeeDetailsReport(res.data))
+                                  .catch(() => setSeeDetailsReport(report));
+                              }}
+                              style={{ background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '6px', padding: '3px 8px', fontSize: '12.5px', fontWeight: '600', cursor: 'pointer' }}
+                            >
+                              See Details
+                            </button>
+                          )}
+                          <Link to={`/my-reports/${report.id}`} style={{ color: '#2563eb', textDecoration: 'none', fontSize: '14px', fontWeight: '500' }}>Full View</Link>
+                        </div>
                       </div>
                     </div>
                   ))
@@ -283,6 +301,20 @@ const MyReports = () => {
           </>}
         </div>
       </main>
+
+      {/* SEE DETAILS MODAL */}
+      {seeDetailsReport && (
+        <SeeDetailsModal
+          report={seeDetailsReport}
+          onClose={() => setSeeDetailsReport(null)}
+          onRefresh={() => {
+            loadReports();
+            axios.get(`${API_URL}/api/reports/${seeDetailsReport.id}`, { headers: { Authorization: `Bearer ${token}` } })
+              .then((res) => setSeeDetailsReport(res.data))
+              .catch(() => {});
+          }}
+        />
+      )}
     </div>
   );
 };

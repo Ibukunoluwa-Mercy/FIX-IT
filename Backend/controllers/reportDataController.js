@@ -1,5 +1,6 @@
 const Report = require('../models/Report');
 const User = require('../models/User');
+const ArtisanProfile = require('../models/ArtisanProfile');
 const Comment = require('../models/Comment');
 const mongoose = require('mongoose');
 const {
@@ -266,16 +267,40 @@ const getMyReport = (req, res) => {
 	if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 	if (!mongoose.Types.ObjectId.isValid(reportId)) return res.status(404).json({ error: 'Report not found' });
 
-	
-	return Report.findOne({ _id: reportId, $or: [{ user: userId }, { createdBy: userId }] }).lean()
-		.then((report) => {
+	const isArtisan = req.user?.role === 'artisan';
+	const reportQuery = isArtisan
+		? { _id: reportId }
+		: { _id: reportId, $or: [{ user: userId }, { createdBy: userId }] };
+
+	return Report.findOne(reportQuery).lean()
+		.then(async (report) => {
 			if (!report) return null;
-			return User.findById(report.createdBy || report.user).select('name avatarUrl').lean()
-				.then((reporter) => ({ report, reporter }));
+			const reporter = await User.findById(report.createdBy || report.user).select('name avatarUrl').lean();
+			let artisanInfo = null;
+			if (report.assignedArtisan) {
+				const [artisanUser, artisanProfile] = await Promise.all([
+					User.findById(report.assignedArtisan).select('name avatarUrl email phone').lean(),
+					ArtisanProfile.findOne({ user: report.assignedArtisan }).select('businessName certificateUrl verificationStatus').lean()
+				]);
+				if (artisanUser) {
+					artisanInfo = {
+						id: String(artisanUser._id),
+						name: artisanUser.name,
+						avatarUrl: artisanUser.avatarUrl || '',
+						email: artisanUser.email || '',
+						phone: artisanUser.phone || '',
+						businessName: artisanProfile?.businessName || '',
+						certificateUrl: artisanProfile?.certificateUrl || '',
+						verificationStatus: artisanProfile?.verificationStatus || '',
+						qualifications: artisanProfile?.businessName ? `Verified Artisan • ${artisanProfile.businessName}` : 'Registered Community Artisan'
+					};
+				}
+			}
+			return { report, reporter, artisanInfo };
 		})
 		.then((result) => {
 			if (!result) return res.status(404).json({ error: 'Report not found' });
-			const { report, reporter } = result;
+			const { report, reporter, artisanInfo } = result;
 			const images = [...new Set([...(report.images || []), ...(report.photos || []), report.imageUrl].filter(Boolean))];
 			const location = report.location || {};
 			
@@ -302,6 +327,8 @@ const getMyReport = (req, res) => {
 				inProgressAt: report.inProgressAt || null,
 				resolvedAt: report.resolvedAt || null,
 				closedAt: report.closedAt || null,
+				assignedArtisan: artisanInfo,
+				review: report.review || null,
 				updates: report.updates || [],
 			});
 		})
@@ -421,10 +448,158 @@ const getMyReportComments = (req, res) => {
 			});
 		})
 		.catch((error) => {
-			
 			console.error('Report comments fetch failed:', error);
 			return res.status(500).json({ error: 'Unable to load report comments' });
 		});
 };
 
-module.exports = { getHomeData, getCommunityOverview, getMapReports, getNearbyReports, getReportsByMe, getMyReport, getMyReportComments };
+/**
+ * sendMessageToArtisan
+ * Sends an email message from the resident to the artisan assigned to this report.
+ * Hides the artisan's direct email from the resident.
+ */
+const sendMessageToArtisan = async (req, res) => {
+	try {
+		const userId = req.user?._id || req.user?.id;
+		const reportId = req.params.id;
+		const { subject, message } = req.body;
+
+		if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+		if (!mongoose.Types.ObjectId.isValid(reportId)) return res.status(404).json({ error: 'Report not found' });
+		if (!message || !message.trim()) {
+			return res.status(400).json({ error: 'Message content is required.' });
+		}
+
+		// Find report owned by or created by this resident
+		const report = await Report.findOne({
+			_id: reportId,
+			$or: [{ user: userId }, { createdBy: userId }],
+		}).lean();
+
+		if (!report) return res.status(404).json({ error: 'Report not found' });
+		if (!report.assignedArtisan) {
+			return res.status(400).json({ error: 'No artisan is currently assigned to this report.' });
+		}
+
+		const [artisanUser, residentUser] = await Promise.all([
+			User.findById(report.assignedArtisan).select('name email').lean(),
+			User.findById(userId).select('name email').lean(),
+		]);
+
+		if (!artisanUser || !artisanUser.email) {
+			return res.status(404).json({ error: 'Artisan contact details are unavailable.' });
+		}
+
+		const { sendArtisanMessageEmail } = require('../services/emailService');
+		await sendArtisanMessageEmail({
+			artisanEmail: artisanUser.email,
+			artisanName: artisanUser.name,
+			residentName: residentUser?.name || 'Resident',
+			residentEmail: residentUser?.email || '',
+			reportTitle: report.title || report.category,
+			reportId: report.reportId || `#CF-${String(report._id).slice(-6).toUpperCase()}`,
+			subject: subject ? subject.trim() : '',
+			message: message.trim(),
+		});
+
+		// Also add to report updates timeline
+		await Report.findByIdAndUpdate(reportId, {
+			$push: {
+				updates: {
+					type: 'NEW_COMMENT',
+					text: `Resident sent a direct message to artisan: ${subject ? `[${subject.trim()}] ` : ''}${message.trim()}`,
+					author: residentUser?.name || 'Resident',
+					timestamp: new Date(),
+				},
+			},
+		});
+
+		return res.status(200).json({
+			success: true,
+			message: `Your message has been sent to ${artisanUser.name}.`,
+			artisanName: artisanUser.name,
+		});
+	} catch (error) {
+		console.error('sendMessageToArtisan error:', error);
+		return res.status(500).json({ error: 'Unable to send message to artisan' });
+	}
+};
+
+/**
+ * submitReportReview
+ * Allows resident to submit a 1-5 star review for a resolved report.
+ * Transitions report status from resolved to closed.
+ */
+const submitReportReview = async (req, res) => {
+	try {
+		const userId = req.user?._id || req.user?.id;
+		const reportId = req.params.id;
+		const { rating, comment } = req.body;
+
+		if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+		if (!mongoose.Types.ObjectId.isValid(reportId)) return res.status(404).json({ error: 'Report not found' });
+
+		const numericRating = Number(rating);
+		if (!Number.isFinite(numericRating) || numericRating < 1 || numericRating > 5) {
+			return res.status(400).json({ error: 'A valid rating between 1 and 5 stars is required.' });
+		}
+
+		const report = await Report.findOne({
+			_id: reportId,
+			$or: [{ user: userId }, { createdBy: userId }],
+		});
+
+		if (!report) return res.status(404).json({ error: 'Report not found' });
+		if (report.review?.rating) {
+			return res.status(400).json({ error: 'This report has already been reviewed.' });
+		}
+		if (report.status !== 'resolved') {
+			return res.status(400).json({ error: 'Only resolved reports can be reviewed.' });
+		}
+
+		const now = new Date();
+		report.review = {
+			rating: numericRating,
+			comment: comment ? String(comment).trim() : '',
+			reviewedAt: now,
+			reviewedBy: userId,
+		};
+		report.status = 'closed';
+		report.closedAt = now;
+		report.completedAt = report.completedAt || now;
+		report.updates.push({
+			type: 'STATUS_CHANGE',
+			text: `Resident left a ${numericRating}-star review. Report is now closed.`,
+			author: req.user?.name || 'Resident',
+			timestamp: now,
+		});
+
+		await report.save();
+
+		return res.status(200).json({
+			success: true,
+			message: 'Review submitted successfully. Report is now closed.',
+			report: {
+				id: String(report._id),
+				status: report.status,
+				closedAt: report.closedAt,
+				review: report.review,
+			},
+		});
+	} catch (error) {
+		console.error('submitReportReview error:', error);
+		return res.status(500).json({ error: 'Unable to submit review' });
+	}
+};
+
+module.exports = {
+	getHomeData,
+	getCommunityOverview,
+	getMapReports,
+	getNearbyReports,
+	getReportsByMe,
+	getMyReport,
+	getMyReportComments,
+	sendMessageToArtisan,
+	submitReportReview,
+};

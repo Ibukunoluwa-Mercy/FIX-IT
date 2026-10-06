@@ -1,0 +1,58 @@
+/* ReviewModal.css */
+
+.custom-review-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 1060;
+}
+
+.review-modal-box {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.rating-selector-wrapper {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+.stars-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.star-btn {
+    background: transparent;
+    border: none;
+    font-size: 28px;
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: transform 0.15s ease, color 0.15s ease;
+    padding: 4px;
+}
+
+.star-btn:hover {
+    transform: scale(1.2);
+}
+
+.star-btn.filled {
+    color: #f59e0b;
+}
+
+.rating-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}

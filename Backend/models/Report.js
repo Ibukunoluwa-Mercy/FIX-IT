@@ -8,11 +8,21 @@ const reportSchema = new mongoose.Schema(
 		description: { type: String, default: '', maxlength: 500, trim: true },
 		category: { type: String, required: true, trim: true, default: 'Other' },
 		severity: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Medium' },
-		status: { type: String, enum: ['open', 'reported', 'in_progress', 'resolved', 'closed', 'completed'], default: 'open' },
+		status: { type: String, enum: ['reported', 'in_progress', 'resolved', 'closed'], default: 'reported' },
 		reportedAt: { type: Date, default: Date.now },
 		inProgressAt: { type: Date, default: null },
 		resolvedAt: { type: Date, default: null },
 		closedAt: { type: Date, default: null },
+		assignedArtisan: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+		assignedArtisanId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+		assignedAt: { type: Date, default: null },
+		appliedAt: { type: Date, default: null },
+		review: {
+			rating: { type: Number, min: 1, max: 5 },
+			comment: { type: String, trim: true, default: '' },
+			reviewedAt: { type: Date },
+			reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+		},
 		location: {
 			address: { type: String, default: '' },
 			lat: { type: Number },
@@ -53,7 +63,18 @@ reportSchema.index({ status: 1 });
 
 reportSchema.pre('validate', function normalizeLegacyStatus() {
 	
-	const legacyStatuses = { new: 'open', pending: 'open', reported: 'open', 'in progress': 'in_progress', in_progress: 'in_progress', resolved: 'completed', closed: 'completed', rejected: 'completed', open: 'open', completed: 'completed' };
+	const legacyStatuses = {
+		new: 'reported',
+		pending: 'reported',
+		reported: 'reported',
+		open: 'reported',
+		'in progress': 'in_progress',
+		in_progress: 'in_progress',
+		resolved: 'resolved',
+		closed: 'closed',
+		completed: 'closed',
+		rejected: 'closed'
+	};
 	const normalizedStatus = legacyStatuses[String(this.status || '').toLowerCase().trim()];
 	if (normalizedStatus) this.status = normalizedStatus;
 });

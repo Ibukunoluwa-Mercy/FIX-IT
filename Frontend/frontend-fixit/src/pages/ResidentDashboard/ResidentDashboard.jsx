@@ -8,6 +8,8 @@ import DashboardRecentReports from './components/DashboardRecentReports';
 import DashboardRecentUpdates from './components/DashboardRecentUpdates';
 import ResidentAvatar from '../../components/ResidentAvatar';
 import { getReportImageUrls } from '../../utils/reportImages';
+import SeeDetailsModal from '../MyReports/SeeDetailsModal';
+import ReviewModal from '../MyReports/ReviewModal';
 import logoWhite from '../../assets/fixit-white-logo.png';
 import './ResidentDashboard.css';
 
@@ -38,6 +40,8 @@ const ResidentDashboard = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showReportWizard, setShowReportWizard] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
+  const [detailsModalReport, setDetailsModalReport] = useState(null);
+  const [reviewModalReport, setReviewModalReport] = useState(null);
   const [filter, setFilter] = useState('All');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -267,9 +271,82 @@ const ResidentDashboard = () => {
             <small>{selectedReport.reportId || selectedReport.id}</small>
             <h2>{selectedReport.title}</h2>
             <p>{selectedReport.location?.address || 'Location unavailable'}</p>
-            <span className={`status-pill ${statusClass(selectedReport.status)}`}><i />{selectedReport.status}</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '12px', flexWrap: 'wrap', gap: '8px' }}>
+              <span className={`status-pill ${statusClass(selectedReport.status)}`}><i />{selectedReport.status}</span>
+              {(selectedReport.status === 'in_progress' || selectedReport.status === 'resolved' || selectedReport.status === 'closed') && (
+                <button
+                  type="button"
+                  style={{ background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', borderRadius: '6px', padding: '6px 12px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
+                  onClick={() => {
+                    const rId = selectedReport._id || selectedReport.id;
+                    axios.get(`${API_URL}/api/reports/${rId}`, { headers: { Authorization: `Bearer ${token}` } })
+                      .then((res) => {
+                        setSelectedReport(null);
+                        setDetailsModalReport(res.data);
+                      })
+                      .catch(() => {
+                        setSelectedReport(null);
+                        setDetailsModalReport(selectedReport);
+                      });
+                  }}
+                >
+                  <i className="fa-solid fa-circle-info me-1"></i> See Details
+                </button>
+              )}
+            </div>
+            {selectedReport.status === 'resolved' && (
+              <div style={{ marginTop: '16px', background: '#fffbeb', border: '1px solid #fef3c7', padding: '12px', borderRadius: '8px' }}>
+                <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#92400e', fontWeight: '500' }}>
+                  This report has been resolved! You can leave a review to finalize and close it.
+                </p>
+                <button
+                  type="button"
+                  style={{ background: '#f59e0b', color: '#0f172a', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}
+                  onClick={() => {
+                    const rId = selectedReport._id || selectedReport.id;
+                    axios.get(`${API_URL}/api/reports/${rId}`, { headers: { Authorization: `Bearer ${token}` } })
+                      .then((res) => {
+                        setSelectedReport(null);
+                        setReviewModalReport(res.data);
+                      })
+                      .catch(() => {
+                        setSelectedReport(null);
+                        setReviewModalReport(selectedReport);
+                      });
+                  }}
+                >
+                  <i className="fa-solid fa-star me-1"></i> Leave a Review
+                </button>
+              </div>
+            )}
           </div>
         </div>
+      )}
+
+      {/* SEE DETAILS MODAL */}
+      {detailsModalReport && (
+        <SeeDetailsModal
+          report={detailsModalReport}
+          onClose={() => setDetailsModalReport(null)}
+          onRefresh={() => {
+            loadDashboard();
+            const rId = detailsModalReport._id || detailsModalReport.id;
+            axios.get(`${API_URL}/api/reports/${rId}`, { headers: { Authorization: `Bearer ${token}` } })
+              .then((res) => setDetailsModalReport(res.data))
+              .catch(() => {});
+          }}
+        />
+      )}
+
+      {/* REVIEW MODAL */}
+      {reviewModalReport && (
+        <ReviewModal
+          report={reviewModalReport}
+          onClose={() => setReviewModalReport(null)}
+          onReviewed={() => {
+            loadDashboard();
+          }}
+        />
       )}
     </div>
   );

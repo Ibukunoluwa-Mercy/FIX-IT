@@ -22,7 +22,7 @@ const uploadCertificate = (req, res, next) => {
 
 const rateLimit = require('express-rate-limit');
 const { requireAuth, requireRole } = require('../middleware/authMiddleware');
-const { getDashboardSummary } = require('../controllers/artisanController');
+const { getDashboardSummary, getArtisanReports, applyForReport, resolveReport } = require('../controllers/artisanController');
 
 // Rate limiter for dashboard summary endpoint
 const summaryRateLimiter = rateLimit({
@@ -35,5 +35,10 @@ router.post('/register', uploadCertificate, registerArtisan);
 
 // Dashboard summary route
 router.get('/dashboard/summary', requireAuth, requireRole('artisan'), summaryRateLimiter, getDashboardSummary);
+
+// Reports feed and management for artisans
+router.get('/reports', requireAuth, requireRole('artisan'), getArtisanReports);
+router.post('/reports/:id/apply', requireAuth, requireRole('artisan'), applyForReport);
+router.post('/reports/:id/resolve', requireAuth, requireRole('artisan'), resolveReport);
 
 module.exports = router;

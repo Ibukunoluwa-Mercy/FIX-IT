@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, useNavigate, Link } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation, Link } from 'react-router-dom';
 import logoWhite from '../../assets/fixit-white-logo.png';
+import ArtisanReportsPage from './ArtisanReportsPage';
 import './ArtisanDashboard.css';
 
 // The main layout and dashboard component for Artisans
 const ArtisanDashboard = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const isReportsRoute = location.pathname.includes('/reports');
 
     // State for user data (from /api/auth/me)
     const [user, setUser] = useState(null);
@@ -347,8 +350,12 @@ const ArtisanDashboard = () => {
                 </header>
 
                 <div className="artisan-content">
-                    {/* Welcome Section */}
-                    <section className="welcome-section">
+                    {isReportsRoute ? (
+                        <ArtisanReportsPage onReportStatusChanged={fetchDashboardSummary} />
+                    ) : (
+                        <>
+                            {/* Welcome Section */}
+                            <section className="welcome-section">
                         <div className="welcome-text">
                             {/* Greeting using static Welcome */}
                             <h1>Welcome, {user.fullName ? user.fullName.split(' ')[0] : user.name}!</h1>
@@ -479,6 +486,8 @@ const ArtisanDashboard = () => {
                             )}
                         </div>
                     </section>
+                        </>
+                    )}
                 </div>
             </main>
         </div>

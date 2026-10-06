@@ -229,8 +229,8 @@ const sendSupportTicketEmail = ({ name, email, subject, message, ticketId }) => 
 	// Step 3: Sanitize every user-supplied string before embedding it in HTML.
 	// escapeHtml() replaces &, <, >, ", ' with their HTML entity equivalents
 	// so a user cannot inject markup or scripts through the form.
-	const safeName    = escapeHtml(name);
-	const safeEmail   = escapeHtml(email);   // shown in the body as display text
+	const safeName = escapeHtml(name);
+	const safeEmail = escapeHtml(email);   // shown in the body as display text
 	const safeSubject = escapeHtml(subject || 'General Support Inquiry');
 	// Convert newlines → <br/> AFTER escaping so the conversion itself cannot
 	// be used to inject tags (escaping first turns any < from the user into &lt;).
@@ -239,26 +239,26 @@ const sendSupportTicketEmail = ({ name, email, subject, message, ticketId }) => 
 	// Step 4: Build and send the email, returning a promise.
 	return transporter.sendMail({
 		// FROM: the app's own sending address so SPF/DKIM pass on our domain.
-		
+
 		from: process.env.MAIL_FROM || process.env.SMTP_USER,
 
-		
-		
+
+
 		to: supportTargetEmail,
 
-		
-		
-		
-		
+
+
+
+
 		replyTo: email,
 
-		
-		
+
+
 		subject: `New Support Request from ${name}${ticketId ? ` [Ticket #${ticketId}]` : ''}`,
 
-		
-		
-		
+
+
+
 		text: [
 			`New Support Request`,
 			`${'─'.repeat(40)}`,
@@ -274,8 +274,8 @@ const sendSupportTicketEmail = ({ name, email, subject, message, ticketId }) => 
 			`Reply directly to this email to respond to the resident.`,
 		].filter(Boolean).join('\n'),
 
-		
-		
+
+
 		html: `
 <!DOCTYPE html>
 <html lang="en">
@@ -359,6 +359,63 @@ const sendSupportTicketEmail = ({ name, email, subject, message, ticketId }) => 
 	}).then(() => ({ sent: true, skipped: false }));
 };
 
+/**
+ * sendArtisanMessageEmail
+ * ----------------------
+ * Sends a message from a resident to an assigned artisan via the Fixit platform.
+ * Keeps the artisan's email private from the resident while setting Reply-To to the resident.
+ */
+const sendArtisanMessageEmail = ({ artisanEmail, artisanName, residentName, residentEmail, reportTitle, reportId, subject, message }) => {
+	const transporter = createTransporter();
+	if (!transporter) {
+		console.warn('[EmailService] SMTP not configured. Skipping artisan message email.');
+		return Promise.resolve({ sent: false, skipped: true });
+	}
+
+	const safeArtisanName = escapeHtml(artisanName || 'Artisan');
+	const safeResidentName = escapeHtml(residentName || 'Resident');
+	const safeResidentEmail = escapeHtml(residentEmail || '');
+	const safeReportTitle = escapeHtml(reportTitle || 'Report');
+	const safeReportId = escapeHtml(reportId || '');
+	const safeSubject = escapeHtml(subject || `New message regarding job: ${reportTitle || 'Community Report'}`);
+	const safeMessage = escapeHtml(message || '').replace(/\n/g, '<br/>');
+
+	return transporter.sendMail({
+		from: `"Fixit Community" <${process.env.SMTP_USER}>`,
+		to: artisanEmail,
+		replyTo: residentEmail || process.env.SMTP_USER,
+		subject: `Fixit: ${subject || `Message from ${residentName || 'Resident'} regarding "${reportTitle || 'Report'}"`}`,
+		html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /></head>
+<body style="margin:0;padding:24px;background:#f1f5f9;font-family:'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;margin:0 auto;background:#fff;border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,0.05);overflow:hidden;">
+    <tr><td style="background:#0f172a;padding:24px;text-align:center;">
+      <h1 style="margin:0;color:#f8fafc;font-size:22px;">Fix<span style="color:#f59e0b;">It</span></h1>
+      <p style="margin:4px 0 0;color:#94a3b8;font-size:13px;">Resident Message Notification</p>
+    </td></tr>
+    <tr><td style="padding:28px 32px;">
+      <p style="font-size:15px;color:#334155;">Hello <strong>${safeArtisanName}</strong>,</p>
+      <p style="font-size:14px;color:#475569;line-height:1.6;">You have received a new message from resident <strong>${safeResidentName}</strong> regarding the job: <strong>${safeReportTitle}</strong>${safeReportId ? ` (ID: ${safeReportId})` : ''}.</p>
+      
+      <div style="background:#f8fafc;border-left:4px solid #f59e0b;padding:16px 20px;border-radius:4px;margin:20px 0;">
+        <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#0f172a;">Subject: ${safeSubject}</p>
+        <div style="font-size:14px;line-height:1.6;color:#334155;">${safeMessage}</div>
+      </div>
+
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:12px 16px;font-size:13px;color:#1e40af;">
+        &#128073; <strong>To reply:</strong> Simply click <em>Reply</em> in your email client to respond directly to <strong>${safeResidentName}</strong> (${safeResidentEmail}).
+      </div>
+    </td></tr>
+    <tr><td style="background:#f8fafc;padding:16px 32px;text-align:center;border-top:1px solid #e2e8f0;font-size:12px;color:#94a3b8;">
+      This message was sent through FixIt Community Platform.
+    </td></tr>
+  </table>
+</body>
+</html>`
+	}).then(() => ({ sent: true, skipped: false }));
+};
+
 module.exports = {
 	verifySmtpConnection,
 	sendVerificationEmail,
@@ -367,4 +424,5 @@ module.exports = {
 	sendPasswordResetEmail,
 	sendAccountDeletionEmail,
 	sendSupportTicketEmail,
+	sendArtisanMessageEmail,
 };
