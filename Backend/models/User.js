@@ -3,12 +3,32 @@ const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema(
 	{
-		name: { type: String, required: true, trim: true },
-		avatarUrl: { type: String, trim: true, default: '' },
-		impactScore: { type: Number, default: 0 },
-		cityRank: { type: String, default: 'Top 0%' },
-		firstName: { type: String, trim: true },
-		lastName: { type: String, trim: true },
+		name: { 
+			type: String, 
+			required: true, 
+			trim: true 
+		},
+		avatarUrl: { 
+			type: String, 
+			trim: true, 
+			default: '' 
+		},
+		impactScore: { 
+			type: Number, 
+			default: 0 
+		},
+		cityRank: { 
+			type: String, 
+			default: 'Top 0%' 
+		},
+		firstName: { 
+			type: String, 
+			trim: true 
+		},
+		lastName: { 
+			type: String, 
+			trim: true 
+		},
 		email: {
 			type: String,
 			required: true,
@@ -18,10 +38,29 @@ const userSchema = new mongoose.Schema(
 			index: true,
 			match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please provide a valid email address'],
 		},
-		phone: { type: String, trim: true, index: true, sparse: true },
-		password: { type: String, required: true, minlength: 8, select: false },
-		role: { type: String, enum: ['resident', 'admin', 'Community Member', 'Issue Resolver', 'Administrator', 'artisan'], default: 'resident', required: true },
-		location: { type: String, trim: true, default: '' },
+		phone: { 
+			type: String, 
+			trim: true, 
+			index: true, 
+			sparse: true 
+		},
+		password: { 
+			type: String, 
+			required: true, 
+			minlength: 8, 
+			select: false 
+		},
+		role: { 
+			type: String, 
+			enum: ['resident', 'admin', 'Community Member', 'Issue Resolver', 'Administrator', 'artisan'], 
+			default: 'resident', 
+			required: true 
+		},
+		location: { 
+			type: String, 
+			trim: true, 
+			default: '' 
+		},
 		notificationPreferences: {
 			issueUpdates: { type: Boolean, default: true },
 			communityMessages: { type: Boolean, default: true },
@@ -51,16 +90,45 @@ const userSchema = new mongoose.Schema(
 			accuracy: { type: Number, min: 0 },
 			capturedAt: { type: Date },
 		},
-		isActive: { type: Boolean, default: true },
-		accountStatus: { type: String, enum: ['verifying', 'active', 'suspended'], default: 'verifying' },
-		verificationEndsAt: { type: Date },
-		activatedAt: { type: Date },
-		emailVerified: { type: Boolean, default: false },
-		deletedAt: { type: Date, default: null },
-		emailVerificationTokenHash: { type: String, select: false },
-		emailVerificationExpires: { type: Date, select: false },
-		resetPasswordToken: { type: String, select: false },
-		resetPasswordExpire: { type: Date, select: false },
+		isActive: { 
+			type: Boolean, 
+			default: true 
+		},
+		accountStatus: { 
+			type: String, 
+			enum: ['verifying', 'active', 'suspended'], 
+			default: 'verifying' 
+		},
+		verificationEndsAt: { 
+			type: Date 
+		},
+		activatedAt: { 
+			type: Date
+		},
+		emailVerified: { 
+			type: Boolean, 
+			default: false 
+		},
+		deletedAt: { 
+			type: Date, 
+			default: null 
+		},
+		emailVerificationTokenHash: { 
+			type: String, 
+			select: false 
+		},
+		emailVerificationExpires: { 
+			type: Date, 
+			select: false 
+		},
+		resetPasswordToken: { 
+			type: String, 
+			select: false 
+		},
+		resetPasswordExpire: { 
+			type: Date, 
+			select: false 
+		},
 	},
 	{ timestamps: true }
 );
