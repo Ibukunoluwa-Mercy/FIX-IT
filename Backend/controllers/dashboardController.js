@@ -135,6 +135,55 @@ const getOverview = async (req, res) => {
 	}
 };
 
+const getResidentDashboardStats = (req, res) => {
+	const userId = getAuthenticatedUserId(req);
+	if (!userId) {
+		return res.status(401).json({ message: 'Authentication required' });
+	}
+
+	return User.findById(userId).select('name impactScore cityRank').lean()
+		.then((user) => {
+			if (!user) {
+				return res.status(404).json({ message: 'User not found' });
+			}
+
+			const userReportFilter = { $or: [{ user: userId }, { createdBy: userId }] };
+			const startOfMonth = new Date();
+			startOfMonth.setDate(1);
+			startOfMonth.setHours(0, 0, 0, 0);
+
+			// active = status in ['reported', 'in_progress']
+			const activePromise = Report.countDocuments({
+				...userReportFilter,
+				status: { $in: ['reported', 'in_progress'] },
+			});
+
+			// resolved this month = status in ['resolved', 'closed'] AND resolvedAt within current month (or updatedAt fallback)
+			const resolvedThisMonthPromise = Report.countDocuments({
+				...userReportFilter,
+				status: { $in: ['resolved', 'closed'] },
+				$or: [
+					{ resolvedAt: { $gte: startOfMonth } },
+					{ updatedAt: { $gte: startOfMonth } },
+				],
+			});
+
+			return Promise.all([activePromise, resolvedThisMonthPromise])
+				.then(([myReportsActive, resolvedThisMonth]) => {
+					return res.status(200).json({
+						myReportsActive,
+						resolvedThisMonth,
+						impactScore: user.impactScore ?? 0,
+						communityRank: user.cityRank || 'Top 0%',
+					});
+				});
+		})
+		.catch((error) => {
+			console.error('getResidentDashboardStats failed:', error);
+			return res.status(500).json({ message: 'Unable to load resident dashboard stats', error: error.message });
+		});
+};
+
 const submitWizardReport = async (req, res) => {
 	try {
 		const userId = getAuthenticatedUserId(req);
@@ -244,4 +293,4 @@ const submitReport = async (req, res) => {
 	}
 };
 
-module.exports = { getOverview, submitReport, submitWizardReport, uploadReportPhotos, geocodeReportLocation };
+module.exports = { getOverview, getResidentDashboardStats, submitReport, submitWizardReport, uploadReportPhotos, geocodeReportLocation };

@@ -211,6 +211,8 @@ const getDashboardSummary = (req, res) => {
 			console.error('Error in getDashboardSummary:', error.message);
 			return res.status(500).json({ message: 'Unable to fetch dashboard summary', error: error.message });
 		});
+};
+
 /**
  * getArtisanDashboardStats
  * ------------------------

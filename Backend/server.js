@@ -67,11 +67,13 @@ app.get('/api/health', (req, res) => res.status(mongoose.connection.readyState =
 
 app.use('/api/auth', authRoutes);
 app.use('/api/artisans', artisanRoutes);
+app.use('/api/artisan', artisanRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/geocode', geocodeRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/resident', dashboardRoutes);
 app.use('/api/issues', issuesRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/help', helpRoutes);
