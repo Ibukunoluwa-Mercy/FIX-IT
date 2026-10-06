@@ -98,7 +98,7 @@ const HomePage = () => {
       </section>
 
       
-      <ImpactCounters data={data.stats} />
+      <ImpactCounters data={data.heroMetrics || data.stats} />
 
       
       <HowItWorks />
