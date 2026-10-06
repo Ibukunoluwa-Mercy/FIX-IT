@@ -28,37 +28,109 @@ const getCoordinates = (coordinates) => {
 	return null;
 };
 
-const getCommunityOverview = async (req, res) => {
-	try {
-		const requestedTimeframe = req.query.timeframe || 'this_month';
-		const validTimeframes = ['today', 'this_week', 'this_month', 'this_year', 'all_time'];
-		const timeframe = validTimeframes.includes(requestedTimeframe) ? requestedTimeframe : 'this_month';
-		const startDate = getTimeframeStart(timeframe);
-		const reportFilter = startDate ? { createdAt: { $gte: startDate } } : {};
-		const [totalReports, verifiedReports, inProgressReports, resolvedReports, activeUsers, severityCounts, statusCounts, topCategories, activeAreas] = await Promise.all([
-			Report.countDocuments(reportFilter),
-			Report.countDocuments({ ...reportFilter, status: 'Verified' }),
-			Report.countDocuments({ ...reportFilter, status: 'In Progress' }),
-			Report.countDocuments({ ...reportFilter, status: 'Resolved' }),
-			User.countDocuments({ isActive: { $ne: false } }),
-			Report.aggregate([{ $match: reportFilter }, { $group: { _id: '$severity', count: { $sum: 1 } } }]),
-			Report.aggregate([{ $match: reportFilter }, { $group: { _id: '$status', count: { $sum: 1 } } }]),
-			Report.aggregate([{ $match: reportFilter }, { $match: { category: { $nin: ['', null] } } }, { $group: { _id: '$category', count: { $sum: 1 } } }, { $sort: { count: -1, _id: 1 } }, { $limit: 5 }]),
-			Report.aggregate([{ $match: { ...reportFilter, 'location.address': { $nin: ['', null] } } }, { $group: { _id: '$location.address', count: { $sum: 1 } } }, { $sort: { count: -1, _id: 1 } }, { $limit: 5 }]),
-		]);
-		const severities = Object.fromEntries(severityCounts.map(({ _id, count }) => [_id, count]));
-		const statuses = Object.fromEntries(statusCounts.map(({ _id, count }) => [_id, count]));
-		return res.json({
-			timeframe,
-			metrics: { totalReports, verifiedReports, inProgressReports, resolvedReports, activeUsers },
-			issuesBySeverity: getBreakdown(severities, totalReports, ['High', 'Medium', 'Low']),
-			issuesByStatus: getBreakdown(statuses, totalReports, ['In Progress', 'Resolved']),
-			topIssueCategories: topCategories.map(({ _id, count }) => ({ category: _id, count })),
-			mostActiveAreas: activeAreas.map(({ _id, count }) => ({ location: _id, totalLoggedIssues: count })),
+const getCommunityOverview = (req, res) => {
+	const requestedTimeframe = req.query.timeframe || 'this_month';
+	const validTimeframes = ['today', 'this_week', 'this_month', 'this_year', 'all_time'];
+	const timeframe = validTimeframes.includes(requestedTimeframe) ? requestedTimeframe : 'this_month';
+	const startDate = getTimeframeStart(timeframe);
+	const reportFilter = startDate ? { createdAt: { $gte: startDate } } : {};
+
+	// Count total reports for timeframe
+	const totalReportsPromise = Report.countDocuments(reportFilter);
+
+	// Verified issues: reports that have community confirmations or are verified
+	const verifiedReportsPromise = Report.countDocuments({
+		...reportFilter,
+		$or: [
+			{ 'confirmedBy.0': { $exists: true } },
+			{ status: { $in: ['verified', 'Verified'] } },
+		],
+	});
+
+	// In Progress: active artisan work
+	const inProgressReportsPromise = Report.countDocuments({
+		...reportFilter,
+		status: { $in: ['in_progress', 'In Progress', 'in progress'] },
+	});
+
+	// Resolved: resolved or closed reports
+	const resolvedReportsPromise = Report.countDocuments({
+		...reportFilter,
+		status: { $in: ['resolved', 'Resolved', 'closed', 'Closed'] },
+	});
+
+	// Active community members
+	const activeUsersPromise = User.countDocuments({ isActive: { $ne: false } });
+
+	// Issues by severity aggregation
+	const severityCountsPromise = Report.aggregate([
+		{ $match: reportFilter },
+		{ $group: { _id: '$severity', count: { $sum: 1 } } },
+	]);
+
+	// Issues by status aggregation
+	const statusCountsPromise = Report.aggregate([
+		{ $match: reportFilter },
+		{ $group: { _id: '$status', count: { $sum: 1 } } },
+	]);
+
+	// Top issue categories aggregation
+	const topCategoriesPromise = Report.aggregate([
+		{ $match: reportFilter },
+		{ $match: { category: { $nin: ['', null] } } },
+		{ $group: { _id: '$category', count: { $sum: 1 } } },
+		{ $sort: { count: -1, _id: 1 } },
+		{ $limit: 5 },
+	]);
+
+	// Most active areas aggregation
+	const activeAreasPromise = Report.aggregate([
+		{ $match: { ...reportFilter, 'location.address': { $nin: ['', null] } } },
+		{ $group: { _id: '$location.address', count: { $sum: 1 } } },
+		{ $sort: { count: -1, _id: 1 } },
+		{ $limit: 5 },
+	]);
+
+	return Promise.all([
+		totalReportsPromise,
+		verifiedReportsPromise,
+		inProgressReportsPromise,
+		resolvedReportsPromise,
+		activeUsersPromise,
+		severityCountsPromise,
+		statusCountsPromise,
+		topCategoriesPromise,
+		activeAreasPromise,
+	])
+		.then(([totalReports, verifiedReports, inProgressReports, resolvedReports, activeUsers, severityCounts, statusCounts, topCategories, activeAreas]) => {
+			const severities = Object.fromEntries(severityCounts.map(({ _id, count }) => [_id, count]));
+			const statuses = Object.fromEntries(statusCounts.map(({ _id, count }) => [String(_id).toLowerCase(), count]));
+
+			const normalizedInProgress = (statuses['in_progress'] || 0) + (statuses['in progress'] || 0);
+			const normalizedResolved = (statuses['resolved'] || 0) + (statuses['closed'] || 0);
+
+			return res.status(200).json({
+				timeframe,
+				metrics: {
+					totalReports,
+					verifiedReports,
+					inProgressReports,
+					resolvedReports,
+					activeUsers,
+				},
+				issuesBySeverity: getBreakdown(severities, totalReports, ['High', 'Medium', 'Low']),
+				issuesByStatus: [
+					{ name: 'In Progress', count: normalizedInProgress, percentage: percentage(normalizedInProgress, totalReports) },
+					{ name: 'Resolved', count: normalizedResolved, percentage: percentage(normalizedResolved, totalReports) },
+				],
+				topIssueCategories: topCategories.map(({ _id, count }) => ({ category: _id, count })),
+				mostActiveAreas: activeAreas.map(({ _id, count }) => ({ location: _id, totalLoggedIssues: count })),
+			});
+		})
+		.catch((error) => {
+			console.error('getCommunityOverview error:', error);
+			return res.status(500).json({ message: 'Unable to load community overview', error: error.message });
 		});
-	} catch (error) {
-		return res.status(500).json({ message: 'Unable to load community overview', error: error.message });
-	}
 };
 
 const getMapReports = async (req, res) => {
