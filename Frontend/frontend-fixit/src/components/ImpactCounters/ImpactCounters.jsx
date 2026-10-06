@@ -12,7 +12,7 @@ const ImpactCounters = ({ data }) => {
               <div className="stat-icon-wrapper">
                 <i className="fa-solid fa-circle-check" style={{ fontSize: 28 }}></i>
               </div>
-              <div className="stat-number">{data?.resolvedIssues || '1240'}</div>
+              <div className="stat-number">{data?.resolvedIssues || '10'}</div>
               <div className="stat-label">Issues Resolved</div>
             </div>
           </Col>
@@ -22,7 +22,7 @@ const ImpactCounters = ({ data }) => {
               <div className="stat-icon-wrapper">
                 <i className="fa-solid fa-users" style={{ fontSize: 28 }}></i>
               </div>
-              <div className="stat-number">{data?.communityMembers || '0.0k'}</div>
+              <div className="stat-number">{data?.communityMembers || '8'}</div>
               <div className="stat-label">Community Members</div>
             </div>
           </Col>
@@ -32,7 +32,7 @@ const ImpactCounters = ({ data }) => {
               <div className="stat-icon-wrapper">
                 <i className="fa-solid fa-map-location-dot" style={{ fontSize: 28 }}></i>
               </div>
-              <div className="stat-number">{data?.neighborhoodsCount || '15'}</div>
+              <div className="stat-number">{data?.neighborhoodsCount || '5'}</div>
               <div className="stat-label">Neighborhoods Improved</div>
             </div>
           </Col>

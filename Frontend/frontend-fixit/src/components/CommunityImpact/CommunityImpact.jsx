@@ -22,22 +22,22 @@ const CommunityImpact = () => {
             <Col md={7} className="p-md-4">
               <div className="stat-row">
                 <span className="stat-name">Issues reported this month</span>
-                <span className="stat-number">246</span>
+                <span className="stat-number">20</span>
               </div>
               <hr className="stat-divider" />
               <div className="stat-row">
                 <span className="stat-name">Issues resolved this month</span>
-                <span className="stat-number">201</span>
+                <span className="stat-number">5</span>
               </div>
               <hr className="stat-divider" />
               <div className="stat-row">
                 <span className="stat-name">Currently in progress</span>
-                <span className="stat-number">31</span>
+                <span className="stat-number">15</span>
               </div>
               <hr className="stat-divider" />
               <div className="stat-row">
                 <span className="stat-name">Average resolution time</span>
-                <span className="stat-number">4.2 days</span>
+                <span className="stat-number">3 days</span>
               </div>
             </Col>
           </Row>
