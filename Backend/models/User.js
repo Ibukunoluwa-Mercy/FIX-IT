@@ -21,6 +21,14 @@ const userSchema = new mongoose.Schema(
 			type: String, 
 			default: 'Top 0%' 
 		},
+		reviewCount: {
+			type: Number,
+			default: 0,
+		},
+		avgRating: {
+			type: Number,
+			default: 0,
+		},
 		firstName: { 
 			type: String, 
 			trim: true 

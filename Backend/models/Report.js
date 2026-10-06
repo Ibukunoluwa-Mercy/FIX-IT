@@ -80,6 +80,11 @@ reportSchema.pre('validate', function normalizeLegacyStatus() {
 });
 
 reportSchema.pre('save', function normalizeReportData() {
+	if (this.assignedArtisanId && !this.assignedArtisan) this.assignedArtisan = this.assignedArtisanId;
+	if (this.assignedArtisan && !this.assignedArtisanId) this.assignedArtisanId = this.assignedArtisan;
+	if (this.appliedAt && !this.assignedAt) this.assignedAt = this.appliedAt;
+	if (this.assignedAt && !this.appliedAt) this.appliedAt = this.assignedAt;
+
 	const normalizedCategory = (this.category || '').trim();
 	if (!this.title && normalizedCategory) this.title = normalizedCategory;
 	if (!this.category && this.title) this.category = this.title;

@@ -416,6 +416,59 @@ const sendArtisanMessageEmail = ({ artisanEmail, artisanName, residentName, resi
 	}).then(() => ({ sent: true, skipped: false }));
 };
 
+/**
+ * sendResolutionNoticeEmail
+ * -------------------------
+ * Notifies the resident that their reported issue has been marked resolved
+ * by the assigned artisan, and invites them to leave a review to close the job.
+ */
+const sendResolutionNoticeEmail = ({ residentEmail, residentName, reportTitle, reportId, artisanName }) => {
+	const transporter = createTransporter();
+	if (!transporter) {
+		console.warn('[EmailService] SMTP not configured. Skipping resolution notification email.');
+		return Promise.resolve({ sent: false, skipped: true });
+	}
+
+	const safeResidentName = escapeHtml(residentName || 'Resident');
+	const safeReportTitle = escapeHtml(reportTitle || 'Report');
+	const safeReportId = escapeHtml(reportId || '');
+	const safeArtisanName = escapeHtml(artisanName || 'Your assigned artisan');
+
+	return transporter.sendMail({
+		from: `"Fixit Community" <${process.env.SMTP_USER}>`,
+		to: residentEmail,
+		subject: `Fixit: "${reportTitle || 'Your issue'}" has been marked Resolved`,
+		html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /></head>
+<body style="margin:0;padding:24px;background:#f1f5f9;font-family:'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;margin:0 auto;background:#fff;border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,0.05);overflow:hidden;">
+    <tr><td style="background:#0f172a;padding:24px;text-align:center;">
+      <h1 style="margin:0;color:#f8fafc;font-size:22px;">Fix<span style="color:#f59e0b;">It</span></h1>
+      <p style="margin:4px 0 0;color:#94a3b8;font-size:13px;">Issue Resolution Update</p>
+    </td></tr>
+    <tr><td style="padding:28px 32px;">
+      <p style="font-size:15px;color:#334155;">Hello <strong>${safeResidentName}</strong>,</p>
+      <p style="font-size:14px;color:#475569;line-height:1.6;">
+        Great news! Artisan <strong>${safeArtisanName}</strong> has marked your report <strong>&ldquo;${safeReportTitle}&rdquo;</strong>${safeReportId ? ` (ID: ${safeReportId})` : ''} as <strong style="color:#059669;">Resolved</strong>.
+      </p>
+      
+      <div style="background:#ecfdf5;border-left:4px solid #10b981;padding:16px 20px;border-radius:4px;margin:20px 0;">
+        <p style="margin:0 0 6px;font-size:13.5px;font-weight:700;color:#065f46;">Action Requested: Leave a Review</p>
+        <p style="margin:0;font-size:13px;line-height:1.5;color:#047857;">
+          Please log into your Fixit dashboard to inspect the resolution and leave a 1-5 star review. Submitting your review will officially close the report.
+        </p>
+      </div>
+    </td></tr>
+    <tr><td style="background:#f8fafc;padding:16px 32px;text-align:center;border-top:1px solid #e2e8f0;font-size:12px;color:#94a3b8;">
+      Thank you for helping keep our community well-maintained and safe.
+    </td></tr>
+  </table>
+</body>
+</html>`
+	}).then(() => ({ sent: true, skipped: false }));
+};
+
 module.exports = {
 	verifySmtpConnection,
 	sendVerificationEmail,
@@ -425,4 +478,5 @@ module.exports = {
 	sendAccountDeletionEmail,
 	sendSupportTicketEmail,
 	sendArtisanMessageEmail,
+	sendResolutionNoticeEmail,
 };
