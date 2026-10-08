@@ -161,12 +161,8 @@ const getDashboardSummary = (req, res) => {
 			const messagesPromise = getUnreadMessages();
 			const notifsPromise = getUnreadNotifications();
 
-			// 4. Check if artisan account is approved to fetch recent activity
-			const isApproved = String(profile.verificationStatus || '').toLowerCase() === 'approved';
-			
-			const recentActivityPromise = isApproved 
-				? Report.find({}).sort({ createdAt: -1 }).limit(5).select('_id title category location createdAt').lean()
-				: Promise.resolve([]);
+			// 4. Fetch recent activity
+			const recentActivityPromise = Report.find({}).sort({ createdAt: -1 }).limit(5).select('_id title category location createdAt').lean();
 
 			// 5. Execute all queries in parallel with Promise.all
 			return Promise.all([
@@ -383,50 +379,35 @@ const applyForReport = (req, res) => {
 		return res.status(400).json({ error: 'Invalid report ID' });
 	}
 
-	// 1. Verify artisan account is approved/verified (not "Pending" or "Rejected")
-	return ArtisanProfile.findOne({ user: userId }).lean()
-		.then((profile) => {
-			if (!profile) {
-				return res.status(404).json({ error: 'Artisan profile not found' });
-			}
-			const status = String(profile.verificationStatus || '').toLowerCase();
-			if (status !== 'approved') {
-				return res.status(403).json({
-					error: 'Your artisan account is still under review or unapproved. Only approved artisans can claim reports.',
-					verificationStatus: profile.verificationStatus,
-				});
-			}
+	const now = new Date();
 
-			const now = new Date();
-
-			// 2. Atomic findOneAndUpdate with status: 'reported' baked into the filter.
-			// This prevents race conditions when multiple artisans claim concurrently.
-			return Report.findOneAndUpdate(
-				{
-					_id: reportId,
-					status: 'reported',
+	// Atomic findOneAndUpdate with status: 'reported' baked into the filter.
+	// This prevents race conditions when multiple artisans claim concurrently.
+	return Report.findOneAndUpdate(
+		{
+			_id: reportId,
+			status: 'reported',
+		},
+		{
+			$set: {
+				status: 'in_progress',
+				assignedArtisanId: userId,
+				assignedArtisan: userId,
+				appliedAt: now,
+				assignedAt: now,
+				inProgressAt: now,
+			},
+			$push: {
+				updates: {
+					type: 'STATUS_CHANGE',
+					text: `Artisan ${req.user.name || 'assigned'} claimed this report. Job status is now In Progress.`,
+					author: req.user.name || 'Artisan',
+					timestamp: now,
 				},
-				{
-					$set: {
-						status: 'in_progress',
-						assignedArtisanId: userId,
-						assignedArtisan: userId,
-						appliedAt: now,
-						assignedAt: now,
-						inProgressAt: now,
-					},
-					$push: {
-						updates: {
-							type: 'STATUS_CHANGE',
-							text: `Artisan ${req.user.name || 'assigned'} claimed this report. Job status is now In Progress.`,
-							author: req.user.name || 'Artisan',
-							timestamp: now,
-						},
-					},
-				},
-				{ new: true }
-			).lean();
-		})
+			},
+		},
+		{ new: true }
+	).lean()
 		.then((report) => {
 			// If response already handled (e.g. 403 unapproved), return early
 			if (res.headersSent) return null;
