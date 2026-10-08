@@ -81,7 +81,7 @@ const ArtisanReportsPage = ({ onReportStatusChanged }) => {
                     throw new Error(data.message || 'This report has already been claimed by another artisan.');
                 }
                 if (!res.ok) {
-                    throw new Error(data.message || 'Failed to claim this report');
+                    throw new Error(data.error || data.message || 'Failed to claim this report');
                 }
                 return data;
             })
@@ -131,7 +131,7 @@ const ArtisanReportsPage = ({ onReportStatusChanged }) => {
             .then(async (res) => {
                 const data = await res.json();
                 if (!res.ok) {
-                    throw new Error(data.message || 'Failed to mark job as resolved');
+                    throw new Error(data.error || data.message || 'Failed to mark job as resolved');
                 }
                 return data;
             })
