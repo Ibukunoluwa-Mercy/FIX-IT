@@ -125,10 +125,8 @@ const SeeDetailsModal = ({ report, onClose, onRefresh }) => {
                                         <div className="contact-detail-item">
                                             <i className="fa-solid fa-envelope"></i>
                                             <div>
-                                                <small>Direct Inquiries</small>
-                                                <span className="relay-secure-tag">
-                                                    <i className="fa-solid fa-shield-halved me-1"></i> Routed via Secure FixIt Relay
-                                                </span>
+                                                <small>Email Address</small>
+                                                <strong>{artisan.email || 'Not provided'}</strong>
                                             </div>
                                         </div>
                                         {artisan.businessName && (
