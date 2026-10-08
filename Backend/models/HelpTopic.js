@@ -9,6 +9,13 @@ const helpTopicSchema = new mongoose.Schema(
 			trim: true,
 			index: true,
 		},
+		audience: {
+			type: String,
+			required: true,
+			enum: ['resident', 'artisan', 'all'],
+			default: 'all',
+			index: true,
+		},
 		section: {
 			type: String,
 			required: true,

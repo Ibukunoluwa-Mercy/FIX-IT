@@ -23,6 +23,7 @@ const artisanNavItems = [
   { label: 'Messages', iconClass: 'fa-solid fa-envelope', path: '/dashboard/artisan/messages' },
   { label: 'Settings', iconClass: 'fa-solid fa-gear', path: '/dashboard/artisan/settings' },
   { label: 'Reviews', iconClass: 'fa-solid fa-star', path: '/dashboard/artisan/reviews' },
+  { label: 'Help Center', iconClass: 'fa-solid fa-circle-question', path: '/dashboard/artisan/help-center' },
 ];
 
 const ArtisanSettingsPage = () => {
@@ -224,6 +225,10 @@ const ArtisanSettingsPage = () => {
           <NavLink to="/dashboard/artisan/reviews" className={({isActive}) => isActive ? "nav-item active" : "nav-item"} onClick={() => setIsSidebarOpen(false)}>
             <i className="fa-solid fa-star nav-icon"></i>
             <span>Reviews</span>
+          </NavLink>
+          <NavLink to="/dashboard/artisan/help-center" className={({isActive}) => isActive ? "nav-item active" : "nav-item"} onClick={() => setIsSidebarOpen(false)}>
+            <i className="fa-solid fa-circle-question nav-icon"></i>
+            <span>Help Center</span>
           </NavLink>
         </nav>
 

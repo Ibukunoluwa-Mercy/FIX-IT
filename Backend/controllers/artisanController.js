@@ -718,6 +718,447 @@ const getDebugCounts = (req, res) => {
 		});
 };
 
+// In-memory data store for Artisan Help Center
+const ARTISAN_HELP_DATA = {
+	topics: [
+		// Quick Help Options (4 items)
+		{
+			id: 'apply-for-report',
+			slug: 'apply-for-report',
+			section: 'quick_help',
+			icon: 'fa-solid fa-hand-holding-hand',
+			iconBg: '#eff6ff',
+			iconColor: '#2563eb',
+			title: 'Apply for a Report',
+			description: 'Learn how to claim a report you want to fix.',
+			hasSteps: true,
+			steps: [
+				{
+					order: 1,
+					title: 'Open "Reports" from the sidebar',
+					description: 'Navigate to the Reports page to view the live community feed of reported issues.',
+				},
+				{
+					order: 2,
+					title: 'Browse the list of reports submitted by residents',
+					description: 'Filter by Open to Claim or search by issue category and location area.',
+				},
+				{
+					order: 3,
+					title: 'Click "Apply" on the report you want to fix',
+					description: 'Inspect the report description, photos, and address to confirm you can resolve it.',
+				},
+				{
+					order: 4,
+					title: 'Confirm in the popup',
+					description: 'Confirm your application in the modal dialog to lock in your assignment.',
+				},
+				{
+					order: 5,
+					title: 'Job transitions to "In Progress"',
+					description: 'The report is now yours and shows as In Progress (the resident sees this update too). Other artisans can no longer apply for it.',
+				},
+			],
+		},
+		{
+			id: 'update-job-status',
+			slug: 'update-job-status',
+			section: 'quick_help',
+			icon: 'fa-solid fa-wrench',
+			iconBg: '#fef3c7',
+			iconColor: '#d97706',
+			title: 'Update Job Status',
+			description: 'Mark your job as in progress or resolved.',
+			hasSteps: true,
+			steps: [
+				{
+					order: 1,
+					title: 'Go to "Reports" in your artisan dashboard',
+					description: 'Filter by "My Active Jobs" to see all reports assigned to your workspace.',
+				},
+				{
+					order: 2,
+					title: 'Inspect your active job',
+					description: 'Each claimed report shows a status tracker stepper ("Reported → In Progress").',
+				},
+				{
+					order: 3,
+					title: 'Click "Mark as Resolved"',
+					description: 'Once all physical repairs and tests are finished, click the green "Mark as Resolved" button.',
+				},
+				{
+					order: 4,
+					title: 'Confirm in the popup',
+					description: 'Confirm the resolution in the confirmation dialog.',
+				},
+				{
+					order: 5,
+					title: 'Resident review prompt',
+					description: 'The resident is notified that the job is resolved and prompted to leave a 1-5 star review. Once reviewed, the report officially closes.',
+				},
+			],
+		},
+		{
+			id: 'message-residents',
+			slug: 'message-residents',
+			section: 'quick_help',
+			icon: 'fa-solid fa-envelope',
+			iconBg: '#ecfdf5',
+			iconColor: '#059669',
+			title: 'Message Residents',
+			description: 'Understand how resident messages reach you.',
+			hasSteps: true,
+			steps: [
+				{
+					order: 1,
+					title: 'Resident opens "See Details"',
+					description: 'A resident views their in-progress report and clicks the "Message" button on your artisan card.',
+				},
+				{
+					order: 2,
+					title: 'Message sent to your email',
+					description: 'Their message is dispatched directly to the primary email address registered on your artisan account.',
+				},
+				{
+					order: 3,
+					title: 'Reply to them by email',
+					description: 'You can reply directly to the resident via email. Always keep your email address updated in Settings.',
+				},
+			],
+		},
+		{
+			id: 'get-verified',
+			slug: 'get-verified',
+			section: 'quick_help',
+			icon: 'fa-solid fa-shield-halved',
+			iconBg: '#f3e8ff',
+			iconColor: '#9333ea',
+			title: 'Get Verified',
+			description: 'Learn how account approval works.',
+			hasSteps: true,
+			steps: [
+				{
+					order: 1,
+					title: 'Sign up with brand & certificate',
+					description: 'During sign-up, enter your business name and upload your professional certificate (PDF, JPG, or PNG).',
+				},
+				{
+					order: 2,
+					title: 'Account review period',
+					description: 'Your dashboard displays "Account Under Review" while the municipal team verifies your credentials.',
+				},
+				{
+					order: 3,
+					title: 'Verified status badge',
+					description: 'Once approved, your account badge changes to "Account Verified" and you can claim and resolve community jobs.',
+				},
+			],
+		},
+
+		// Browse by Category (8 items)
+		{
+			id: 'getting-started',
+			slug: 'getting-started',
+			section: 'category',
+			icon: 'fa-solid fa-rocket',
+			iconBg: '#eff6ff',
+			iconColor: '#2563eb',
+			title: 'Getting Started',
+			description: 'Set up your artisan account.',
+			hasSteps: true,
+			steps: [
+				{ order: 1, title: 'Complete your registration', description: 'Provide your name, phone number, trade category, and business details.' },
+				{ order: 2, title: 'Upload your credentials', description: 'Attach a valid vocational certificate or proof of trade apprenticeship.' },
+				{ order: 3, title: 'Explore your dashboard', description: 'Tour the Reports feed, Reviews tracker, and profile configuration tools.' },
+			],
+		},
+		{
+			id: 'account-verification',
+			slug: 'account-verification',
+			section: 'category',
+			icon: 'fa-solid fa-id-card',
+			iconBg: '#ecfdf5',
+			iconColor: '#059669',
+			title: 'Account Verification',
+			description: 'Certificate upload and approval status.',
+			hasSteps: false,
+			body: 'Fixit enforces quality assurance by vetting artisan credentials. When you register, our admin team reviews your uploaded certificate. While pending, your dashboard displays an "Account Under Review" banner. If rejected, you will receive a specific explanation and can upload a replacement certificate directly from Settings.',
+		},
+		{
+			id: 'browsing-reports',
+			slug: 'browsing-reports',
+			section: 'category',
+			icon: 'fa-solid fa-list-check',
+			iconBg: '#fff7ed',
+			iconColor: '#ea580c',
+			title: 'Browsing Reports',
+			description: 'Find and filter available reports.',
+			hasSteps: true,
+			steps: [
+				{ order: 1, title: 'Navigate to Reports', description: 'Click "Reports" in your sidebar to see real-time issues submitted by residents.' },
+				{ order: 2, title: 'Use Quick Filter Tabs', description: 'Switch between "All Reports", "Open to Claim", "My Active Jobs", and "Resolved Jobs".' },
+				{ order: 3, title: 'Inspect Details', description: 'Click "Details" on any card to view photos, full description, reporter info, and exact GPS location.' },
+			],
+		},
+		{
+			id: 'applying-job-status',
+			slug: 'applying-job-status',
+			section: 'category',
+			icon: 'fa-solid fa-clipboard-check',
+			iconBg: '#fef3c7',
+			iconColor: '#d97706',
+			title: 'Applying & Job Status',
+			description: 'Claim jobs and track their progress.',
+			hasSteps: true,
+			steps: [
+				{ order: 1, title: 'Claim an open report', description: 'Click "Apply" and confirm to assign the report to yourself.' },
+				{ order: 2, title: 'Work in progress', description: 'Perform repairs on-site; the issue is marked as In Progress across the community feed.' },
+				{ order: 3, title: 'Mark as Resolved', description: 'Click "Mark as Resolved" once finished to trigger resident confirmation and review.' },
+			],
+		},
+		{
+			id: 'messages-reviews',
+			slug: 'messages-reviews',
+			section: 'category',
+			icon: 'fa-solid fa-star',
+			iconBg: '#fdf2f8',
+			iconColor: '#db2777',
+			title: 'Messages & Reviews',
+			description: 'Resident messages and ratings.',
+			hasSteps: false,
+			body: 'Residents can communicate with you regarding your assigned reports. When a job is marked resolved, residents leave a 1 to 5 star rating and feedback comment. You can view all testimonials, ratings breakdown, and average score on your "Reviews" page.',
+		},
+		{
+			id: 'earnings',
+			slug: 'earnings',
+			section: 'category',
+			icon: 'fa-solid fa-wallet',
+			iconBg: '#f0fdf4',
+			iconColor: '#16a34a',
+			title: 'Earnings',
+			description: 'Understand your total earnings.',
+			hasSteps: false,
+			body: 'Your dashboard features a Total Earnings card summarizing payments from completed community repairs and municipal sponsorships. Keep resolving issues and receiving positive reviews to boost your service ranking and payout eligibility.',
+		},
+		{
+			id: 'settings-profile',
+			slug: 'settings-profile',
+			section: 'category',
+			icon: 'fa-solid fa-sliders',
+			iconBg: '#f1f5f9',
+			iconColor: '#475569',
+			title: 'Settings & Profile',
+			description: 'Manage your account, password and appearance.',
+			hasSteps: true,
+			steps: [
+				{ order: 1, title: 'Access Settings', description: 'Click "Settings" in the sidebar to open the account management portal.' },
+				{ order: 2, title: 'Update Personal & Business Profile', description: 'Change your display photo, business name, phone number, and service skills.' },
+				{ order: 3, title: 'Security & Theme', description: 'Update your password and toggle your preferred appearance (Light, Dark, or System mode).' },
+			],
+		},
+		{
+			id: 'troubleshooting',
+			slug: 'troubleshooting',
+			section: 'category',
+			icon: 'fa-solid fa-triangle-exclamation',
+			iconBg: '#fef2f2',
+			iconColor: '#dc2626',
+			title: 'Troubleshooting',
+			description: 'Fix common issues and errors.',
+			hasSteps: false,
+			body: 'If you encounter issues claiming a report, make sure your account is active and the report has not already been claimed by another artisan. If the dashboard fails to load stats, click the "Retry" button or check your internet connection. For persistent issues, contact support using the button below.',
+		},
+
+		// Quick Guides (4 items with read times)
+		{
+			id: 'guide-how-to-apply',
+			slug: 'guide-how-to-apply',
+			section: 'guide',
+			icon: 'fa-solid fa-file-signature',
+			iconBg: '#eff6ff',
+			iconColor: '#2563eb',
+			title: 'How to Apply for a Report',
+			readTime: '2 min read',
+			hasSteps: true,
+			steps: [
+				{ order: 1, title: 'Open Reports Tab', description: 'Click "Reports" in your navigation sidebar.' },
+				{ order: 2, title: 'Find Unclaimed Issue', description: 'Locate a report with the orange "Reported" badge and "Apply" button.' },
+				{ order: 3, title: 'Click Apply & Confirm', description: 'Review the details, click Apply, and confirm in the dialog to begin work.' },
+			],
+		},
+		{
+			id: 'guide-how-to-resolve',
+			slug: 'guide-how-to-resolve',
+			section: 'guide',
+			icon: 'fa-solid fa-circle-check',
+			iconBg: '#ecfdf5',
+			iconColor: '#059669',
+			title: 'How to Mark a Job as Resolved',
+			readTime: '2 min read',
+			hasSteps: true,
+			steps: [
+				{ order: 1, title: 'Go to My Active Jobs', description: 'Filter your reports by "My Active Jobs" to locate your in-progress repair.' },
+				{ order: 2, title: 'Complete On-site Repair', description: 'Ensure the problem is fully resolved and safe for the community.' },
+				{ order: 3, title: 'Click "Mark as Resolved"', description: 'Click the green button and confirm to notify the resident for review.' },
+			],
+		},
+		{
+			id: 'guide-dashboard-stats',
+			slug: 'guide-dashboard-stats',
+			section: 'guide',
+			icon: 'fa-solid fa-chart-simple',
+			iconBg: '#fef3c7',
+			iconColor: '#d97706',
+			title: 'Understanding Your Dashboard Stats',
+			readTime: '3 min read',
+			hasSteps: false,
+			body: 'Your dashboard displays four key indicators: Total Reports (all community issues submitted across the zone), Total Earnings (funds earned from confirmed jobs), Reviews (number of resident reviews received), and New Messages. The Recent Activity feed lists the latest issues and updates in your zone.',
+		},
+		{
+			id: 'guide-update-profile',
+			slug: 'guide-update-profile',
+			section: 'guide',
+			icon: 'fa-solid fa-user-gear',
+			iconBg: '#f3e8ff',
+			iconColor: '#9333ea',
+			title: 'Updating Your Profile and Brand Details',
+			readTime: '2 min read',
+			hasSteps: true,
+			steps: [
+				{ order: 1, title: 'Open Settings', description: 'Select Settings from the sidebar or top profile menu.' },
+				{ order: 2, title: 'Edit Business Information', description: 'Update your Trade Category, Business Name, and phone number.' },
+				{ order: 3, title: 'Save Changes', description: 'Click Save Changes to ensure your updated profile is visible to residents.' },
+			],
+		},
+	],
+
+	faqs: [
+		{
+			id: 'faq-under-review',
+			order: 1,
+			question: 'Why does my dashboard say "Account Under Review"?',
+			answer: 'When you register as an artisan and submit your trade certificate, your credentials undergo validation by our team. While under review, your profile remains pending. Once approved, the badge updates to "Account Verified" and you can claim and resolve community jobs.',
+		},
+		{
+			id: 'faq-how-apply',
+			order: 2,
+			question: 'How do I apply for a report?',
+			answer: 'Go to the Reports page from the sidebar, find any unclaimed report with the orange "Reported" status, and click the orange "Apply" button. Confirm in the dialog, and the report will be assigned to your workspace under "In Progress".',
+		},
+		{
+			id: 'faq-after-apply',
+			order: 3,
+			question: 'What happens after I apply for a report?',
+			answer: 'The report status updates to "In Progress" in real-time. The resident who submitted the report receives an update showing that an artisan has taken the job, and other artisans can no longer claim it.',
+		},
+		{
+			id: 'faq-two-artisans',
+			order: 4,
+			question: 'Can two artisans apply for the same report?',
+			answer: 'No. Fixit enforces a single-artisan lock. As soon as you confirm your application, the report is locked to you and displays "Assigned to another artisan" to other users.',
+		},
+		{
+			id: 'faq-mark-completed',
+			order: 5,
+			question: 'How do I mark a job as completed?',
+			answer: 'Navigate to Reports, select your active job, and click the green "Mark as Resolved" button. Confirm in the popup. The report will update to "Resolved", and the resident will be invited to confirm and rate your workmanship.',
+		},
+		{
+			id: 'faq-residents-contact',
+			order: 6,
+			question: 'How do residents contact me?',
+			answer: 'Residents who view your assigned report can click "Message" on your profile card. The system dispatches their message directly to the email registered on your artisan account. You can reply directly through your email provider.',
+		},
+		{
+			id: 'faq-reviews-where',
+			order: 7,
+			question: 'How do I get reviews, and where do I see them?',
+			answer: 'Once you mark a job as resolved, the resident is prompted to review your service with a 1-5 star rating and comment. All submissions appear on your "Reviews" page (accessible via the sidebar or the Reviews stat card on your dashboard).',
+		},
+		{
+			id: 'faq-reports-number',
+			order: 8,
+			question: 'What does the Reports number on my dashboard mean?',
+			answer: 'The "Reports" card on your dashboard displays the total number of community issues reported within your coverage zone, giving you an accurate picture of available opportunities and local maintenance needs.',
+		},
+	],
+};
+
+/**
+ * getArtisanHelpTopics
+ * GET /api/artisans/help/topics
+ */
+const getArtisanHelpTopics = (req, res) => {
+	const { section } = req.query;
+	let topics = ARTISAN_HELP_DATA.topics;
+	if (section) {
+		topics = topics.filter((t) => t.section === section);
+	}
+	return res.status(200).json(topics);
+};
+
+/**
+ * getArtisanHelpTopicBySlug
+ * GET /api/artisans/help/topics/:slug
+ */
+const getArtisanHelpTopicBySlug = (req, res) => {
+	const { slug } = req.params;
+	const topic = ARTISAN_HELP_DATA.topics.find((t) => t.slug === slug || t.id === slug);
+	if (!topic) {
+		return res.status(404).json({ error: 'Help topic not found' });
+	}
+	return res.status(200).json(topic);
+};
+
+/**
+ * getArtisanHelpFaqs
+ * GET /api/artisans/help/faqs
+ */
+const getArtisanHelpFaqs = (req, res) => {
+	const shouldReturnAll = req.query.all === 'true' || req.query.all === '1';
+	const limit = parseInt(req.query.limit, 10) || 5;
+	const faqs = shouldReturnAll ? ARTISAN_HELP_DATA.faqs : ARTISAN_HELP_DATA.faqs.slice(0, limit);
+	return res.status(200).json(faqs);
+};
+
+/**
+ * searchArtisanHelp
+ * GET /api/artisans/help/search?q=...
+ */
+const searchArtisanHelp = (req, res) => {
+	const rawQuery = req.query.q || req.query.query || '';
+	const query = rawQuery.trim().toLowerCase();
+
+	if (!query) {
+		return res.status(200).json({
+			query: '',
+			total: 0,
+			results: { articles: [], faqs: [] },
+		});
+	}
+
+	const matchedArticles = ARTISAN_HELP_DATA.topics.filter((t) => {
+		const inTitle = t.title.toLowerCase().includes(query);
+		const inDesc = t.description?.toLowerCase().includes(query);
+		const inBody = t.body?.toLowerCase().includes(query);
+		const inSteps = t.steps?.some((s) => s.title.toLowerCase().includes(query) || s.description.toLowerCase().includes(query));
+		return inTitle || inDesc || inBody || inSteps;
+	});
+
+	const matchedFaqs = ARTISAN_HELP_DATA.faqs.filter((f) => {
+		return f.question.toLowerCase().includes(query) || f.answer.toLowerCase().includes(query);
+	});
+
+	return res.status(200).json({
+		query,
+		total: matchedArticles.length + matchedFaqs.length,
+		results: {
+			articles: matchedArticles,
+			faqs: matchedFaqs,
+		},
+	});
+};
+
 module.exports = {
 	registerArtisan,
 	getDashboardSummary,
@@ -728,4 +1169,8 @@ module.exports = {
 	updateReportStatus,
 	resolveReport,
 	getArtisanReviews,
+	getArtisanHelpTopics,
+	getArtisanHelpTopicBySlug,
+	getArtisanHelpFaqs,
+	searchArtisanHelp,
 };

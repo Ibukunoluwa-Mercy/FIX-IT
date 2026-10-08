@@ -29,13 +29,20 @@ const isValidEmail = (email) => {
  * Uses .then() / .catch() promise chaining throughout.
  */
 const submitContactSupport = (req, res) => {
-	const { name, email, subject, message, userId } = req.body || {};
+	// If user is authenticated, derive user identification directly from auth context
+	const authUser = req.user || null;
+	const body = req.body || {};
+
+	const resolvedName = authUser ? (authUser.name || authUser.fullName || '') : (body.name || '');
+	const resolvedEmail = authUser ? (authUser.email || '') : (body.email || '');
+	const resolvedRole = authUser ? (authUser.role || 'resident') : (body.role || 'resident');
+	const resolvedUserId = authUser ? authUser._id : (body.userId || null);
 
 	// Step 1: Input Validation
-	const trimmedName = typeof name === 'string' ? name.trim() : '';
-	const trimmedEmail = typeof email === 'string' ? email.trim() : '';
-	const trimmedMessage = typeof message === 'string' ? message.trim() : '';
-	const trimmedSubject = typeof subject === 'string' && subject.trim() ? subject.trim() : 'General Support Inquiry';
+	const trimmedName = typeof resolvedName === 'string' ? resolvedName.trim() : '';
+	const trimmedEmail = typeof resolvedEmail === 'string' ? resolvedEmail.trim() : '';
+	const trimmedMessage = typeof body.message === 'string' ? body.message.trim() : '';
+	const trimmedSubject = typeof body.subject === 'string' && body.subject.trim() ? body.subject.trim() : 'General Support Inquiry';
 
 	if (!trimmedName) {
 		return res.status(400).json({ error: 'Please provide your name.' });
@@ -58,7 +65,8 @@ const submitContactSupport = (req, res) => {
 
 	// Step 2: Create Support Ticket record in Database
 	SupportTicket.create({
-		userId: userId || req.user?._id || null,
+		userId: resolvedUserId,
+		role: resolvedRole,
 		name: sanitizeText(trimmedName),
 		email: trimmedEmail.toLowerCase(),
 		subject: sanitizeText(trimmedSubject),

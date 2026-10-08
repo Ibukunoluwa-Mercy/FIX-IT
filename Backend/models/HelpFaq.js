@@ -7,6 +7,13 @@ const helpFaqSchema = new mongoose.Schema(
 			required: true,
 			trim: true,
 		},
+		audience: {
+			type: String,
+			required: true,
+			enum: ['resident', 'artisan', 'all'],
+			default: 'all',
+			index: true,
+		},
 		answer: {
 			type: String,
 			required: true,

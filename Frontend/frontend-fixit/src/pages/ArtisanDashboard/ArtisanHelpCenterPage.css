@@ -1,0 +1,22 @@
+/* Artisan Help Center Page CSS */
+.artisan-help-page {
+  width: 100%;
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Ensure step modal text styling */
+.help-step-body-text {
+  padding: 8px 4px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--text-secondary, #475569);
+}
+
+.help-step-body-text p {
+  margin-bottom: 0;
+}

@@ -8,6 +8,12 @@ const supportTicketSchema = new mongoose.Schema(
 			default: null,
 			index: true,
 		},
+		role: {
+			type: String,
+			enum: ['resident', 'artisan', 'official', 'admin', 'user'],
+			default: 'resident',
+			index: true,
+		},
 		name: {
 			type: String,
 			required: true,

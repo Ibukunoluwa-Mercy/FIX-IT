@@ -3,6 +3,7 @@ import { NavLink, useNavigate, useLocation, Link } from 'react-router-dom';
 import logoWhite from '../../assets/fixit-white-logo.png';
 import ArtisanReportsPage from './ArtisanReportsPage';
 import ArtisanReviewsPage from './ArtisanReviewsPage';
+import ArtisanHelpCenterPage from './ArtisanHelpCenterPage';
 import './ArtisanDashboard.css';
 
 // The main layout and dashboard component for Artisans
@@ -11,6 +12,7 @@ const ArtisanDashboard = () => {
     const location = useLocation();
     const isReportsRoute = location.pathname.includes('/reports');
     const isReviewsRoute = location.pathname.includes('/reviews');
+    const isHelpRoute = location.pathname.includes('/help-center') || location.pathname.includes('/help');
 
     // State for user data (from localStorage cache first, then updated via /api/auth/me)
     const [user, setUser] = useState(() => {
@@ -295,6 +297,10 @@ const ArtisanDashboard = () => {
                         <i className="fa-solid fa-star nav-icon"></i>
                         <span>Reviews</span>
                     </NavLink>
+                    <NavLink to="/dashboard/artisan/help-center" className={({isActive}) => isActive ? "nav-item active" : "nav-item"} onClick={() => setIsSidebarOpen(false)}>
+                        <i className="fa-solid fa-circle-question nav-icon"></i>
+                        <span>Help Center</span>
+                    </NavLink>
                 </nav>
 
                 <div className="sidebar-bottom">
@@ -306,7 +312,7 @@ const ArtisanDashboard = () => {
                                 <span>Contact our support team.</span>
                             </div>
                         </div>
-                        <button className="help-btn" onClick={() => navigate('/help-center')}>
+                        <button className="help-btn" onClick={() => navigate('/dashboard/artisan/help-center')}>
                             Help Center <i className="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>
@@ -373,6 +379,8 @@ const ArtisanDashboard = () => {
                         <ArtisanReportsPage onReportStatusChanged={fetchDashboardSummary} />
                     ) : isReviewsRoute ? (
                         <ArtisanReviewsPage />
+                    ) : isHelpRoute ? (
+                        <ArtisanHelpCenterPage />
                     ) : (
                         <>
                             {/* Welcome Section */}

@@ -80,6 +80,10 @@ function AppShell() {
           <Route path="/dashboard/resident" element={<ResidentDashboard />} />
           <Route path="/dashboard/official" element={<ResidentDashboard />} />
           <Route path="/dashboard/artisan/settings" element={<ArtisanSettingsPage />} />
+          <Route path="/dashboard/artisan/reviews" element={<ArtisanDashboard />} />
+          <Route path="/dashboard/artisan/reports" element={<ArtisanDashboard />} />
+          <Route path="/dashboard/artisan/help-center" element={<ArtisanDashboard />} />
+          <Route path="/dashboard/artisan" element={<ArtisanDashboard />} />
           <Route path="/dashboard/artisan/*" element={<ArtisanDashboard />} />
           <Route path="/my-reports" element={<MyReports />} />
           <Route path="/my-reports/:id" element={<MyReports />} />
