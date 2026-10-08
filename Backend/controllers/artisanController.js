@@ -573,6 +573,123 @@ const resolveReport = (req, res) => {
 	return updateReportStatus(req, res);
 };
 
+/**
+ * getArtisanReviews
+ * -----------------
+ * GET /api/artisans/reviews
+ * Returns all reviews submitted by residents for the authenticated artisan.
+ * Supports both the Review collection and embedded Report.review data.
+ */
+const getArtisanReviews = (req, res) => {
+	const userId = req.user?._id || req.user?.id;
+	if (!userId) {
+		return res.status(401).json({ error: 'Authentication required' });
+	}
+
+	const Review = require('../models/Review');
+
+	// Query Review collection for this artisan, populate resident and report
+	Review.find({ artisanId: userId })
+		.populate('residentId', 'name fullName avatarUrl profilePhoto email')
+		.populate('reportId', 'title category reportId location images imageUrl status')
+		.sort({ createdAt: -1 })
+		.lean()
+		.then((reviews) => {
+			if (reviews && reviews.length > 0) {
+				const formattedReviews = reviews.map((rev) => {
+					const resident = rev.residentId || {};
+					const report = rev.reportId || {};
+					return {
+						id: String(rev._id),
+						_id: rev._id,
+						rating: rev.rating,
+						comment: rev.comment || '',
+						createdAt: rev.createdAt,
+						resident: {
+							id: resident._id ? String(resident._id) : null,
+							name: resident.name || resident.fullName || 'Resident',
+							avatarUrl: resident.avatarUrl || resident.profilePhoto || '',
+						},
+						report: {
+							id: report._id ? String(report._id) : null,
+							reportId: report.reportId || `#CF-${String(report._id || '').slice(-6).toUpperCase()}`,
+							title: report.title || report.category || 'Service Request',
+							category: report.category || 'General',
+							location: report.location?.addressText || report.location?.address || 'Community Area',
+						},
+					};
+				});
+
+				const totalReviews = formattedReviews.length;
+				const avgRating = totalReviews > 0
+					? Number((formattedReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1))
+					: 0;
+
+				return res.status(200).json({
+					success: true,
+					reviews: formattedReviews,
+					stats: {
+						totalReviews,
+						avgRating,
+					},
+				});
+			}
+
+			// Fallback: Check Reports collection where review.rating exists and assignedArtisan matches
+			return Report.find({
+				$or: [{ assignedArtisan: userId }, { assignedArtisanId: userId }],
+				'review.rating': { $exists: true, $ne: null },
+			})
+				.populate('user', 'name fullName avatarUrl profilePhoto')
+				.populate('createdBy', 'name fullName avatarUrl profilePhoto')
+				.populate('review.reviewedBy', 'name fullName avatarUrl profilePhoto')
+				.sort({ 'review.reviewedAt': -1, updatedAt: -1 })
+				.lean()
+				.then((reportsWithReview) => {
+					const formattedReviews = reportsWithReview.map((rep) => {
+						const revUser = rep.review?.reviewedBy || rep.user || rep.createdBy || {};
+						return {
+							id: String(rep._id),
+							_id: rep._id,
+							rating: rep.review?.rating || 5,
+							comment: rep.review?.comment || '',
+							createdAt: rep.review?.reviewedAt || rep.updatedAt,
+							resident: {
+								id: revUser._id ? String(revUser._id) : null,
+								name: revUser.name || revUser.fullName || 'Resident',
+								avatarUrl: revUser.avatarUrl || revUser.profilePhoto || '',
+							},
+							report: {
+								id: String(rep._id),
+								reportId: rep.reportId || `#CF-${String(rep._id).slice(-6).toUpperCase()}`,
+								title: rep.title || rep.category || 'Service Request',
+								category: rep.category || 'General',
+								location: rep.location?.addressText || rep.location?.address || 'Community Area',
+							},
+						};
+					});
+
+					const totalReviews = formattedReviews.length;
+					const avgRating = totalReviews > 0
+						? Number((formattedReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1))
+						: 0;
+
+					return res.status(200).json({
+						success: true,
+						reviews: formattedReviews,
+						stats: {
+							totalReviews,
+							avgRating,
+						},
+					});
+				});
+		})
+		.catch((err) => {
+			console.error('getArtisanReviews failed:', err);
+			return res.status(500).json({ error: 'Unable to load reviews' });
+		});
+};
+
 // Dev-only debug endpoint to inspect database collections and document counts
 const getDebugCounts = (req, res) => {
 	const db = mongoose.connection.db;
@@ -610,4 +727,5 @@ module.exports = {
 	applyForReport,
 	updateReportStatus,
 	resolveReport,
+	getArtisanReviews,
 };

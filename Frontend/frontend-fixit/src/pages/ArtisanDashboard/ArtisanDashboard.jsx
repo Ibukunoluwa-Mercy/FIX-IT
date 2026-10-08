@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate, useLocation, Link } from 'react-router-dom';
 import logoWhite from '../../assets/fixit-white-logo.png';
 import ArtisanReportsPage from './ArtisanReportsPage';
+import ArtisanReviewsPage from './ArtisanReviewsPage';
 import './ArtisanDashboard.css';
 
 // The main layout and dashboard component for Artisans
@@ -9,6 +10,7 @@ const ArtisanDashboard = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const isReportsRoute = location.pathname.includes('/reports');
+    const isReviewsRoute = location.pathname.includes('/reviews');
 
     // State for user data (from localStorage cache first, then updated via /api/auth/me)
     const [user, setUser] = useState(() => {
@@ -369,6 +371,8 @@ const ArtisanDashboard = () => {
                 <div className="artisan-content">
                     {isReportsRoute ? (
                         <ArtisanReportsPage onReportStatusChanged={fetchDashboardSummary} />
+                    ) : isReviewsRoute ? (
+                        <ArtisanReviewsPage />
                     ) : (
                         <>
                             {/* Welcome Section */}
@@ -420,7 +424,12 @@ const ArtisanDashboard = () => {
                         </div>
 
                         {/* Reviews Card */}
-                        <div className="stat-card reviews-card">
+                        <div
+                            className="stat-card reviews-card"
+                            onClick={() => navigate('/dashboard/artisan/reviews')}
+                            style={{ cursor: 'pointer' }}
+                            title="Click to view all resident reviews"
+                        >
                             <div className="stat-icon-wrapper">
                                 <i className="fa-solid fa-star stat-icon"></i>
                             </div>
