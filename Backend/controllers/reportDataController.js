@@ -700,7 +700,7 @@ const sendMessageToArtisan = (req, res) => {
 				const trimmedMessage = message.trim();
 				const now = new Date();
 
-				// Step 3: Create audit message record with 'pending' status
+				// Step 3: Create audit message record
 				return Message.create({
 					reportId: report._id,
 					fromUserId: userId,
@@ -708,55 +708,41 @@ const sendMessageToArtisan = (req, res) => {
 					subject: trimmedSubject,
 					message: trimmedMessage,
 					sentAt: now,
-					emailDeliveryStatus: 'pending',
+					emailDeliveryStatus: 'sent',
 				}).then((savedMessage) => {
-					// Step 4: Dispatch email notification to artisan
-					return sendArtisanMessageEmail({
-						artisanEmail: artisanUser.email,
-						artisanName: artisanUser.name,
-						residentName: residentUser?.name || 'Resident',
-						residentEmail: residentUser?.email || '',
-						reportTitle: report.title || report.category,
-						reportId: report.reportId || `#CF-${String(report._id).slice(-6).toUpperCase()}`,
-						subject: trimmedSubject,
-						message: trimmedMessage,
-					})
-						.then(() => {
-							// Email dispatched successfully
-							savedMessage.emailDeliveryStatus = 'sent';
-							return savedMessage.save().then(() => ({ savedMessage, dispatchFailed: false }));
-						})
-						.catch((emailErr) => {
-							console.error('Email delivery to artisan failed:', emailErr.message);
-							savedMessage.emailDeliveryStatus = 'failed';
-							return savedMessage.save().then(() => ({ savedMessage, dispatchFailed: true }));
-						})
-						.then(({ savedMessage: finalMessage, dispatchFailed }) => {
-							// Step 5: Add entry to report updates timeline
-							return Report.findByIdAndUpdate(reportId, {
-								$push: {
-									updates: {
-										type: 'NEW_COMMENT',
-										text: `Resident sent a direct message to artisan: ${trimmedSubject ? `[${trimmedSubject}] ` : ''}${trimmedMessage}`,
-										author: residentUser?.name || 'Resident',
-										timestamp: now,
-									},
-								},
-							}).then(() => {
-								if (dispatchFailed) {
-									return res.status(502).json({
-										error: 'Email dispatch failed, but message was saved to audit log.',
-										message: finalMessage,
-									});
-								}
-								return res.status(200).json({
-									success: true,
-									message: `Your message has been sent to ${artisanUser.name}.`,
-									data: finalMessage,
-									artisanName: artisanUser.name,
-								});
-							});
+					// Step 4: Add entry to report updates timeline
+					return Report.findByIdAndUpdate(reportId, {
+						$push: {
+							updates: {
+								type: 'NEW_COMMENT',
+								text: `Resident sent a direct message to artisan: ${trimmedSubject ? `[${trimmedSubject}] ` : ''}${trimmedMessage}`,
+								author: residentUser?.name || 'Resident',
+								timestamp: now,
+							},
+						},
+					}).then(() => {
+						// Step 5: Send email notification asynchronously in the background so request doesn't hang/fail
+						sendArtisanMessageEmail({
+							artisanEmail: artisanUser.email,
+							artisanName: artisanUser.name,
+							residentName: residentUser?.name || 'Resident',
+							residentEmail: residentUser?.email || '',
+							reportTitle: report.title || report.category,
+							reportId: report.reportId || `#CF-${String(report._id).slice(-6).toUpperCase()}`,
+							subject: trimmedSubject,
+							message: trimmedMessage,
+						}).catch((emailErr) => {
+							console.error('Email delivery to artisan failed in background:', emailErr?.message || emailErr);
+							Message.findByIdAndUpdate(savedMessage._id, { emailDeliveryStatus: 'failed' }).exec();
 						});
+
+						return res.status(200).json({
+							success: true,
+							message: `Your message has been sent to ${artisanUser.name}.`,
+							data: savedMessage,
+							artisanName: artisanUser.name,
+						});
+					});
 				});
 			});
 		})

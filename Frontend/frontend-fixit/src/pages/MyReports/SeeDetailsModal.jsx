@@ -26,9 +26,10 @@ const SeeDetailsModal = ({ report, onClose, onRefresh }) => {
         }
 
         setSendingMessage(true);
+        const reportId = report.id || report._id;
         try {
             const response = await axios.post(
-                `${API_URL}/api/reports/${report.id}/message-artisan`,
+                `${API_URL}/api/reports/${reportId}/message-artisan`,
                 {
                     subject: messageSubject,
                     message: messageBody,
@@ -44,7 +45,7 @@ const SeeDetailsModal = ({ report, onClose, onRefresh }) => {
             setMessageBody('');
             if (onRefresh) onRefresh();
         } catch (error) {
-            toast.error(error.response?.data?.error || 'Failed to send message to artisan.');
+            toast.error(error.response?.data?.error || error.response?.data?.message || 'Failed to send message to artisan.');
         } finally {
             setSendingMessage(false);
         }
