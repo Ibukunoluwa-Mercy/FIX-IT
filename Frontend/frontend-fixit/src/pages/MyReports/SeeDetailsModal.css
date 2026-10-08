@@ -151,20 +151,28 @@
 
 .artisan-contact-details {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px 20px;
+    width: 100%;
 }
 
 .contact-detail-item {
     display: flex;
     align-items: flex-start;
     gap: 10px;
+    min-width: 0;
+}
+
+.contact-detail-item > div {
+    min-width: 0;
+    flex: 1;
 }
 
 .contact-detail-item i {
     font-size: 16px;
     color: #94a3b8;
     margin-top: 3px;
+    flex-shrink: 0;
 }
 
 .contact-detail-item small {
@@ -176,8 +184,12 @@
 }
 
 .contact-detail-item strong {
+    display: block;
     font-size: 13.5px;
     color: #1e293b;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+    white-space: normal;
 }
 
 .relay-secure-tag {

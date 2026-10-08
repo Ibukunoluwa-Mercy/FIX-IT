@@ -380,8 +380,10 @@ const sendArtisanMessageEmail = ({ artisanEmail, artisanName, residentName, resi
 	const safeSubject = escapeHtml(subject || `New message regarding job: ${reportTitle || 'Community Report'}`);
 	const safeMessage = escapeHtml(message || '').replace(/\n/g, '<br/>');
 
+	console.log(`[EmailService] Attempting to send artisan message email to: "${artisanEmail}" (subject: "${safeSubject}")`);
+
 	return transporter.sendMail({
-		from: `"Fixit Community" <${process.env.SMTP_USER}>`,
+		from: process.env.MAIL_FROM ? `"Fixit Community" <${process.env.MAIL_FROM}>` : `"Fixit Community" <${process.env.SMTP_USER}>`,
 		to: artisanEmail,
 		replyTo: residentEmail || process.env.SMTP_USER,
 		subject: `Fixit: ${subject || `Message from ${residentName || 'Resident'} regarding "${reportTitle || 'Report'}"`}`,
@@ -413,7 +415,13 @@ const sendArtisanMessageEmail = ({ artisanEmail, artisanName, residentName, resi
   </table>
 </body>
 </html>`
-	}).then(() => ({ sent: true, skipped: false }));
+	}).then((info) => {
+		console.log(`[EmailService] Email successfully delivered to ${artisanEmail}. MessageId: ${info?.messageId}`);
+		return { sent: true, skipped: false, messageId: info?.messageId };
+	}).catch((err) => {
+		console.error(`[EmailService] Failed to send email to ${artisanEmail}:`, err?.message || err);
+		throw err;
+	});
 };
 
 /**

@@ -11,12 +11,18 @@ const SeeDetailsModal = ({ report, onClose, onRefresh }) => {
     const [messageSubject, setMessageSubject] = useState('');
     const [messageBody, setMessageBody] = useState('');
     const [sendingMessage, setSendingMessage] = useState(false);
+    const [avatarImgError, setAvatarImgError] = useState(false);
 
     if (!report) return null;
 
     const token = localStorage.getItem('fixitToken');
     const artisan = report.assignedArtisan;
     const isJobDone = report.status === 'resolved' || report.status === 'closed';
+
+    const rawAvatar = artisan?.avatarUrl || artisan?.photoUrl;
+    const artisanAvatarSource = !avatarImgError && rawAvatar
+        ? (rawAvatar.startsWith('/uploads/') ? `${API_URL}${rawAvatar}` : rawAvatar)
+        : null;
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
@@ -87,8 +93,13 @@ const SeeDetailsModal = ({ report, onClose, onRefresh }) => {
                                     <div className="artisan-header-row">
                                         <div className="artisan-left-meta">
                                             <div className="artisan-avatar-wrapper">
-                                                {artisan.avatarUrl ? (
-                                                    <img src={artisan.avatarUrl} alt={artisan.name} className="artisan-avatar-img" />
+                                                {artisanAvatarSource ? (
+                                                    <img
+                                                        src={artisanAvatarSource}
+                                                        alt={artisan.name}
+                                                        className="artisan-avatar-img"
+                                                        onError={() => setAvatarImgError(true)}
+                                                    />
                                                 ) : (
                                                     <div className="artisan-avatar-fallback">
                                                         <i className="fa-solid fa-user-gear"></i>
