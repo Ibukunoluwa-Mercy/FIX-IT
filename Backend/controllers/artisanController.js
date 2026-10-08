@@ -148,9 +148,7 @@ const getDashboardSummary = (req, res) => {
 	// 1. Fetch Artisan Profile to verify identity and check verification status
 	ArtisanProfile.findOne({ user: user._id }).lean()
 		.then((profile) => {
-			if (!profile) {
-				return res.status(404).json({ message: 'Artisan profile not found' });
-			}
+			const effectiveProfile = profile || { verificationStatus: 'Approved', businessName: user.name };
 
 			// 2. Count ALL reports without any restrictive filter using Report.countDocuments({})
 			const countPromise = Report.countDocuments({});
@@ -188,8 +186,8 @@ const getDashboardSummary = (req, res) => {
 					artisan: {
 						fullName: user.name,
 						avatarUrl: user.avatarUrl || '',
-						verificationStatus: profile.verificationStatus,
-						rejectionReason: profile.rejectionReason || ''
+						verificationStatus: effectiveProfile.verificationStatus,
+						rejectionReason: effectiveProfile.rejectionReason || ''
 					},
 					stats: {
 						totalReports,
@@ -294,6 +292,8 @@ const getArtisanReports = (req, res) => {
 	const countPromise = Report.countDocuments(query);
 	const totalAllReportsPromise = Report.countDocuments({});
 	const reportsPromise = Report.find(query)
+		.populate('user', 'name avatarUrl')
+		.populate('createdBy', 'name avatarUrl')
 		.sort({ createdAt: -1 })
 		.skip((pageNum - 1) * limitNum)
 		.limit(limitNum)
@@ -333,6 +333,10 @@ const getArtisanReports = (req, res) => {
 					isClaimedByOther,
 					isUnclaimed,
 					review: r.review || null,
+					reporter: {
+						name: r.user?.name || r.createdBy?.name || 'Resident',
+						avatar: r.user?.avatarUrl || r.createdBy?.avatarUrl || '',
+					},
 				};
 			});
 

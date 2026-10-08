@@ -295,8 +295,38 @@
 /* Action Area */
 .card-action-bar {
     display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.card-action-buttons {
+    display: flex;
     align-items: center;
-    min-height: 40px;
+    gap: 10px;
+    width: 100%;
+}
+
+.btn-view-report-details {
+    padding: 9px 14px;
+    background: #f8fafc;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.btn-view-report-details:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #94a3b8;
+    transform: translateY(-1px);
 }
 
 .btn-apply-claim {
@@ -444,4 +474,108 @@
     background: #ffffff;
     border: none;
     overflow: hidden;
+}
+
+/* Artisan Report Full Details Modal Styles */
+.artisan-details-modal {
+    max-height: 90vh;
+}
+
+.artisan-details-photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+}
+
+.artisan-details-photo-card {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 110px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    display: block;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.artisan-details-photo-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.artisan-details-photo-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.artisan-details-desc-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: #334155;
+    font-size: 14.5px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.artisan-details-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 576px) {
+    .artisan-details-meta-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.details-meta-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+    padding: 10px 14px;
+    border-radius: 8px;
+}
+
+.details-meta-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.details-meta-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.meta-label {
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 2px;
+}
+
+.meta-value {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1e293b;
+    word-break: break-word;
 }

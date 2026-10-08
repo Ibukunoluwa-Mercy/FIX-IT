@@ -19,9 +19,10 @@ const ArtisanReportsPage = ({ onReportStatusChanged }) => {
     const [filter, setFilter] = useState('all'); // all, unclaimed, my_jobs, resolved
     const [actionLoadingId, setActionLoadingId] = useState(null);
 
-    // Confirmation Modals State
+    // Confirmation & Details Modals State
     const [applyModalReport, setApplyModalReport] = useState(null);
     const [resolveModalReport, setResolveModalReport] = useState(null);
+    const [detailsModalReport, setDetailsModalReport] = useState(null);
 
     const token = localStorage.getItem('fixitToken');
 
@@ -294,16 +295,26 @@ const ArtisanReportsPage = ({ onReportStatusChanged }) => {
 
                                 {/* Action Area */}
                                 <div className="card-action-bar">
-                                    {/* 1. Unclaimed: Orange Apply Button */}
+                                    {/* 1. Unclaimed: Details + Apply Button */}
                                     {report.isUnclaimed && (
-                                        <button
-                                            className="btn-apply-claim"
-                                            onClick={() => setApplyModalReport(report)}
-                                            disabled={isActionDisabled}
-                                        >
-                                            <i className="fa-solid fa-hand-holding-hand me-1"></i>
-                                            {isActionDisabled ? 'Claiming...' : 'Apply'}
-                                        </button>
+                                        <div className="card-action-buttons">
+                                            <button
+                                                type="button"
+                                                className="btn-view-report-details"
+                                                onClick={() => setDetailsModalReport(report)}
+                                                title="View complete report details and photos"
+                                            >
+                                                <i className="fa-regular fa-eye me-1"></i> Details
+                                            </button>
+                                            <button
+                                                className="btn-apply-claim flex-grow-1"
+                                                onClick={() => setApplyModalReport(report)}
+                                                disabled={isActionDisabled}
+                                            >
+                                                <i className="fa-solid fa-hand-holding-hand me-1"></i>
+                                                {isActionDisabled ? 'Claiming...' : 'Apply'}
+                                            </button>
+                                        </div>
                                     )}
 
                                     {/* 2. Claimed By Current Artisan */}
@@ -318,14 +329,24 @@ const ArtisanReportsPage = ({ onReportStatusChanged }) => {
                                                     <i className="fa-solid fa-wrench"></i> In Progress
                                                 </span>
                                             </div>
-                                            <button
-                                                className="btn-mark-resolved"
-                                                onClick={() => setResolveModalReport(report)}
-                                                disabled={isActionDisabled}
-                                            >
-                                                <i className="fa-solid fa-circle-check me-1"></i>
-                                                {isActionDisabled ? 'Updating...' : 'Mark as Resolved'}
-                                            </button>
+                                            <div className="card-action-buttons">
+                                                <button
+                                                    type="button"
+                                                    className="btn-view-report-details"
+                                                    onClick={() => setDetailsModalReport(report)}
+                                                    title="View complete report details and photos"
+                                                >
+                                                    <i className="fa-regular fa-eye me-1"></i> Details
+                                                </button>
+                                                <button
+                                                    className="btn-mark-resolved flex-grow-1"
+                                                    onClick={() => setResolveModalReport(report)}
+                                                    disabled={isActionDisabled}
+                                                >
+                                                    <i className="fa-solid fa-circle-check me-1"></i>
+                                                    {isActionDisabled ? 'Updating...' : 'Mark as Resolved'}
+                                                </button>
+                                            </div>
                                         </div>
                                     )}
 
@@ -341,16 +362,36 @@ const ArtisanReportsPage = ({ onReportStatusChanged }) => {
                                                     <i className="fa-solid fa-circle-check"></i> {report.status === 'closed' ? 'Closed' : 'Resolved'}
                                                 </span>
                                             </div>
-                                            <span className="status-completed-notice">
-                                                <i className="fa-solid fa-lock me-1"></i> Job Completed
-                                            </span>
+                                            <div className="d-flex align-items-center justify-content-between gap-2">
+                                                <button
+                                                    type="button"
+                                                    className="btn-view-report-details flex-grow-1"
+                                                    onClick={() => setDetailsModalReport(report)}
+                                                    title="View complete report details"
+                                                >
+                                                    <i className="fa-regular fa-eye me-1"></i> View Details
+                                                </button>
+                                                <span className="status-completed-notice">
+                                                    <i className="fa-solid fa-lock me-1"></i> Completed
+                                                </span>
+                                            </div>
                                         </div>
                                     )}
 
-                                    {/* 4. Claimed by another artisan: Greyed out notice */}
+                                    {/* 4. Claimed by another artisan: Details button + Greyed out notice */}
                                     {report.isClaimedByOther && (
-                                        <div className="claimed-by-other-badge" title="This report was claimed by another artisan">
-                                            <i className="fa-solid fa-user-lock me-1"></i> Assigned to another artisan
+                                        <div className="d-flex align-items-center gap-2">
+                                            <button
+                                                type="button"
+                                                className="btn-view-report-details"
+                                                onClick={() => setDetailsModalReport(report)}
+                                                title="View report details"
+                                            >
+                                                <i className="fa-regular fa-eye me-1"></i> Details
+                                            </button>
+                                            <div className="claimed-by-other-badge flex-grow-1" title="This report was claimed by another artisan">
+                                                <i className="fa-solid fa-user-lock me-1"></i> Assigned to another
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -464,6 +505,210 @@ const ArtisanReportsPage = ({ onReportStatusChanged }) => {
                                 >
                                     {actionLoadingId === resolveModalReport.id ? 'Updating...' : 'Confirm Resolved'}
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* REPORT FULL DETAILS MODAL */}
+            {detailsModalReport && (
+                <div
+                    className="modal fade show custom-modal-backdrop"
+                    tabIndex="-1"
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    role="dialog"
+                    aria-modal="true"
+                    onClick={() => setDetailsModalReport(null)}
+                >
+                    <div
+                        className="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+                        style={{ maxWidth: '640px', width: '92%', maxHeight: '90vh' }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="modal-content custom-modal-box artisan-details-modal">
+                            <div className="modal-header border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+                                <div className="d-flex align-items-center gap-2">
+                                    <span className="category-pill">{detailsModalReport.category}</span>
+                                    <span className="report-code">{detailsModalReport.reportId}</span>
+                                </div>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    aria-label="Close"
+                                    onClick={() => setDetailsModalReport(null)}
+                                ></button>
+                            </div>
+
+                            <div className="modal-body px-4 py-3" style={{ maxHeight: '72vh', overflowY: 'auto' }}>
+                                {/* Header / Title & Status */}
+                                <div className="d-flex justify-content-between align-items-start gap-3 mb-3">
+                                    <h4 className="fw-bold text-dark m-0" style={{ fontSize: '1.25rem', lineHeight: '1.35' }}>
+                                        {detailsModalReport.title}
+                                    </h4>
+                                    <div>
+                                        {detailsModalReport.status === 'reported' && (
+                                            <span className="badge-custom badge-orange">
+                                                <i className="fa-solid fa-circle-dot me-1"></i> Reported
+                                            </span>
+                                        )}
+                                        {detailsModalReport.status === 'in_progress' && (
+                                            <span className="badge-custom badge-blue">
+                                                <i className="fa-solid fa-spinner fa-spin me-1"></i> In Progress
+                                            </span>
+                                        )}
+                                        {detailsModalReport.status === 'resolved' && (
+                                            <span className="badge-custom badge-green">
+                                                <i className="fa-solid fa-circle-check me-1"></i> Resolved
+                                            </span>
+                                        )}
+                                        {detailsModalReport.status === 'closed' && (
+                                            <span className="badge-custom badge-gray">
+                                                <i className="fa-solid fa-lock me-1"></i> Closed
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Attached Photos Gallery */}
+                                {detailsModalReport.images && detailsModalReport.images.length > 0 && (
+                                    <div className="mb-4">
+                                        <label className="text-muted fw-semibold small text-uppercase letter-spacing-1 mb-2 d-block">
+                                            <i className="fa-regular fa-image me-1"></i> Attached Photos ({detailsModalReport.images.length})
+                                        </label>
+                                        <div className="artisan-details-photos-grid">
+                                            {detailsModalReport.images.map((imgSrc, idx) => {
+                                                const resolvedSrc = imgSrc.startsWith('http')
+                                                    ? imgSrc
+                                                    : `${API_URL}${imgSrc.startsWith('/') ? '' : '/'}${imgSrc}`;
+                                                return (
+                                                    <a
+                                                        key={idx}
+                                                        href={resolvedSrc}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="artisan-details-photo-card"
+                                                        title="Click to view full photo"
+                                                    >
+                                                        <img
+                                                            src={resolvedSrc}
+                                                            alt={`Report attachment ${idx + 1}`}
+                                                            onError={(e) => {
+                                                                e.target.style.display = 'none';
+                                                            }}
+                                                        />
+                                                    </a>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Full Description */}
+                                <div className="mb-4">
+                                    <label className="text-muted fw-semibold small text-uppercase letter-spacing-1 mb-2 d-block">
+                                        <i className="fa-solid fa-align-left me-1"></i> Description
+                                    </label>
+                                    <div className="artisan-details-desc-box">
+                                        {detailsModalReport.description || 'No detailed description provided by the resident.'}
+                                    </div>
+                                </div>
+
+                                {/* Details Meta Grid */}
+                                <div className="artisan-details-meta-grid mb-3">
+                                    <div className="details-meta-item">
+                                        <div className="details-meta-icon"><i className="fa-solid fa-location-dot"></i></div>
+                                        <div className="details-meta-content">
+                                            <span className="meta-label">Location</span>
+                                            <span className="meta-value">{detailsModalReport.location?.address || 'Community Area'}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="details-meta-item">
+                                        <div className="details-meta-icon"><i className="fa-regular fa-calendar"></i></div>
+                                        <div className="details-meta-content">
+                                            <span className="meta-label">Reported On</span>
+                                            <span className="meta-value">{formatDate(detailsModalReport.reportedAt)}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="details-meta-item">
+                                        <div className="details-meta-icon"><i className="fa-solid fa-gauge-high"></i></div>
+                                        <div className="details-meta-content">
+                                            <span className="meta-label">Severity</span>
+                                            <span className="meta-value">{detailsModalReport.severity || 'Medium'}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="details-meta-item">
+                                        <div className="details-meta-icon"><i className="fa-solid fa-user"></i></div>
+                                        <div className="details-meta-content">
+                                            <span className="meta-label">Reported By</span>
+                                            <span className="meta-value">{detailsModalReport.reporter?.name || 'Resident'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Review / Feedback if completed */}
+                                {detailsModalReport.review && (
+                                    <div className="alert alert-success mt-3 mb-0 p-3" style={{ borderRadius: '10px' }}>
+                                        <div className="d-flex align-items-center gap-2 mb-1">
+                                            <strong style={{ fontSize: '14px' }}>Resident Review:</strong>
+                                            <span className="text-warning">
+                                                {'★'.repeat(detailsModalReport.review.rating || 5)}
+                                                {'☆'.repeat(5 - (detailsModalReport.review.rating || 5))}
+                                            </span>
+                                        </div>
+                                        {detailsModalReport.review.comment && (
+                                            <p className="mb-0 text-muted fst-italic" style={{ fontSize: '13.5px' }}>
+                                                &ldquo;{detailsModalReport.review.comment}&rdquo;
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="modal-footer border-top py-2 px-4 d-flex justify-content-between align-items-center">
+                                <button
+                                    type="button"
+                                    className="btn btn-light px-3 py-2"
+                                    style={{ fontSize: '13.5px', borderRadius: '8px' }}
+                                    onClick={() => setDetailsModalReport(null)}
+                                >
+                                    Close
+                                </button>
+
+                                <div className="d-flex gap-2">
+                                    {detailsModalReport.isUnclaimed && (
+                                        <button
+                                            type="button"
+                                            className="btn btn-warning px-4 py-2 text-dark fw-semibold"
+                                            style={{ fontSize: '13.5px', borderRadius: '8px', backgroundColor: '#f59e0b', borderColor: '#f59e0b' }}
+                                            onClick={() => {
+                                                const rep = detailsModalReport;
+                                                setDetailsModalReport(null);
+                                                setApplyModalReport(rep);
+                                            }}
+                                        >
+                                            <i className="fa-solid fa-hand-holding-hand me-1"></i> Apply for Job
+                                        </button>
+                                    )}
+
+                                    {detailsModalReport.isClaimedByMe && detailsModalReport.status === 'in_progress' && (
+                                        <button
+                                            type="button"
+                                            className="btn btn-success px-4 py-2 text-white fw-semibold"
+                                            style={{ fontSize: '13.5px', borderRadius: '8px', backgroundColor: '#10b981', borderColor: '#10b981' }}
+                                            onClick={() => {
+                                                const rep = detailsModalReport;
+                                                setDetailsModalReport(null);
+                                                setResolveModalReport(rep);
+                                            }}
+                                        >
+                                            <i className="fa-solid fa-circle-check me-1"></i> Mark as Resolved
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

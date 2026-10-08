@@ -10,8 +10,15 @@ const ArtisanDashboard = () => {
     const location = useLocation();
     const isReportsRoute = location.pathname.includes('/reports');
 
-    // State for user data (from /api/auth/me)
-    const [user, setUser] = useState(null);
+    // State for user data (from localStorage cache first, then updated via /api/auth/me)
+    const [user, setUser] = useState(() => {
+        try {
+            const cached = localStorage.getItem('fixitUser');
+            return cached ? JSON.parse(cached) : null;
+        } catch {
+            return null;
+        }
+    });
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
@@ -53,14 +60,24 @@ const ArtisanDashboard = () => {
             const fetchedUser = data.user || data;
             
             // Check if role is artisan, otherwise redirect
-            if (fetchedUser.role !== 'artisan') {
+            const userRole = String(fetchedUser.role || '').toLowerCase();
+            if (userRole !== 'artisan') {
                 navigate('/dashboard'); // Let the main app router handle standard dashboards based on role
                 return;
             }
             setUser(fetchedUser);
+            try {
+                localStorage.setItem('fixitUser', JSON.stringify(fetchedUser));
+            } catch {
+                // Ignore storage write issues
+            }
         })
         .catch((err) => {
             console.error('Auth error:', err);
+            // If token is missing, redirect to login
+            if (!localStorage.getItem('fixitToken')) {
+                navigate('/login');
+            }
         });
     }, [navigate, API_URL]);
 

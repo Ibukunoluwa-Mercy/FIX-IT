@@ -324,8 +324,19 @@ const login = (req, res) => {
 };
 
 const getMe = (req, res) => {
-	
-	return res.status(200).json({ user: req.user.toSafeProfile() });
+	const userProfile = req.user.toSafeProfile();
+	if (req.user.role === 'artisan') {
+		const ArtisanProfile = require('../models/ArtisanProfile');
+		return ArtisanProfile.findOne({ user: req.user._id })
+			.lean()
+			.then((profile) => {
+				userProfile.verificationStatus = profile?.verificationStatus || 'Approved';
+				userProfile.businessName = profile?.businessName || '';
+				return res.status(200).json({ user: userProfile });
+			})
+			.catch(() => res.status(200).json({ user: userProfile }));
+	}
+	return res.status(200).json({ user: userProfile });
 };
 
 const logout = (req, res) => {

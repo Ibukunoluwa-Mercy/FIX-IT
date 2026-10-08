@@ -158,6 +158,7 @@ userSchema.methods.toSafeProfile = function toSafeProfile() {
 		phone: this.phone,
 		location: this.location,
 		role: this.role,
+		avatarUrl: this.avatarUrl,
 		emailVerified: this.emailVerified,
 		createdAt: this.createdAt,
 	};
